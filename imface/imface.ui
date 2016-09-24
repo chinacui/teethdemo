@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>ImfaceWindow</class>
+  <widget class="QWidget" name="ImfaceWindow">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1200</width>
+        <height>900</height>
+      </rect>
+    </property>
+    <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+      </sizepolicy>
+    </property>
+    <property name="minimumSize">
+      <size>
+        <width>1200</width>
+        <height>900</height>
+      </size>
+    </property>
+    <property name="maximumSize">
+      <size>
+        <width>1200</width>
+        <height>900</height>
+      </size>
+    </property>
+    <property name="windowTitle">
+      <string>ModelFitting</string>
+    </property>
+    <widget class="QGroupBox" name="view_region">
+      <property name="geometry">
+        <rect>
+          <x>340</x>
+          <y>20</y>
+          <width>850</width>
+          <height>850</height>
+        </rect>
+      </property>
+      <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+        <size>
+          <width>850</width>
+          <height>850</height>
+        </size>
+      </property>
+      <property name="maximumSize">
+        <size>
+          <width>850</width>
+          <height>850</height>
+        </size>
+      </property>
+      <property name="title">
+        <string>Model Viewer</string>
+      </property>
+      <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+          <widget class="CModelViewer" name="model_viewer" native="true">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>800</width>
+                <height>800</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>800</width>
+                <height>800</height>
+              </size>
+            </property>
+          </widget>
+        </item>
+      </layout>
+    </widget>
+    <widget class="QGroupBox" name="control_input_panel">
+      <property name="geometry">
+        <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>300</width>
+          <height>250</height>
+        </rect>
+      </property>
+      <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+        <size>
+          <width>300</width>
+          <height>250</height>
+        </size>
+      </property>
+      <property name="maximumSize">
+        <size>
+          <width>300</width>
+          <height>250</height>
+        </size>
+      </property>
+      <property name="title">
+        <string>Input Panel</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+          <widget class="QPushButton" name="button_load_image">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="text">
+              <string>Load Image</string>
+            </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="button_load_model">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="text">
+              <string>Load Model</string>
+            </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="button_generate_test">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="text">
+              <string>Generate Test</string>
+            </property>
+          </widget>
+        </item>
+      </layout>
+    </widget>
+    <widget class="QGroupBox" name="control_model_fitting">
+      <property name="geometry">
+        <rect>
+          <x>20</x>
+          <y>290</y>
+          <width>300</width>
+          <height>580</height>
+        </rect>
+      </property>
+      <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+        <size>
+          <width>300</width>
+          <height>580</height>
+        </size>
+      </property>
+      <property name="maximumSize">
+        <size>
+          <width>300</width>
+          <height>580</height>
+        </size>
+      </property>
+      <property name="title">
+        <string> Fitting Panel</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+          <widget class="QPushButton" name="button_begin_fitting">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="text">
+              <string>Begin to Fit</string>
+            </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QTextBrowser" name="text_info">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>400</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>400</height>
+              </size>
+            </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="button_save_fitting_result">
+            <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="maximumSize">
+              <size>
+                <width>250</width>
+                <height>40</height>
+              </size>
+            </property>
+            <property name="text">
+              <string>Save Result</string>
+            </property>
+          </widget>
+        </item>
+      </layout>
+    </widget>
+  </widget>
+  <layoutdefault spacing="6" margin="11"/>
+  <customwidgets>
+    <customwidget>
+      <class>CImface</class>
+      <extends>QWidget</extends>
+      <header>cmodelviewer.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources/>
+  <connections/>
+</ui>
