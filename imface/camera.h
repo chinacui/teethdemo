@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #ifndef CCAMERA_H
 #define CCAMERA_H
 #include"QGLViewer/camera.h"

@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #ifndef UI_CONTEXT_H
 #define UI_CONTEXT_H
 class CScene;

@@ -15,4 +15,5 @@ void main(void)
 	fn = mat3(mv_matrix)* a_normal;
 	gl_Position = mvp_matrix * a_pos;
 	v_texcoords=a_texcoords;
+	v_color=a_color;
  }

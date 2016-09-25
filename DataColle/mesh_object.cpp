@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #include"mesh_object.h"
 int CMeshObject::GetId()
 {

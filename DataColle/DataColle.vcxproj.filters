@@ -33,6 +33,12 @@
     <ClInclude Include="data_io.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="base_object.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="config_reader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="data_pool.cpp">
@@ -45,6 +51,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="data_io.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base_object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="config_reader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

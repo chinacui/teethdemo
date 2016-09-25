@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #ifndef SCENE_H
 #define SCENE_H
 #include<iostream>
@@ -12,15 +13,15 @@
 class CScene
 {
 protected:
-	std::map<int, CSceneMeshObject*> scene_mesh_;
+	std::map<int, CSceneMeshObject*> scene_mesh_;//mesh object in scene
 
-	
+	void UpdateScene();//called each frame, check and update the scene when datapool is updated
 public:
 	CScene();
 	~CScene();
 
 
-	void UpdateScene();
-	void Render( CCamera camera);
+	
+	void Render( CCamera camera);//render the scene
 };
 #endif

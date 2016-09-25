@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #include"data_pool.h"
 
 std::map<int, std::shared_ptr<CMeshObject>> DataPool::mesh_object_pool_;

@@ -27,13 +27,13 @@ void main(void)
 	L = normalize(L);
 	V = normalize(V);
 	vec4 vcolor;
-	vcolor=vec4(vcolor.x,vcolor.y,vcolor.z,1.0);
+	vcolor=vec4(v_color.x,v_color.y,v_color.z,1.0);
 	vec3 R = reflect(-L, N);
 	vec4 diffuse;
 	diffuse = max(abs(dot(N,L)),0) * u_light_diff*vcolor;
 	vec4 specular = pow(max(dot(R,V), 0.0), u_spec_power) * u_light_spec;
 		
 	gl_FragColor = vcolor*u_light_amb + diffuse + specular;
-		
+	gl_FragColor=vcolor;
 	
 }

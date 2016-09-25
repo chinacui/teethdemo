@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #ifndef DATA_IO_H
 #define DATA_IO_H
 #include"prereq.h"

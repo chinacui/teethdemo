@@ -1,3 +1,4 @@
+// Copyright 2016_9_25 by ChenNenglun
 #include "cmodelviewer.h"
 
 #include <cmath>
@@ -26,15 +27,22 @@ void CModelViewer::initializeGL()
 	initializeOpenGLFunctions();
 
 
-	setBackgroundColor(::Qt::white);
 
-	std::cerr << "initializeGL" << std::endl;
 }
 CModelViewer::CModelViewer(QWidget *parent)
 {
 	background_color_ = Eigen::Vector3d(1, 1, 1);
 	scene_ = NULL;
 	
+	
+}
+void CModelViewer::InitCamera()
+{
+	
+	camera_.setAspectRatio(1);
+	camera_.setPosition(qglviewer::Vec(0, 0, 1));
+	camera_.lookAt(qglviewer::Vec(0, 0, 0));
+
 }
 void CModelViewer::SetScene(CScene* scene)
 {
@@ -46,5 +54,10 @@ CModelViewer::~CModelViewer()
 }
 void CModelViewer::init()
 {
-
+	InitCamera();
+	setCamera(&camera_);
+	setMouseBinding(Qt::ControlModifier, Qt::LeftButton, QGLViewer::CAMERA, QGLViewer::ROTATE);
+	setMouseBinding(Qt::ControlModifier, Qt::RightButton, QGLViewer::CAMERA, QGLViewer::TRANSLATE);
+	setMouseBinding(Qt::ControlModifier, Qt::MidButton, QGLViewer::CAMERA, QGLViewer::ZOOM);
+	setWheelBinding(Qt::ControlModifier, QGLViewer::CAMERA, QGLViewer::ZOOM);
 }

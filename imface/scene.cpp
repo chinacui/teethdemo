@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #include"scene.h"
 #include<fstream>
 CScene::CScene()

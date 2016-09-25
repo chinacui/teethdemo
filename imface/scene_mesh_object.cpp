@@ -1,15 +1,18 @@
+// Copyright 2016_9 by ChenNenglun
 #include"scene_mesh_object.h"
 #include<fstream>
 void CSceneMeshObject::SetGLBufferDataFromElements()
 {
 	rendering_program_.bind();
-	if (vertex_pos_buffer_.isCreated())
-		vertex_pos_buffer_.destroy();
-	vertex_pos_buffer_.create();
+	
 	if (vao_.isCreated())
 		vao_.destroy();
 	vao_.create();
 	vao_.bind();
+
+	if (vertex_pos_buffer_.isCreated())
+		vertex_pos_buffer_.destroy();
+	vertex_pos_buffer_.create();
 	vertex_pos_buffer_.bind();
 	vertex_pos_buffer_.allocate(vertexs_pos_.data(), static_cast<int>(vertexs_pos_.size() * sizeof(float)));
 	auto v_pos_loc = rendering_program_.attributeLocation("a_pos");
@@ -20,6 +23,7 @@ void CSceneMeshObject::SetGLBufferDataFromElements()
 	if (vertex_normals_buffer_.isCreated())
 		vertex_normals_buffer_.destroy();
 	vertex_normals_buffer_.create();
+	vertex_normals_buffer_.bind();
 	vertex_pos_buffer_.allocate(vertex_normals_.data(), static_cast<int>(vertex_normals_.size() * sizeof(float)));
 	auto v_normal_loc = rendering_program_.attributeLocation("a_normal");
 	rendering_program_.enableAttributeArray(v_normal_loc);
@@ -30,7 +34,8 @@ void CSceneMeshObject::SetGLBufferDataFromElements()
 	if (vertex_colors_buffer_.isCreated())
 		vertex_colors_buffer_.destroy();
 	vertex_colors_buffer_.create();
-	vertex_pos_buffer_.allocate(vertex_colors_.data(), static_cast<int>(vertex_colors_.size() * sizeof(float)));
+	vertex_colors_buffer_.bind();
+	vertex_colors_buffer_.allocate(vertex_colors_.data(), static_cast<int>(vertex_colors_.size() * sizeof(float)));
 	auto v_color_loc = rendering_program_.attributeLocation("a_color");
 	rendering_program_.enableAttributeArray(v_color_loc);
 	rendering_program_.setAttributeBuffer(v_color_loc, GL_FLOAT, 0, 3);
@@ -56,44 +61,54 @@ void CSceneMeshObject::Render( CCamera camera)
 	rendering_program_.bind();
 	
 	//compute attributes
-		QMatrix4x4 mvpMatrix;
-		QMatrix4x4 mvMatrix, frame_matrix, scale_matrix;
-		double mat[16];
-		camera.getModelViewProjectionMatrix(mat);
+	QMatrix4x4 mvpMatrix;
+	QMatrix4x4 mvMatrix, frame_matrix, scale_matrix;
+	double mat[16];
+	camera.getModelViewProjectionMatrix(mat);
 
-
-		for (int i = 0; i < 16; i++)
+	auto local_mat= mesh_.lock().get()->GetMatrix();
+	QMatrix4x4 q_local_mat;
+	for (int i = 0; i < local_mat.rows(); i++)
+	{
+		for (int j = 0; j < local_mat.cols(); j++)
 		{
-			mvpMatrix.data()[i] = (float)mat[i];
+			q_local_mat(i, j) = local_mat(i, j);
 		}
-		camera.getModelViewMatrix(mat);
-		for (int i = 0; i < 16; i++)
-		{
-			mvMatrix.data()[i] = (float)mat[i];
-		}
+	}
+	for (int i = 0; i < 16; i++)
+	{
+		mvpMatrix.data()[i] = (float)mat[i];
+	}
+	mvpMatrix = mvpMatrix*q_local_mat;
+	camera.getModelViewMatrix(mat);
+	for (int i = 0; i < 16; i++)
+	{
+		mvMatrix.data()[i] = (float)mat[i];
+	}
+	mvMatrix = mvMatrix*q_local_mat;
+	
 
+	QVector4D	ambient(0.1,0.1,0.1,1.0);
+	QVector4D	diffuse(1, 1, 1, 1);
+	QVector4D	specular(0,0,0,1);
+	QVector4D	light_pos(0.0f, 0.0f, 100.0f, 1.0f);
 
-		QVector4D	ambient(0.1,0.1,0.1,1.0);
-		QVector4D	diffuse(1, 1, 1, 1);
-		QVector4D	specular(0,0,0,1);
-		QVector4D	light_pos(0.0f, 0.0f, 100.0f, 1.0f);
-
-		int mvp_mat_loc = rendering_program_.uniformLocation("mvp_matrix");
-		int mv_mat_loc  = rendering_program_.uniformLocation("mv_matrix");
-		int light_pos_loc = rendering_program_.uniformLocation("u_light_pos");
-		int light_diff_loc = rendering_program_.uniformLocation("u_light_diff");
-		int light_spec_loc = rendering_program_.uniformLocation("u_light_spec");
-		int light_amb_loc = rendering_program_.uniformLocation("u_light_amb");
-		int spec_power_loc = rendering_program_.uniformLocation("u_spec_power");
+	int mvp_mat_loc = rendering_program_.uniformLocation("mvp_matrix");
+	int mv_mat_loc  = rendering_program_.uniformLocation("mv_matrix");
+	int light_pos_loc = rendering_program_.uniformLocation("u_light_pos");
+	int light_diff_loc = rendering_program_.uniformLocation("u_light_diff");
+	int light_spec_loc = rendering_program_.uniformLocation("u_light_spec");
+	int light_amb_loc = rendering_program_.uniformLocation("u_light_amb");
+	int spec_power_loc = rendering_program_.uniformLocation("u_spec_power");
 
 
 		
-		rendering_program_.setUniformValue(light_pos_loc, light_pos);
-		rendering_program_.setUniformValue(mvp_mat_loc, mvpMatrix);
-		rendering_program_.setUniformValue(mv_mat_loc, mvMatrix);
-		rendering_program_.setUniformValue(light_diff_loc, diffuse);
-		rendering_program_.setUniformValue(light_spec_loc, specular);
-		rendering_program_.setUniformValue(light_amb_loc, ambient);
+	rendering_program_.setUniformValue(light_pos_loc, light_pos);
+	rendering_program_.setUniformValue(mvp_mat_loc, mvpMatrix);
+	rendering_program_.setUniformValue(mv_mat_loc, mvMatrix);
+	rendering_program_.setUniformValue(light_diff_loc, diffuse);
+	rendering_program_.setUniformValue(light_spec_loc, specular);
+	rendering_program_.setUniformValue(light_amb_loc, ambient);
 
 
 	
@@ -162,7 +177,7 @@ void CSceneMeshObject::ComputeRenderingElements()
 			for (int k = 0; k < 3; k++)
 			{
 				vertexs_pos_.push_back(mesh->vertexs_(vid, k));
-				vertex_normals_.push_back(fnormal(k));
+				vertex_normals_.push_back(fnormal(k));		
 				vertex_colors_.push_back(mesh->vertex_colors_(vid, k));
 			}
 		}

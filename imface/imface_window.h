@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #ifndef IMFACE_WINDOW_H
 #define IMFACE_WINDOW_H
 
@@ -18,7 +19,7 @@ protected:
 protected:
 	 
 private slots:
-	void OnClick_Button_Load_Data();
+	void OnClickButtonLoadData();
 };
 
 #endif // MY3DMM_H

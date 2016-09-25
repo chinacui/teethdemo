@@ -1,3 +1,4 @@
+// Copyright 2016_9 by ChenNenglun
 #include"data_io.h"
 #include<vector>
 int CDataIO::ReadPlyVertexCallback(p_ply_argument argument)
@@ -122,9 +123,9 @@ bool CDataIO::ReadPly(std::string fname, CMeshObject & res_mesh_obj)
 	res_mesh_obj.vertex_colors_.resize(vcolorlist.size(), 3);
 	for (int i = 0; i < vcolorlist.size(); i++)
 	{
-		res_mesh_obj.vertex_colors_(i, 0) = vcolorlist[i](0);
-		res_mesh_obj.vertex_colors_(i, 1) = vcolorlist[i](1);
-		res_mesh_obj.vertex_colors_(i, 2) = vcolorlist[i](2);
+		res_mesh_obj.vertex_colors_(i, 0) = vcolorlist[i](0)/255.0;
+		res_mesh_obj.vertex_colors_(i, 1) = vcolorlist[i](1)/255.0;
+		res_mesh_obj.vertex_colors_(i, 2) = vcolorlist[i](2)/255.0;
 	}
 	res_mesh_obj.faces_.resize(facelist.size(), 3);
 	for (int i = 0; i < facelist.size(); i++)
