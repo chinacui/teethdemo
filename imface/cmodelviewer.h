@@ -3,16 +3,25 @@
 
 #include <QGLViewer/qglviewer.h>
 #include <vector>
-
-
-class CModelViewer : public QGLViewer
+#include"../DataColle/mesh_object.h"
+#include <QOpenGLFunctions_2_1>
+#include"camera.h"
+#include"scene.h"
+class CModelViewer : public QGLViewer, public QOpenGLFunctions_2_1
 {
+protected:
+	CCamera camera_;
+	CScene *scene_;
+	Eigen::Vector3d background_color_;
 protected:
 	virtual void draw();
 	virtual void init();
+	virtual void initializeGL();
 public:
 	CModelViewer(QWidget *parent);
 	~CModelViewer();
+	void SetScene(CScene* scene);
+	void SetBackgroundColor(Eigen::Vector3d background_color);
 
 
 };

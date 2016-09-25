@@ -144,12 +144,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="data_io.h" />
     <ClInclude Include="data_pool.h" />
     <ClInclude Include="mesh_object.h" />
     <ClInclude Include="prereq.h" />
+    <ClInclude Include="rply.h" />
+    <ClInclude Include="rplyfile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="data_io.cpp" />
     <ClCompile Include="data_pool.cpp" />
+    <ClCompile Include="mesh_object.cpp" />
+    <ClCompile Include="rply.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

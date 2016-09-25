@@ -24,9 +24,27 @@
     <ClInclude Include="mesh_object.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="rply.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="rplyfile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="data_io.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="data_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh_object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rply.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="data_io.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

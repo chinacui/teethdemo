@@ -12,6 +12,7 @@ public:
 	CImfaceWindow(QWidget *parent = 0);
 	~CImfaceWindow();
 
+
 protected:
 	Ui::ImfaceWindow ui;
 protected:

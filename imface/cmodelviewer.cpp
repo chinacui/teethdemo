@@ -8,30 +8,37 @@ using namespace std;
 
 void CModelViewer::draw()
 {
-	const float nbSteps = 200.0;
+	glClearColor(background_color_(0), background_color_(1), background_color_(2),1);
+	if(scene_!=NULL)
+	scene_->Render( camera_);
 
-	glBegin(GL_QUAD_STRIP);
-	for (int i = 0; i<nbSteps; ++i)
-	{
-		const float ratio = i / nbSteps;
-		const float angle = 21.0*ratio;
-		const float c = cos(angle);
-		const float s = sin(angle);
-		const float r1 = 1.0 - 0.8f*ratio;
-		const float r2 = 0.8f - 0.8f*ratio;
-		const float alt = ratio - 0.5f;
-		const float nor = 0.5f;
-		const float up = sqrt(1.0 - nor*nor);
-		glColor3f(1.0 - ratio, 0.2f, ratio);
-		glNormal3f(nor*c, up, nor*s);
-		glVertex3f(r1*c, alt, r1*s);
-		glVertex3f(r2*c, alt + 0.05f, r2*s);
-	}
-	glEnd();
+}
+void CModelViewer::SetBackgroundColor(Eigen::Vector3d background_color)
+{
+	background_color_ = background_color;
+}
+void CModelViewer::initializeGL()
+{
+
+
+	QGLViewer::initializeGL();
+
+	initializeOpenGLFunctions();
+
+
+	setBackgroundColor(::Qt::white);
+
+	std::cerr << "initializeGL" << std::endl;
 }
 CModelViewer::CModelViewer(QWidget *parent)
 {
+	background_color_ = Eigen::Vector3d(1, 1, 1);
+	scene_ = NULL;
 	
+}
+void CModelViewer::SetScene(CScene* scene)
+{
+	scene_ = scene;
 }
 CModelViewer::~CModelViewer()
 {
@@ -39,7 +46,5 @@ CModelViewer::~CModelViewer()
 }
 void CModelViewer::init()
 {
-	int a = 0;
-	int b = 1;
 
 }
