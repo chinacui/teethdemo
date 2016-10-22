@@ -1,63 +1,90 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data_pool.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="prereq.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mesh_object.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rply.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rplyfile.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="data_io.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="base_object.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="config_reader.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cgal_igl_converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polyhedron_type_fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polyhedron_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aux_geo_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="geo_primit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="custom_openmesh_type.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="data_pool.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mesh_object.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rply.c">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="data_io.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="base_object.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="config_reader.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cgal_igl_converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aux_geo_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="geo_primit.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

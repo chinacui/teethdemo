@@ -17,9 +17,10 @@ public:
 protected:
 	Ui::ImfaceWindow ui;
 protected:
-	 
+	
+	 void UpdateRequest();
 private slots:
-	void OnClickButtonLoadData();
+	//void OnClickButtonLoadData();
 };
 
 #endif // MY3DMM_H

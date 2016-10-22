@@ -159,30 +159,47 @@ void CSceneMeshObject::ComputeRenderingElements()
 	vertex_colors_.resize(0);
 		
 	CMeshObject* mesh = mesh_.lock().get();
-		
+	auto openmesh = mesh->GetMesh();
 	
-	for(int i = 0; i < mesh->faces_.rows(); i++)
-	{
-		Eigen::Vector3i v_face( mesh->faces_(i,0), mesh->faces_(i, 1), mesh->faces_(i, 2));
-		Eigen::Vector3d va(mesh->vertexs_(v_face(0),0), mesh->vertexs_(v_face(0), 1), mesh->vertexs_(v_face(0), 2));
-		Eigen::Vector3d vb(mesh->vertexs_(v_face(1),0), mesh->vertexs_(v_face(1), 1), mesh->vertexs_(v_face(1), 2));
-		Eigen::Vector3d vc(mesh->vertexs_(v_face(2),0), mesh->vertexs_(v_face(2), 1), mesh->vertexs_(v_face(2), 2));
-		Eigen::Vector3d ab = vb - va;
-		Eigen::Vector3d ac = vc - va;
-		Eigen::Vector3d fnormal = ab.cross(ac);
 
-		for (int j = 0; j < mesh->faces_.cols(); j++)
+	COpenMeshT::FaceIter fiter = openmesh.faces_begin();
+
+	for (int i = 0; i < openmesh.n_faces(); i++, fiter++)
+	{
+		COpenMeshT::FaceHalfedgeIter fhi = openmesh.fh_begin(*fiter), fhend = openmesh.fh_end(*fiter);
+		std::vector<COMTraits::Point> vs;
+
+		while (fhi != fhend)
 		{
-			int vid = mesh->faces_(i, j);
+			int vid=openmesh.to_vertex_handle(*fhi).idx();
+			auto vpos =openmesh.points()[vid];
+			
+			auto vcolor = openmesh.vertex_colors()[openmesh.to_vertex_handle(fhi).idx()];
+
+			for (int j = 0; j < 3; j++)
+			{
+				vertexs_pos_.push_back(vpos[j]);
+				vertex_colors_.push_back(vcolor[j]);
+			}
+			vs.push_back(vpos);
+			fhi++;
+		}
+	
+
+
+		auto  ab = vs[1] - vs[0];
+		auto ac = vs[2] - vs[0];
+		auto fnormal = ab%ac;
+		for (int j = 0; j < 3; j++)
+		{
 			for (int k = 0; k < 3; k++)
 			{
-				vertexs_pos_.push_back(mesh->vertexs_(vid, k));
-				vertex_normals_.push_back(fnormal(k));		
-				vertex_colors_.push_back(mesh->vertex_colors_(vid, k));
+				vertex_normals_.push_back(fnormal[k]);
 			}
 		}
-			
 	}
+
+	
 
 	
 

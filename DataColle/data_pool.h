@@ -14,6 +14,7 @@ protected:
 	static int mesh_object_max_id_;// current max id in mesh_object_pool_
 public:
 	static int AddMeshObject(CMeshObject *mesh);// add CMeshObject to mesh_object_pool_
+	static CMeshObject * GetMeshObject(int id);
 	static void Init();//initialization
 	static std::map<int, std::shared_ptr<CMeshObject>>& GetMeshObjectPool();
 };

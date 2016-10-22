@@ -100,11 +100,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ALGCOLLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ALGCOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;INCLUDE_TEMPLATES;CGAL_USE_MPFR;CGAL_USE_GMP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_DIR)\auxiliary\gmp\include;$(TCGAL_BUILD)/include;$(TOPENCV_DIR)\include;$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(TCGAL_DIR)/lib;$(TCGAL_BUILD)/lib;$(BOOST_LIBRARYDIR);$(TCGAL_DIR)\auxiliary\gmp\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPENCV_DIR)\x64\vc14\lib;$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CGAL_Core-vc140-mt-gd-4.9.lib;CGAL_ImageIO-vc140-mt-gd-4.9.lib;CGAL_Qt5-vc140-mt-gd-4.9.lib;CGAL-vc140-mt-gd-4.9.lib;libgmp-10.lib;DataColle.lib;libmpfr-4.lib;opencv_core310d.lib;opencv_highgui310d.lib;opencv_imgcodecs310d.lib;opencv_imgproc310d.lib;opencv_xphoto310d.lib;opencv_photo310d.lib;OpenMeshToolsd.lib;OpenMeshCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,16 +135,32 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ALGCOLLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ALGCOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;INCLUDE_TEMPLATES;CGAL_USE_MPFR;CGAL_USE_GMP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_DIR)\auxiliary\gmp\include;$(TCGAL_BUILD)/include;$(TOPENCV_DIR)\include;$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(TCGAL_DIR)/lib;$(TCGAL_BUILD)/lib;$(BOOST_LIBRARYDIR);$(TCGAL_DIR)\auxiliary\gmp\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPENCV_DIR)\x64\vc14\lib;$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CGAL_ImageIO-vc140-mt-4.9.lib;CGAL_Qt5-vc140-mt-4.9.lib;CGAL-vc140-mt-4.9.lib;CGAL_Core-vc140-mt-4.9.lib;libgmp-10.lib;libmpfr-4.lib;DataColle.lib;opencv_core310.lib;opencv_imgcodecs310.lib;opencv_highgui310.lib;opencv_imgproc310.lib;opencv_xphoto310.lib;opencv_photo310.lib;OpenMeshTools.lib;OpenMeshCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="geo_alg.h" />
+    <ClInclude Include="geo_base_alg.h" />
+    <ClInclude Include="morphlogic_operation.h" />
+    <ClInclude Include="morph_skel_dental_mesh_seg.h" />
+    <ClInclude Include="numerical_base_alg.h" />
+    <ClInclude Include="prereq.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="geo_alg.cpp" />
+    <ClCompile Include="geo_base_alg.cpp" />
+    <ClCompile Include="morphlogic_operation.cpp" />
+    <ClCompile Include="morph_skel_dental_mesh_seg.cpp" />
+    <ClCompile Include="numerical_base_alg.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

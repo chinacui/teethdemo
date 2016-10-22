@@ -100,12 +100,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;_SCL_SECURE_NO_WARNINGS;OM_STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_BUILD)/include;$(TCGAL_DIR)\auxiliary\gmp\include;$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(TCGAL_BUILD)/lib;$(TCGAL_DIR)\auxiliary\gmp\lib;$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CGAL_Core-vc140-mt-gd-4.9.lib;CGAL_ImageIO-vc140-mt-gd-4.9.lib;CGAL_Qt5-vc140-mt-gd-4.9.lib;CGAL-vc140-mt-gd-4.9.lib;libgmp-10.lib;libmpfr-4.lib;OpenMeshCored.lib;OpenMeshToolsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,31 +135,42 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;_SCL_SECURE_NO_WARNINGS;OM_STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)/include;$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_DIR)\auxiliary\gmp\include;$(TCGAL_BUILD)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(TCGAL_BUILD)/lib;$(TCGAL_DIR)\auxiliary\gmp\lib;$(TOPEN_MESH_DIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CGAL_Core-vc140-mt-4.9.lib;CGAL_ImageIO-vc140-mt-4.9.lib;CGAL_Qt5-vc140-mt-4.9.lib;CGAL-vc140-mt-4.9.lib;libgmp-10.lib;libmpfr-4.lib;OpenMeshCore.lib;OpenMeshTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="aux_geo_utils.h" />
     <ClInclude Include="base_object.h" />
+    <ClInclude Include="cgal_igl_converter.h" />
     <ClInclude Include="config_reader.h" />
+    <ClInclude Include="custom_openmesh_type.h" />
     <ClInclude Include="data_io.h" />
     <ClInclude Include="data_pool.h" />
+    <ClInclude Include="geo_primit.h" />
     <ClInclude Include="mesh_object.h" />
+    <ClInclude Include="Polyhedron_type.h" />
+    <ClInclude Include="Polyhedron_type_fwd.h" />
     <ClInclude Include="prereq.h" />
     <ClInclude Include="rply.h" />
     <ClInclude Include="rplyfile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aux_geo_utils.cpp" />
     <ClCompile Include="base_object.cpp" />
+    <ClCompile Include="cgal_igl_converter.cpp" />
     <ClCompile Include="config_reader.cpp" />
     <ClCompile Include="data_io.cpp" />
     <ClCompile Include="data_pool.cpp" />
+    <ClCompile Include="geo_primit.cpp" />
     <ClCompile Include="mesh_object.cpp" />
     <ClCompile Include="rply.c" />
   </ItemGroup>

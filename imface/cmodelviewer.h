@@ -21,6 +21,7 @@ protected:
 	virtual void initializeGL();//called automatically when the opengl context is initialized
 
 	void InitCamera();// init parameters of the camera_
+	void keyPressEvent(QKeyEvent *e);
 public:
 	CModelViewer(QWidget *parent);
 	~CModelViewer();

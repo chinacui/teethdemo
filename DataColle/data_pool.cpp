@@ -7,6 +7,18 @@ std::map<int, std::shared_ptr<CMeshObject>>& DataPool::GetMeshObjectPool()
 {
 	return mesh_object_pool_;
 }
+CMeshObject * DataPool::GetMeshObject(int id)
+{
+	auto iter=mesh_object_pool_.find(id);
+	if (iter == mesh_object_pool_.end())
+	{
+		return NULL;
+	}
+	else
+	{
+		return iter->second.get();
+	}
+}
 int DataPool::AddMeshObject(CMeshObject *mesh)
 {
 

@@ -5,16 +5,16 @@
 #include<iostream>
 #include<string>
 #include"mesh_object.h"
-#include"rply.h"
-#include"rplyfile.h"
+
 class DATACOLLE_CLASS CDataIO
 {
 protected:
-	static int ReadPlyVertexCallback(p_ply_argument argument);
-	static int ReadPlyRgbCallback(p_ply_argument argument);
-	static int ReadPlyFaceCallback(p_ply_argument argument);
+
 public:
-	static bool ReadPly(std::string fname, CMeshObject & res_mesh_obj);
+	
+
+	static bool ReadMesh(std::string fname, CMeshObject & res_mesh_obj);
+	static bool WriteMesh(std::string fname, CMeshObject & res_mesh_obj);
 	
 };
 #endif

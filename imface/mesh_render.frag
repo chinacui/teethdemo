@@ -33,7 +33,7 @@ void main(void)
 	diffuse = max(abs(dot(N,L)),0) * u_light_diff*vcolor;
 	vec4 specular = pow(max(dot(R,V), 0.0), u_spec_power) * u_light_spec;
 		
-	gl_FragColor = vcolor*u_light_amb + diffuse + specular;
-	gl_FragColor=vcolor;
+	gl_FragColor = vcolor*u_light_amb + diffuse ;//+ specular;
+	//gl_FragColor=vec4(0.0,1.0,0.0,1.0);
 	
 }
