@@ -22,3 +22,10 @@ CCamera & CCamera::operator=(const CCamera &b)
 
 	return *this;
 }
+void CCamera::ConvertClickToLine(QPoint p, OpenMesh::Vec3d &orig, OpenMesh::Vec3d &dir)
+{
+	qglviewer::Vec torig, tdir;
+	convertClickToLine(p, torig, tdir);
+	orig = OpenMesh::Vec3d(torig.x, torig.y, torig.z);
+	dir = OpenMesh::Vec3d(tdir.x, tdir.y, tdir.z);
+}

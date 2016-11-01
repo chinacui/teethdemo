@@ -11,7 +11,27 @@ CImfaceWindow::CImfaceWindow(QWidget *parent)
 	/*connect(ui.button_load_model, SIGNAL(clicked()), this, SLOT(OnClickButtonLoadData()));*/
 
 	ui.model_viewer->SetScene(CUIContext::GetScene());
+
+	this->connect(ui.base_cut_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustBaseCuttingPlane(int)));
+	this->connect(ui.region_threshold_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustSmallRegionThreshold(int)));
 	
+}
+void CImfaceWindow::AdjustSmallRegionThreshold(int v)
+{
+	double percent = v / 100.0*0.4;
+	CUIContext::msdm_seg_->AdjustSmallRegionThreshold(percent);
+	CUIContext::msdm_seg_->RemoveSmallIsolateTeethRegion();
+}
+void CImfaceWindow::AdjustBaseCuttingPlane(int v)
+{
+	
+	static int prev = 0;
+	double l = (v - prev) / 100.0;
+	prev = v;
+	CUIContext::msdm_seg_->AdjustBaseCuttingPlane(l/5.0);
+	
+	this->UpdateRequest();
+
 }
 //void CImfaceWindow::OnClickButtonLoadData()
 //{

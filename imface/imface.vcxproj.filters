@@ -68,6 +68,30 @@
     <ClCompile Include="ui_context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_action_base.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_action_base.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="action_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hot_key_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="edit_feature_edge_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="texture_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="harmonic_field_segmentation_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_curve_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="imface.qrc">
@@ -80,6 +104,9 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="cmodelviewer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="action_base.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -99,12 +126,36 @@
     <ClInclude Include="ui_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="action_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hot_key_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="edit_feature_edge_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="texture_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="harmonic_field_segmentation_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_curve_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="mesh_render.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="mesh_render.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="curve_render.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="curve_render.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

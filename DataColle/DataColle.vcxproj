@@ -101,7 +101,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;_SCL_SECURE_NO_WARNINGS;OM_STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_BUILD)/include;$(TCGAL_DIR)\auxiliary\gmp\include;$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_BUILD)/include;$(TCGAL_DIR)\auxiliary\gmp\include;$(TOPEN_MESH_DIR)\include;$(TLIBIGL_DIR)\external\embree\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,7 +137,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DATACOLLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;CGAL_EIGEN3_ENABLED;USE_FORWARD_DECL;_USE_MATH_DEFINES;_SCL_SECURE_NO_WARNINGS;OM_STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)/include;$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_DIR)\auxiliary\gmp\include;$(TCGAL_BUILD)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)/include;$(TEIGEN_ROOT);$(TLIBIGL_INCLDUEDIR);$(TCGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(TCGAL_DIR)\auxiliary\gmp\include;$(TCGAL_BUILD)/include;$(TLIBIGL_DIR)\external\embree\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,10 +150,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="aabb_type.h" />
     <ClInclude Include="aux_geo_utils.h" />
     <ClInclude Include="base_object.h" />
     <ClInclude Include="cgal_igl_converter.h" />
     <ClInclude Include="config_reader.h" />
+    <ClInclude Include="curve_object.h" />
     <ClInclude Include="custom_openmesh_type.h" />
     <ClInclude Include="data_io.h" />
     <ClInclude Include="data_pool.h" />
@@ -168,6 +172,7 @@
     <ClCompile Include="base_object.cpp" />
     <ClCompile Include="cgal_igl_converter.cpp" />
     <ClCompile Include="config_reader.cpp" />
+    <ClCompile Include="curve_object.cpp" />
     <ClCompile Include="data_io.cpp" />
     <ClCompile Include="data_pool.cpp" />
     <ClCompile Include="geo_primit.cpp" />

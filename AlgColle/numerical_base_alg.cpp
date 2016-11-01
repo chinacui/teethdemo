@@ -8,6 +8,64 @@ double CNumericalBaseAlg::ComputeGaussian(double mean, double std_devi, double x
 	double res=(1.0 / (std_devi*std::sqrt(2*PI)))*std::exp(-std::pow(x-mean,2)/(2*std_devi*std_devi));
 	return res;
 }
+void CNumericalBaseAlg::NormalizeScalarField(Eigen::VectorXd &data)
+{
+	double mmin = std::numeric_limits<double>::max();
+	double mmax = std::numeric_limits<double>::min();
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (mmin > data(i))
+			mmin = data(i);
+		if (mmax < data(i))
+			mmax = data(i);
+	}
+	double len = mmax - mmin;
+	
+	if (len != 0)
+	{
+		int data_size = data.size();
+		for (int i = 0; i<data_size;i++)
+		{
+			data(i) = (data(i) - mmin) / len;
+		}
+	}
+
+}
+void CNumericalBaseAlg::ComputeHistgram(Eigen::VectorXd &data, double bin_size, std::vector<std::pair<double, double>>&bins, std::vector<std::vector<int>>&bin_eles)
+{
+	double mmin = std::numeric_limits<double>::max();
+	double mmax = std::numeric_limits<double>::min();
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (data(i) > mmax)
+			mmax = data(i);
+		if (data(i) < mmin)
+			mmin = data(i);
+	}
+	bins.clear();
+	bin_eles.clear();
+	int bin_num = std::ceil((mmax - mmin) / bin_size);
+
+	if ((mmax - mmin) / bin_size == bin_num*1.0)
+		bin_num++;
+	
+	for (int i = 0; i < bin_num; i++)
+	{
+		double s, t;
+		s = i*bin_size+mmin;
+		t = (i + 1)*bin_size+mmin;
+		bins.push_back(std::make_pair(s, t));
+		bin_eles.push_back(std::vector<int>());
+		bin_eles.back().clear();
+	}
+	
+	for (int i = 0; i < data.size(); i++)
+	{
+		int bin_id=(data(i)- mmin) / bin_size;
+		bin_eles[bin_id].push_back(i);
+
+	}
+}
 double CNumericalBaseAlg::ComputeStdDeviation(std::vector<double>&values)
 {
 	double mean = ComputeMean(values);

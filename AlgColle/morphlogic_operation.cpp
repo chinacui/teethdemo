@@ -115,10 +115,10 @@ void CMorphlogicOperation::Skeletonization(COpenMeshT& mesh, std::vector<bool>&l
 			labels[vid] = false;
 
 		}
-		else if (mesh.is_boundary(viter))
+		/*else if (mesh.is_boundary(viter))
 		{
 			labels[vid] = true;
-		}
+		}*/
 		else if (IsComplexVertex(mesh, in_labels, viter))
 		{
 			labels[vid] = true;

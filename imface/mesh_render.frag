@@ -9,7 +9,7 @@ uniform highp vec4 u_light_diff;
 uniform highp vec4 u_light_spec;
 uniform highp vec4 u_light_amb;
 uniform float u_spec_power;
-
+uniform int use_texture;
 uniform sampler2D u_sampler_exture;
 varying vec2 v_texcoords;
 
@@ -27,13 +27,16 @@ void main(void)
 	L = normalize(L);
 	V = normalize(V);
 	vec4 vcolor;
-	vcolor=vec4(v_color.x,v_color.y,v_color.z,1.0);
+	if (use_texture == 1)
+		vcolor = texture2D(u_sampler_exture, v_texcoords);
+	else
+		vcolor=vec4(v_color.x,v_color.y,v_color.z,1.0);
 	vec3 R = reflect(-L, N);
 	vec4 diffuse;
 	diffuse = max(abs(dot(N,L)),0) * u_light_diff*vcolor;
 	vec4 specular = pow(max(dot(R,V), 0.0), u_spec_power) * u_light_spec;
 		
 	gl_FragColor = vcolor*u_light_amb + diffuse ;//+ specular;
-	//gl_FragColor=vec4(0.0,1.0,0.0,1.0);
+
 	
 }

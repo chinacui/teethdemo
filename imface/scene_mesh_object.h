@@ -12,7 +12,7 @@
 #include <QGLViewer/qglviewer.h>
 #include <QOpenGLFunctions_2_1>
 #include"camera.h"
-
+#include"qopengltexture.h"
 //wraper of CMeshObject, CSceneMeshObject can be drawed in opengl context
 class CSceneMeshObject :public QOpenGLFunctions_2_1
 {
@@ -21,12 +21,15 @@ protected:
 	std::vector<float> vertexs_pos_;//data of opengl buffer,size:n x 3,n is the vertex number in mesh_
 	std::vector<float> vertex_normals_;//data of opengl buffer,size:n x 3,n is the vertex number in mesh_
 	std::vector<float>vertex_colors_;//data of opengl buffer,size:n x 3,n is the vertex number in mesh_
-
-	mutable QOpenGLBuffer vertex_pos_buffer_,vertex_normals_buffer_,vertex_colors_buffer_;
+	std::vector<float>tex_coords_;
+	bool use_texture_ = false;;
+	QOpenGLTexture* texture_ = NULL;
+	mutable QOpenGLBuffer vertex_pos_buffer_,vertex_normals_buffer_,vertex_colors_buffer_,tex_coords_buffer_;
 	mutable QOpenGLVertexArrayObject vao_;
 	mutable QOpenGLShaderProgram rendering_program_;
 
 protected:
+	
 	void ComputeRenderingElements();
 	void SetGLBufferDataFromElements();
 	void InitShader();

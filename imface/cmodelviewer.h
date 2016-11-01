@@ -8,13 +8,14 @@
 #include <QOpenGLFunctions_2_1>
 #include"camera.h"
 #include"scene.h"
-
+#include"action_manager.h"
 class CModelViewer : public QGLViewer, public QOpenGLFunctions_2_1
 {
 protected:
 	CCamera camera_;
 	CScene *scene_;
 	Eigen::Vector3d background_color_;
+	CActionManager *action_manager_;
 protected:
 	virtual void draw();
 	virtual void init();//called automatically when the viewer is initialized
@@ -22,11 +23,18 @@ protected:
 
 	void InitCamera();// init parameters of the camera_
 	void keyPressEvent(QKeyEvent *e);
+	void keyReleaseEvent(QKeyEvent*e);
+	void mousePressEvent(QMouseEvent *);
+	void mouseMoveEvent(QMouseEvent *);
+	void mouseReleaseEvent(QMouseEvent *);
+	void mouseDoubleClickEvent(QMouseEvent *);
+	void wheelEvent(QWheelEvent *);
 public:
 	CModelViewer(QWidget *parent);
 	~CModelViewer();
 	void SetScene(CScene* scene);
 	void SetBackgroundColor(Eigen::Vector3d background_color);
+	CCamera GetCamera() { return camera_; }
 
 
 };

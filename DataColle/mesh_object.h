@@ -7,29 +7,51 @@
 #include<vector>
 #include<set>
 #include"custom_openmesh_type.h"
+class CXWGeodesic;
+class CAABBTree;
 class DATACOLLE_CLASS CMeshObject:public CBaseObject
 {
 protected:
 	int mesh_id_;// id of mesh object
 	bool is_changed_;//if the geometry of mesh is changed , it should be true, thus the opengl render will re-computeds
-
-
+	double tot_surface_area_;
+	int texture_id_;
+	bool use_texture_;
 
 protected:
 	COpenMeshT mesh_;
+
+
+	CAABBTree* aabb_tree_=NULL;
+	CXWGeodesic *geodesic_model_ = NULL;
+
+
 public:
 
 	int GetId();//get id of mesh object
 	void SetId(int id);//set id of mesh object
 	bool IsChanged();
+	double GetTotSurfaceArea();
 	void SetChanged(bool is_changed=true); //if the geometry of mesh is changed, it should be true, and the opengl render will re - computes
-	
+	void SetAttrChanged(bool is_attrchanged = true);
 	void CopyFrom(CMeshObject& b);
+	bool& UseTexture() { return use_texture_; }
 	COpenMeshT& GetMesh() { return mesh_; }
 
 	CMeshObject();
 	CMeshObject(CMeshObject &b);
 	~CMeshObject();
+
+
+
+	void NormalizeUV();
+	CAABBTree* GetAABBTree() { return aabb_tree_; }
+	void SetAABBTree(CAABBTree* t) { aabb_tree_ = t; }
+
+	CXWGeodesic*GetGeodesicModel() { return geodesic_model_; }
+	void SetGeodesicModel(CXWGeodesic *g) { geodesic_model_ = g; }
+
+	int& TextureId() { return texture_id_; }
 };
 
 

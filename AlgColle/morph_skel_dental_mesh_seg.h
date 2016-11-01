@@ -8,14 +8,16 @@
 
 class ALGCOLLE_CLASS CMorphSkelDentalMeshSeg
 {
-	enum CTag{Gingiva,Teeth,Feature,Non};
+public:
+	enum CTag{Gingiva,Teeth,Feature,Non,Base};
 protected://variables
 	CMeshObject &mesh_obj_;
 	bool verbose_ ;
 	//Eigen::VectorXd vertex_penalty_weight_;
-protected://params
+public://params
 	double curvature_threshold_;
 	double small_region_threshold_;
+	double small_teeth_region_percent_threshold_;
 	Eigen::MatrixXd mean_curvature_vec_;
 	Eigen::VectorXd mean_curvature_values_;
 	CPlane cutting_plane_;
@@ -24,7 +26,9 @@ protected://params
 	std::vector<bool>is_edge_point_;
 	std::vector<double> vertex_penalty_weight_;
 	std::vector<CTag>tags_;
+
 protected://functions
+	void MarkBaseByPlane(CPlane plane, std::vector<COpenMeshT::VertexHandle>&v_bases);
 	void ComputeCuttingPlane();
 	void ComputeMorphSkeleton();
 	void ComputeEdgePointsFromMeanCurvatureThreshold(double thre);
@@ -34,11 +38,22 @@ protected://functions
 	void RemoveSmallFeatureRegions();
 	void TagGingiva();
 	void RemoveInnerTeethRegionInTeeth();
+	void RemoveGingiva2GingivaFeatureEdge();
+	
+	void ResetEdgeVertexMarkFromTags();
+	double ComputeRegionArea(COpenMeshT::VertexHandle vh,CTag *glue_tag_=NULL);
+	void TagRegion(std::vector<CTag>&tags,COpenMeshT::VertexHandle vh, CTag tag, CTag *glue_tag_ = NULL);
+	
 public:
 	CMorphSkelDentalMeshSeg(CMeshObject &mesh_obj);
 	~CMorphSkelDentalMeshSeg();
 
 	void ComputeSegmentation(bool verbus=false);
+	void AdjustBaseCuttingPlane(double l);
+	void AdjustSmallRegionThreshold(double thre);
+	void SetVertexTags(std::vector<COpenMeshT::VertexHandle>&vhs, std::vector<CMorphSkelDentalMeshSeg::CTag>&tags);
+	void SwitchGingivaAndTeeth(COpenMeshT::VertexHandle vh);
+	void RemoveSmallIsolateTeethRegion();
 	////////////////////////////////
 	void TestErode();
 	void TestDilate();

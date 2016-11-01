@@ -43,6 +43,9 @@ public:
 		request_face_status();
 		request_edge_status();
 		request_vertex_status();
+		request_face_normals();
+		request_vertex_normals();
+		
 	}
 };
 

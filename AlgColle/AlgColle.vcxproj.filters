@@ -33,6 +33,9 @@
     <ClInclude Include="morphlogic_operation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="harmonic_field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="geo_alg.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="morphlogic_operation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="harmonic_field.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

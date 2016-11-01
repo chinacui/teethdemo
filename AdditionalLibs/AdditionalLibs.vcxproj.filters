@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\XWGeodesic">
+      <UniqueIdentifier>{45b5947d-94a1-4fa7-a1a4-697dbf46e534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XWGeodesic">
+      <UniqueIdentifier>{adcd8c48-0d40-4818-b4aa-931fb194e860}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="XWGeodesic\Extremity_Point_Utils.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\BaseModel.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\RichModel.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\ModelWrapper.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\Xin_Wang.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\Point3D.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\Parameters.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\ICH_WindowFiltering.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\FacePoint.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\ExactDGPMethod.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\EdgePoint.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\DistanceApproach.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\Chen_Han.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+    <ClInclude Include="prereq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XWGeodesic\xw_geodesic_wrapper.h">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="XWGeodesic\ComputeGeodesics.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\Extremity_Point_Utils.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\BaseModel.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\RichModel.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\ModelWrapper.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\Xin_Wang.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\Point3D.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\ICH_WindowFiltering.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\ExactDGPMethod.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\DistanceApproach.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\Chen_Han.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="XWGeodesic\xw_geodesic_wrapper.cpp">
+      <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

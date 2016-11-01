@@ -21,6 +21,8 @@ protected:
 	 void UpdateRequest();
 private slots:
 	//void OnClickButtonLoadData();
+void AdjustBaseCuttingPlane(int v);
+void AdjustSmallRegionThreshold(int);
 };
 
 #endif // MY3DMM_H

@@ -16,5 +16,10 @@ public:
 	static double ComputeSquaredDistance2Plane(OpenMesh::Vec3d point, CPlane plane);
 	static bool IsOnPositiveSide(OpenMesh::Vec3d point, CPlane plane);
 	static void RemoveNonManifold(COpenMeshT &mesh);
+	static double ComputeVertexArea(COpenMeshT &mesh, COpenMeshT::VertexHandle vh);
+	static double ComputeFaceArea(COpenMeshT&mesh, COpenMeshT::FaceHandle fh);
+	static void NormalizeMeshSize(COpenMeshT &mesh);
+	static OpenMesh::Vec3d ComputeBaryCoordInTriFace(COpenMeshT &mesh,COpenMeshT::FaceHandle fh, OpenMesh::Vec3d v);
+	static OpenMesh::Vec3d ComputePointFromBaryCoord(COpenMeshT &mesh, COpenMeshT::FaceHandle fh, OpenMesh::Vec3d barycoord);
 };
 #endif

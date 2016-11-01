@@ -7,7 +7,7 @@
 #include"../DataColle/mesh_object.h"
 class CMorphlogicOperation
 {
-protected:
+public:
 	enum CMOVertexTag{Complex,Disk,Center,NonFeature};
 	static bool IsComplexVertex(COpenMeshT & mesh, std::vector<bool>&label, COpenMeshT::VertexHandle vh);
 	static bool IsCenterVertex(COpenMeshT & mesh, std::vector<bool>&label, COpenMeshT::VertexHandle vh);

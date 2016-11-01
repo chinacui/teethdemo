@@ -1,6 +1,8 @@
 // Copyright 2016_9 by ChenNenglun
 #include"scene_mesh_object.h"
 #include<fstream>
+#include"ui_context.h"
+#include"texture_wrapper.h"
 void CSceneMeshObject::SetGLBufferDataFromElements()
 {
 	rendering_program_.bind();
@@ -20,15 +22,26 @@ void CSceneMeshObject::SetGLBufferDataFromElements()
 	rendering_program_.setAttributeBuffer(v_pos_loc, GL_FLOAT, 0, 3);
 	vertex_pos_buffer_.release();
 
+
 	if (vertex_normals_buffer_.isCreated())
 		vertex_normals_buffer_.destroy();
 	vertex_normals_buffer_.create();
 	vertex_normals_buffer_.bind();
-	vertex_pos_buffer_.allocate(vertex_normals_.data(), static_cast<int>(vertex_normals_.size() * sizeof(float)));
+	vertex_normals_buffer_.allocate(vertex_normals_.data(), static_cast<int>(vertex_normals_.size() * sizeof(float)));
 	auto v_normal_loc = rendering_program_.attributeLocation("a_normal");
 	rendering_program_.enableAttributeArray(v_normal_loc);
 	rendering_program_.setAttributeBuffer(v_normal_loc, GL_FLOAT, 0, 3);
 	vertex_normals_buffer_.release();
+
+	if (tex_coords_buffer_.isCreated())
+		tex_coords_buffer_.destroy();
+	tex_coords_buffer_.create();
+	tex_coords_buffer_.bind();
+	tex_coords_buffer_.allocate(tex_coords_.data(), static_cast<int>(tex_coords_.size() * sizeof(float)));
+	auto tex_coords_loc = rendering_program_.attributeLocation("a_texcoords");
+	rendering_program_.enableAttributeArray(tex_coords_loc);
+	rendering_program_.setAttributeBuffer(tex_coords_loc, GL_FLOAT, 0, 2);
+	tex_coords_buffer_.release();
 	
 
 	if (vertex_colors_buffer_.isCreated())
@@ -45,6 +58,26 @@ void CSceneMeshObject::SetGLBufferDataFromElements()
 }
 void CSceneMeshObject::UpdateRenderInfo()
 {
+
+	int tid = mesh_.lock()->TextureId();
+	auto tw = CUIContext::GetTexture(tid);
+
+	if (tw != NULL)
+	{
+
+		if (!tw->IsUpdated())
+			tw->UpdateTexture();
+		texture_ = tw->GetTexture();
+		if (texture_ != NULL)
+			use_texture_ = true;
+		else
+			use_texture_ = false;
+	}
+	else
+	{
+		texture_ = NULL;
+		use_texture_ = false;
+	}
 	if (mesh_.lock().get()->IsChanged())
 	{
 		ComputeRenderingElements();
@@ -99,10 +132,11 @@ void CSceneMeshObject::Render( CCamera camera)
 	int light_diff_loc = rendering_program_.uniformLocation("u_light_diff");
 	int light_spec_loc = rendering_program_.uniformLocation("u_light_spec");
 	int light_amb_loc = rendering_program_.uniformLocation("u_light_amb");
-	int spec_power_loc = rendering_program_.uniformLocation("u_spec_power");
+	int spec_power_loc = rendering_program_.uniformLocation("u_spec_power"); 
+	int use_texture_loc = rendering_program_.uniformLocation("use_texture");
 
-
-		
+	rendering_program_.setUniformValue(use_texture_loc, use_texture_);
+	rendering_program_.setUniformValue("u_sampler_exture", 0);
 	rendering_program_.setUniformValue(light_pos_loc, light_pos);
 	rendering_program_.setUniformValue(mvp_mat_loc, mvpMatrix);
 	rendering_program_.setUniformValue(mv_mat_loc, mvMatrix);
@@ -111,9 +145,19 @@ void CSceneMeshObject::Render( CCamera camera)
 	rendering_program_.setUniformValue(light_amb_loc, ambient);
 
 
-	
+	if (use_texture_&&texture_ != NULL)
+	{
+		auto error = glGetError();
+		if (error != GL_NO_ERROR)
+			std::cerr << error << std::endl;
+		texture_->bind();
+	}
+
 	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexs_pos_.size() / 3));
-	
+	if (use_texture_&& texture_ != NULL)
+	{
+		texture_->release();
+	}
 	rendering_program_.release();
 	vao_.release();
 }
@@ -123,7 +167,7 @@ void CSceneMeshObject::InitShader()
 	std::string vertex_shader_source((std::istreambuf_iterator<char>(v_ifstream)), std::istreambuf_iterator<char>());
 	v_ifstream.close();
 
-	std::cerr << "Init shaders" << std::endl;
+	//std::cerr << "Init shaders" << std::endl;
 	QOpenGLShader *vertex_shader = new QOpenGLShader(QOpenGLShader::Vertex);
 	if (!vertex_shader->compileSourceCode(vertex_shader_source.c_str()))
 	{
@@ -157,7 +201,8 @@ void CSceneMeshObject::ComputeRenderingElements()
 	vertexs_pos_.resize(0);
 	vertex_normals_.resize(0);
 	vertex_colors_.resize(0);
-		
+	tex_coords_.resize(0);
+
 	CMeshObject* mesh = mesh_.lock().get();
 	auto openmesh = mesh->GetMesh();
 	
@@ -180,7 +225,10 @@ void CSceneMeshObject::ComputeRenderingElements()
 			{
 				vertexs_pos_.push_back(vpos[j]);
 				vertex_colors_.push_back(vcolor[j]);
+				
 			}
+			tex_coords_.push_back(openmesh.data(*fhi).GetUV()[0]);
+			tex_coords_.push_back(openmesh.data(*fhi).GetUV()[1]);
 			vs.push_back(vpos);
 			fhi++;
 		}
