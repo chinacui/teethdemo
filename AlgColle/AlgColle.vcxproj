@@ -150,18 +150,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="curve_base_alg.h" />
+    <ClInclude Include="dental_base_alg.h" />
     <ClInclude Include="geo_alg.h" />
     <ClInclude Include="geo_base_alg.h" />
     <ClInclude Include="harmonic_field.h" />
     <ClInclude Include="morphlogic_operation.h" />
     <ClInclude Include="morph_skel_dental_mesh_seg.h" />
     <ClInclude Include="numerical_base_alg.h" />
+    <ClInclude Include="image_base_alg.h" />
     <ClInclude Include="prereq.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="curve_base_alg.cpp" />
+    <ClCompile Include="dental_base_alg.cpp" />
     <ClCompile Include="geo_alg.cpp" />
     <ClCompile Include="geo_base_alg.cpp" />
     <ClCompile Include="harmonic_field.cpp" />
+    <ClCompile Include="image_base_alg.cpp" />
     <ClCompile Include="morphlogic_operation.cpp" />
     <ClCompile Include="morph_skel_dental_mesh_seg.cpp" />
     <ClCompile Include="numerical_base_alg.cpp" />

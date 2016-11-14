@@ -7,6 +7,7 @@ CImfaceWindow* CUIContext::main_window_ = NULL;
 int CUIContext::selected_mesh_object_id_ = -1;
 CMorphSkelDentalMeshSeg* CUIContext::msdm_seg_ = NULL;
 std::string CUIContext::cm_current_adjust_param_= "Curvature";
+int CUIContext::color_stripe_texture_id_ = -1;
 int CUIContext::color_bar_texture_id_ = -1;
 #include"texture_wrapper.h"
 CScene* CUIContext::GetScene()
@@ -26,8 +27,11 @@ void CUIContext::Init()
 	scene_ = new CScene();
 	main_window_ = new CImfaceWindow();
 	main_window_->show();
-	QImage color_bar("stripe2.bmp");
-	color_bar_texture_id_=CUIContext::AddTexture(new QImage(color_bar));
+	QImage color_stripe("stripe2.bmp");
+	color_stripe_texture_id_=CUIContext::AddTexture(new QImage(color_stripe));
+
+	QImage color_bar("color.bmp");
+	color_bar_texture_id_ = CUIContext::AddTexture(new QImage(color_bar));
 
 }
 

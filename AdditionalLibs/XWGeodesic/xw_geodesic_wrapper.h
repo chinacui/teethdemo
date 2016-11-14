@@ -10,6 +10,8 @@ class CGeoFacePoint
 public:
 	int fid_;
 	double ls_[3];
+	double pos_[3];
+	int vids_[3];
 };
 class ADDITIONALLIBS_CLASS CXWGeodesic
 {
@@ -19,7 +21,9 @@ protected:
 public:
 	CXWGeodesic() {  }
 	void SetModel(std::vector<CPoint3D>& vertexs, std::vector<CBaseModel::CFace>&faces);
+	void GeodesicDis(int svid, std::vector<int>&tvids, std::vector<double>&dis);
 	void GeodesicPath(int svid, int tvid, std::vector<CGeoFacePoint>&path);
+	void GeodesicPath(int svid, std::vector<int>&tvids, std::vector<CGeoFacePoint>&path);
 	~CXWGeodesic();
 
 };

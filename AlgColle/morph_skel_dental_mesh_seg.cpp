@@ -310,6 +310,7 @@ void CMorphSkelDentalMeshSeg::ComputeVertexPenaltyWeight()
 	}
 
 }
+
 void CMorphSkelDentalMeshSeg::FindOptimizePlane(CPlane ini_plane, CPlane &res_plane)
 {
 	ComputeVertexPenaltyWeight();
@@ -750,7 +751,7 @@ void CMorphSkelDentalMeshSeg::ComputeCuttingPlane()
 	*/
 
 
-	ComputeEdgePointsFromMeanCurvatureThreshold(curvature_threshold_);
+	//ComputeEdgePointsFromMeanCurvatureThreshold(curvature_threshold_);
 	TestRender();
 
 	

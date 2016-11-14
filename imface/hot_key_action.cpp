@@ -67,10 +67,17 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		delete resmeshes[i];
 		}
 		CGeoBaseAlg::NormalizeMeshSize(mesh);
+		
 		//CGeoAlg::FillHoles(mesh);
 		CGeoBaseAlg::RemoveNonManifold(mesh);
 		CGeoAlg::SelfIntersectionRemoval(mesh);
-		CGeoAlg::FillHoles(mesh);
+		CGeoAlg::FillHoles(mesh, true);
+		CGeoAlg::SimplifyMesh(mesh, 160000);
+		
+		//CGeoAlg::LaplacianSmooth(mesh, 20, 0.5);
+		std::cerr << "vnum " << mesh.n_vertices() << std::endl;
+		std::cerr << "fnum " << mesh.n_faces() << std::endl;
+		std::cerr << "enum " << mesh.n_edges() << std::endl;
 		for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 		{
 			mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
@@ -196,6 +203,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		std::cerr << "switch to edit feature edge action" << std::endl;
 		break;
 	}
+
 	case Qt::Key_H:
 	{
 		manager_->SetCurrentActionType(HarmonicFieldSegmentation);
@@ -207,7 +215,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 	{
 		int mid = CUIContext::GetSelectedMeshObjectId();
 		auto p_mesh_object = DataPool::GetMeshObject(mid);
-		std::vector<COpenMeshT*>meshes;
+		std::map<int,COpenMeshT*>meshes;
 		std::vector<int>tags;
 		for (int i = 0; i < CUIContext::msdm_seg_->tags_.size(); i++)
 		{
@@ -217,7 +225,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 				tags.push_back(0);
 			
 		}
-		CGeoAlg::SeparateMeshByVertexTag(p_mesh_object->GetMesh(), tags, meshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>());
+		CGeoAlg::SeparateMeshByVertexTag(p_mesh_object->GetMesh(), tags, meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>());
 		CMeshObject m;
 		m.GetMesh() = *meshes[1];
 		CDataIO::WriteMesh("res0.obj", m);
@@ -228,7 +236,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		std::cerr << "save" << std::endl;
 		int mid = CUIContext::GetSelectedMeshObjectId();
 		auto p_mesh_object = DataPool::GetMeshObject(mid);
-		CDataIO::WriteMesh("Resources\\testmodel.obj", *p_mesh_object);
+		CDataIO::WriteMesh("Resources\\out.obj", *p_mesh_object);
 	}
 	}
 }

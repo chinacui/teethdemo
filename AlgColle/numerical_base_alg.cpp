@@ -8,16 +8,51 @@ double CNumericalBaseAlg::ComputeGaussian(double mean, double std_devi, double x
 	double res=(1.0 / (std_devi*std::sqrt(2*PI)))*std::exp(-std::pow(x-mean,2)/(2*std_devi*std_devi));
 	return res;
 }
+void CNumericalBaseAlg::GetMaxValue(std::vector<double>&data, int &res_id)
+{
+	res_id = 0;
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (data[res_id] < data[i])
+		{
+			res_id = i;
+		}
+	}
+}
+void CNumericalBaseAlg::GetMinValue(std::vector<double>&data, int &res_id)
+{
+	res_id = 0;
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (data[res_id] > data[i])
+		{
+			res_id = i;
+		}
+	}
+}
+double CNumericalBaseAlg::Sigmoid(double x)
+{
+	return 1.0 / (1.0 + std::exp(-x));
+}
 void CNumericalBaseAlg::NormalizeScalarField(Eigen::VectorXd &data)
 {
 	double mmin = std::numeric_limits<double>::max();
 	double mmax = std::numeric_limits<double>::min();
+	int maxi, mini;
 	for (int i = 0; i < data.size(); i++)
 	{
 		if (mmin > data(i))
+		{
 			mmin = data(i);
+			mini = i;
+		}
+			
 		if (mmax < data(i))
+		{
 			mmax = data(i);
+			maxi = i;
+		}
+		
 	}
 	double len = mmax - mmin;
 	
@@ -27,6 +62,29 @@ void CNumericalBaseAlg::NormalizeScalarField(Eigen::VectorXd &data)
 		for (int i = 0; i<data_size;i++)
 		{
 			data(i) = (data(i) - mmin) / len;
+		}
+	}
+
+}
+void CNumericalBaseAlg::NormalizeScalarField(std::vector<double> &data)
+{
+	double mmin = std::numeric_limits<double>::max();
+	double mmax = std::numeric_limits<double>::min();
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (mmin > data[i])
+			mmin = data[i];
+		if (mmax < data[i])
+			mmax = data[i];
+	}
+	double len = mmax - mmin;
+
+	if (len != 0)
+	{
+		int data_size = data.size();
+		for (int i = 0; i < data_size; i++)
+		{
+			data[i] = (data[i] - mmin) / len;
 		}
 	}
 

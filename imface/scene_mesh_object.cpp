@@ -68,7 +68,7 @@ void CSceneMeshObject::UpdateRenderInfo()
 		if (!tw->IsUpdated())
 			tw->UpdateTexture();
 		texture_ = tw->GetTexture();
-		if (texture_ != NULL)
+		if (texture_ != NULL&&mesh_.lock()->UseTexture())
 			use_texture_ = true;
 		else
 			use_texture_ = false;

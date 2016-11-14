@@ -14,6 +14,13 @@
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include"../DataColle/aabb_type.h"
 #include"../AdditionalLibs/XWGeodesic/xw_geodesic_wrapper.h"
+#include <igl/grad.h>
+#include <CGAL/Surface_mesh_simplification/edge_collapse.h>
+#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Count_stop_predicate.h>
+#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Edge_length_cost.h>
+#include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Midpoint_placement.h>
+#include <CGAL/boost/graph/graph_traits_TriMesh_ArrayKernelT.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 void CGeoAlg::PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&res_mean, std::vector<OpenMesh::Vec3d> &res_eigen_vects, std::vector<double>& res_eigen_values)
 {
 	int sz = static_cast<int>(pts.size());
@@ -44,42 +51,169 @@ void CGeoAlg::PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&r
 	}
 
 }
-bool CGeoAlg::ComputeGeodesicPath(CMeshObject &mesh_obj, int svid, int tvid, std::vector<COpenMeshT::FaceHandle>&res_fhs, std::vector<OpenMesh::Vec3d>&res_bary_coords)
+void CGeoAlg::ComputeGradientOfScalarField(COpenMeshT &mesh, Eigen::VectorXd &scalars, Eigen::MatrixXd & res_grad)
+{
+	Eigen::MatrixXd vertexs;
+	Eigen::MatrixXi faces;
+
+	CConverter::ConvertFromOpenMeshToIGL(mesh, vertexs, faces);
+	Eigen::SparseMatrix<double> G;
+	igl::grad(vertexs, faces, G);
+	// Compute gradient of U
+	res_grad = Eigen::Map<const Eigen::MatrixXd>((G*scalars).eval().data(), faces.rows(), 3);
+	
+}
+void CGeoAlg::InitGeodesicModel(CMeshObject &mesh_obj)
 {
 	auto geodesic_model = mesh_obj.GetGeodesicModel();
 	COpenMeshT &mesh = mesh_obj.GetMesh();
+
 	if (geodesic_model == NULL)
+	//if (true)
 	{
-		geodesic_model = new CXWGeodesic();
+		geodesic_model = (new CXWGeodesic());
 		std::vector<CPoint3D>vertexs(mesh.n_vertices());
 		std::vector<CBaseModel::CFace>faces(mesh.n_faces());
+		
 		for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 		{
 			auto p = mesh.point(viter);
+			if (viter->idx() >= vertexs.size())
+				std::cerr << "error" << std::endl;
 			vertexs[viter->idx()] = CPoint3D(p[0], p[1], p[2]);
 		}
 		for (auto fiter = mesh.faces_begin(); fiter != mesh.faces_end(); fiter++)
 		{
 			CBaseModel::CFace f;
 			int i = 0;
-		
-			for (auto fviter = mesh.fv_begin(fiter); i < 3; fviter++, i++)
+
+			for (auto fviter = mesh.fv_begin(fiter); fviter!=mesh.fv_end(fiter),i < 3; fviter++, i++)
 			{
 				f.verts[i] = fviter->idx();
 			}
 			faces[fiter->idx()] = f;
 		}
 		geodesic_model->SetModel(vertexs, faces);
-		std::cerr << "init model finished" << std::endl;
+		mesh_obj.SetGeodesicModel(geodesic_model);
+		std::cerr << "init geo model finished" << std::endl;
 	}
+}
+void CGeoAlg::ComputeGeodesicDis(CMeshObject &mesh_obj, COpenMeshT::VertexHandle svh, std::vector<COpenMeshT::VertexHandle>&dst_vhs, std::vector<double>&res_dis)
+{
+	InitGeodesicModel(mesh_obj);
+	auto geodesic_model = mesh_obj.GetGeodesicModel();
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	
+	std::vector<CGeoFacePoint>tpath;
+	std::vector<int>tvids(0);
+	for (int i = 0; i < dst_vhs.size(); i++)
+	{
+		tvids.push_back(dst_vhs[i].idx());
+	}
+
+	geodesic_model->GeodesicDis(svh.idx(), tvids, res_dis);
+	
+
+	
+}
+bool CGeoAlg::ComputeGeodesicPath(CMeshObject &mesh_obj, int svid, int tvid, std::vector<OpenMesh::Vec3d>&path)
+{
+	InitGeodesicModel(mesh_obj);
+	auto geodesic_model = mesh_obj.GetGeodesicModel();
+	COpenMeshT &mesh = mesh_obj.GetMesh();
 	std::vector<CGeoFacePoint>tpath;
 	geodesic_model->GeodesicPath(svid, tvid, tpath);
+	path.resize(tpath.size());
+	for (int i = 0; i < tpath.size(); i++)
+	{
+
+		
+		path[i] = OpenMesh::Vec3d(tpath[i].pos_[0], tpath[i].pos_[1], tpath[i].pos_[2]);
+	}
+
+	return true;
+}
+bool CGeoAlg::ComputeGeodesicPath(CMeshObject &mesh_obj, int svid, int tvid, std::vector<COpenMeshT::FaceHandle>&res_fhs, std::vector<OpenMesh::Vec3d>&res_bary_coords)
+{
+	InitGeodesicModel(mesh_obj);
+	auto geodesic_model = mesh_obj.GetGeodesicModel();
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	std::vector<CGeoFacePoint>tpath;
+	geodesic_model->GeodesicPath(svid, tvid, tpath);
+	for (int i = 0; i < tpath.size(); i++)
+	{
+		std::cerr << tpath[i].vids_[0] << std::endl;
+	}
+	res_fhs.resize(tpath.size());
+	res_bary_coords.resize(tpath.size());
+
+	for (int i = 0; i < tpath.size(); i++)
+	{
+		
+		res_fhs[i] = mesh.face_handle(tpath[i].fid_);
+		//std::cerr << res_fhs[i].idx() << " " << tpath[i].fid_ << std::endl;
+		if (res_fhs[i].idx() != tpath[i].fid_)
+		{
+			std::cerr << "ddddddddddddddddddddddddddddddd" << std::endl;
+		}
+		std::vector<int>vids;
+		for (auto viter = mesh.fv_begin(res_fhs[i]); viter!= mesh.fv_end(res_fhs[i]);viter++)
+		{
+			vids.push_back(viter->idx());
+		}
+
+			if (vids[0] != tpath[i].vids_[0])
+			{
+				std::cerr << "error vids[i]!=tpath[i].vids_[i] " << vids[i] << " " << tpath[0].vids_[0] << std::endl;
+				break;
+			}
+				
+	
+		res_bary_coords[i] = OpenMesh::Vec3d(tpath[i].ls_[0], tpath[i].ls_[1], tpath[i].ls_[2]);
+	}
+
+	return true;
+}
+bool CGeoAlg::ComputeGeodesicPath(CMeshObject &mesh_obj, COpenMeshT::VertexHandle svh, std::vector<COpenMeshT::VertexHandle>& tvhs, std::vector<COpenMeshT::FaceHandle>&res_fhs, std::vector<OpenMesh::Vec3d>&res_bary_coords)
+{
+	InitGeodesicModel(mesh_obj);
+	auto geodesic_model = mesh_obj.GetGeodesicModel();
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	std::vector<CGeoFacePoint>tpath;
+	std::vector<int>tvids(tvhs.size());
+	for (int i = 0; i < tvhs.size(); i++)
+	{
+		tvids[i] = tvhs[i].idx();
+	}
+	geodesic_model->GeodesicPath(svh.idx(), tvids, tpath);
 	res_fhs.resize(tpath.size());
 	res_bary_coords.resize(tpath.size());
 	for (int i = 0; i < tpath.size(); i++)
 	{
 		res_fhs[i] = mesh.face_handle(tpath[i].fid_);
 		res_bary_coords[i] = OpenMesh::Vec3d(tpath[i].ls_[0], tpath[i].ls_[1], tpath[i].ls_[2]);
+		//std::cerr << res_bary_coords[i] << std::endl;
+	}
+
+	return true;
+}
+bool CGeoAlg::ComputeGeodesicPath(CMeshObject &mesh_obj, COpenMeshT::VertexHandle svh, std::vector<COpenMeshT::VertexHandle>& tvhs, std::vector<OpenMesh::Vec3d>&path)
+{
+	InitGeodesicModel(mesh_obj);
+	auto geodesic_model = mesh_obj.GetGeodesicModel();
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	std::vector<CGeoFacePoint>tpath;
+	std::vector<int>tvids(tvhs.size());
+	for (int i = 0; i < tvhs.size(); i++)
+	{
+		tvids[i] = tvhs[i].idx();
+	}
+	geodesic_model->GeodesicPath(svh.idx(), tvids, tpath);
+	path.resize(tpath.size());
+	
+	for (int i = 0; i < tpath.size(); i++)
+	{
+		path[i] = OpenMesh::Vec3d(tpath[i].pos_[0], tpath[i].pos_[1], tpath[i].pos_[2]);
 	}
 
 	return true;
@@ -166,6 +300,171 @@ void CGeoAlg::FillHoles(Eigen::MatrixXd & vertexs, Eigen::MatrixXi & faces)
 	std::cout << hole_count << " holes filled" << std::endl;
 	CConverter::ConvertFromCGALToIGL(poly, vertexs, faces);
 }
+
+//for mesh simplification
+typedef boost::graph_traits<OpenMesh::TriMesh_ArrayKernelT<COMTraits>>::edge_descriptor edge_descriptor;
+typedef boost::graph_traits<OpenMesh::TriMesh_ArrayKernelT<COMTraits>>::edge_iterator edge_iterator;
+class Constrained_edge_map
+{
+public:
+	typedef boost::read_write_property_map_tag    category;
+	typedef bool                                  value_type;
+	typedef bool                                  reference;
+	typedef edge_descriptor                       key_type;
+	Constrained_edge_map(OpenMesh::TriMesh_ArrayKernelT<COMTraits>& sm)
+		: sm_(sm)
+	{
+		sm_.add_property(constraint);
+	}
+	inline friend reference get(const Constrained_edge_map& em, key_type e)
+	{
+		bool b = em.sm_.property(em.constraint, em.sm_.edge_handle(e.idx()));
+		return b;
+	}
+
+	inline friend void put(const Constrained_edge_map& em, key_type e, value_type b)
+	{
+		em.sm_.property(em.constraint, em.sm_.edge_handle(e.idx())) = b;
+	}
+private:
+	OpenMesh::TriMesh_ArrayKernelT<COMTraits>& sm_;
+	OpenMesh::EPropHandleT<bool> constraint;
+};
+////////////////////////
+void CGeoAlg::ComputeLocalExtremum(COpenMeshT &mesh, Eigen::VectorXd &scalars, int neighbor_num, std::vector<COpenMeshT::VertexHandle>&res_vhs)
+{
+	res_vhs.clear();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		double vs = scalars(viter->idx());
+		std::vector<COpenMeshT::VertexHandle>neivhs;
+		ExtractNRing(mesh, viter, neighbor_num, neivhs);
+		bool flag = true;
+		for (int i = 0; i < neivhs.size(); i++)
+		{
+			if (scalars(neivhs[i].idx()) > vs)
+			{
+				flag = false;
+				break;
+			}
+		}
+		if (flag)
+		{
+			res_vhs.push_back(viter);
+		}
+	}
+}
+void CGeoAlg::LaplacianSmooth(COpenMeshT &mesh, int epoch, double step)
+{
+	COpenMeshT tmp_mesh[2];
+	tmp_mesh[0]=tmp_mesh[1]= mesh;
+	int p = 0, q = 1;
+	while (epoch--)
+	{
+		p = 1 - p;
+		q = 1 - q;
+		for (auto viter = tmp_mesh[p].vertices_begin(); viter != tmp_mesh[p].vertices_end(); viter++)
+		{
+			OpenMesh::Vec3d mean_v(0, 0, 0);
+			int count = 0;
+			for (auto vviter = tmp_mesh[p].vv_begin(viter); vviter != tmp_mesh[p].vv_end(viter); vviter++)
+			{
+				count++;
+				mean_v += tmp_mesh[p].point(vviter);
+			}
+			mean_v = mean_v / count;
+			auto qviter = tmp_mesh[q].vertex_handle(viter->idx());
+			OpenMesh::Vec3d pv = tmp_mesh[q].point(qviter);
+			pv = pv + (mean_v - pv)*step;
+			tmp_mesh[q].set_point(qviter,pv);
+			
+		}
+
+	}
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		int vid = viter->idx();
+		auto pv=tmp_mesh[p].point(tmp_mesh[p].vertex_handle(vid));
+		mesh.set_point(viter, pv);
+	}
+}
+void CGeoAlg::ComputeLocalExtremum(COpenMeshT &mesh, std::vector<double> &scalars, int neighbor_num, std::vector<COpenMeshT::VertexHandle>&res_vhs)
+{
+	res_vhs.clear();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		double vs = scalars[viter->idx()];
+		std::vector<COpenMeshT::VertexHandle>neivhs;
+		ExtractNRing(mesh, viter, neighbor_num, neivhs);
+		bool flag = true;
+		for (int i = 0; i < neivhs.size(); i++)
+		{
+			if (scalars[neivhs[i].idx()] > vs)
+			{
+				flag = false;
+				break;
+			}
+		}
+		if (flag)
+		{
+			res_vhs.push_back(viter);
+		}
+	}
+}
+void CGeoAlg::ExtractNRing(COpenMeshT &mesh, COpenMeshT::VertexHandle vh, int ringnum, std::vector<COpenMeshT::VertexHandle>&res_vhs)
+{
+	std::queue<std::pair<COpenMeshT::VertexHandle,int>>Q;
+	res_vhs.clear();
+	Q.push(std::make_pair(vh,0));
+	while (!Q.empty())
+	{
+		auto p = Q.front();
+		auto vh = p.first;
+		Q.pop();
+		if (p.second < ringnum)
+		{
+			for (auto vviter = mesh.vv_begin(vh); vviter != mesh.vv_end(vh); vviter++)
+			{
+				res_vhs.push_back(vviter);
+				Q.push(std::make_pair(vviter, p.second + 1));
+			}
+		}
+		
+	}
+}
+void CGeoAlg::SimplifyMesh(OpenMesh::TriMesh_ArrayKernelT<COMTraits> &mesh, int edgenum)
+{
+	std::cerr << "simplify" << std::endl;
+	namespace SMS = CGAL::Surface_mesh_simplification;
+	Constrained_edge_map constraints_map(mesh);
+	
+	// For the pupose of the example we mark 10 edges as constrained edges
+	//edge_iterator b, e;
+	//int count = 0;
+	//for (boost::tie(b, e) = edges(surface_mesh); b != e; ++b) {
+	//	put(constraints_map, *b, (count++ < 100));
+	//}
+	// This is a stop predicate (defines when the algorithm terminates).
+	// In this example, the simplification stops when the number of undirected edges
+	// left in the surface mesh drops below the specified number (1000)
+	SMS::Count_stop_predicate<OpenMesh::TriMesh_ArrayKernelT<COMTraits>> stop(edgenum);
+
+	// This the actual call to the simplification algorithm.
+	// The surface mesh and stop conditions are mandatory arguments.
+	int r = SMS::edge_collapse
+	(mesh
+		, stop
+		, CGAL::parameters::halfedge_index_map(get(CGAL::halfedge_index, mesh))
+		.vertex_point_map(get(boost::vertex_point, mesh))
+		.edge_is_constrained_map(constraints_map)
+	);
+
+	mesh.garbage_collection();
+	std::cerr << "simplify end" << std::endl;
+}
+
+
+
 void CGeoAlg::FillHoles(COpenMeshT &mesh, bool remain_largest)
 {
 	Polyhedron poly;
@@ -207,7 +506,7 @@ void CGeoAlg::FillHoles(COpenMeshT &mesh, bool remain_largest)
 	
 	for (int i = 0; i<border_handles.size(); i++)
 	{
-		if (i == mi)
+		if (remain_largest&&i == mi)
 			continue;
 	
 			hole_count++;
@@ -226,7 +525,7 @@ void CGeoAlg::FillHoles(COpenMeshT &mesh, bool remain_largest)
 	CConverter::ConvertFromCGALToOpenMesh(poly, mesh, std::map<Polyhedron::Vertex_handle, COpenMeshT::VertexHandle>(), std::map<Polyhedron::Facet_handle, COpenMeshT::FaceHandle>());
 
 }
-void CGeoAlg::SeparateMeshByVertexTag(COpenMeshT &mesh, std::vector<int>&v_tag, std::vector<COpenMeshT*>&res_meshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&v_orig)
+void CGeoAlg::SeparateMeshByVertexTag(COpenMeshT &mesh, std::vector<int>&v_tag, std::map<int,COpenMeshT*>&res_meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&v_orig)
 {
 	int max_tag = -1;
 
@@ -238,33 +537,37 @@ void CGeoAlg::SeparateMeshByVertexTag(COpenMeshT &mesh, std::vector<int>&v_tag, 
 			
 		}
 	}
-	res_meshes.resize(max_tag + 1);
-	v_orig.resize(max_tag + 1);
-	for (int i = 0; i <=max_tag; i++)
-	{
-		res_meshes[i] = new COpenMeshT();
-		res_meshes[i]->clear();
-		v_orig[i].clear();
-	}
+	res_meshes.clear();
+	v_orig.clear();
+
+	
 	std::vector<COpenMeshT::VertexHandle>tmp_v_new(mesh.n_vertices());
 	for (auto v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
 	{
 		int t = v_tag[v_it->idx()];
+		if (res_meshes.find(t) == res_meshes.end())
+		{
+			res_meshes.insert(std::make_pair(t,new COpenMeshT()));
+			res_meshes[t]->clear();
+		}
+			
 		auto new_vh=res_meshes[t]->add_vertex(mesh.point(v_it));
 		res_meshes[t]->set_color(new_vh, mesh.color(v_it));
+		if (v_orig.find(t) == v_orig.end())
+			v_orig[t] = std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>();
 		v_orig[t][new_vh] = *v_it;
 		tmp_v_new[v_it->idx()]=new_vh;
 	}
 	for (auto f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
 	{
 		std::vector<COpenMeshT::VertexHandle> vhandles;
-		int t = -1;
+		int t = -std::numeric_limits<int>::max();
 		auto fh = mesh.fh_begin(f_it);
 		for (; fh != mesh.fh_end(f_it); fh++)
 		{
 			int vid = mesh.to_vertex_handle(fh).idx();
 			int pt=v_tag[vid];
-			if (t != -1 && pt != t)
+			if (t != -std::numeric_limits<int>::max() && pt != t)
 			{
 				break;
 			}
@@ -276,6 +579,10 @@ void CGeoAlg::SeparateMeshByVertexTag(COpenMeshT &mesh, std::vector<int>&v_tag, 
 			res_meshes[t]->add_face(vhandles);
 		}
 		
+	}
+	for (auto iter=res_meshes.begin();iter!=res_meshes.end();iter++)
+	{
+		iter->second->garbage_collection();
 	}
 	
 }
@@ -292,8 +599,8 @@ void CGeoAlg::CutByPlane(COpenMeshT &in_mesh, CPlane plane, COpenMeshT &res_mesh
 		if(CGeoBaseAlg::IsOnPositiveSide(p, plane))
 		v_tags[v_iter->idx()] = t;
 	}
-	std::vector<COpenMeshT*>tmp_res_meshes;
-	std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>tmpv_orig;
+	std::map<int,COpenMeshT*>tmp_res_meshes;
+	std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>tmpv_orig;
 	SeparateMeshByVertexTag(mesh, v_tags, tmp_res_meshes, tmpv_orig);
 	res_mesh = *tmp_res_meshes[t];
 	
@@ -389,6 +696,23 @@ bool CGeoAlg::SelfIntersectionRemoval(COpenMeshT& mesh)
 
 	CConverter::ConvertFromCGALToOpenMesh(poly, mesh, std::map<Polyhedron::Vertex_handle, COpenMeshT::VertexHandle>(), std::map<Polyhedron::Facet_handle, COpenMeshT::FaceHandle>());
 	return true;
+}
+void CGeoAlg::ComputeClosestVertex(OpenMesh::Vec3d source, CMeshObject &mesh_obj, OpenMesh::VertexHandle &res_vh)
+{
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	OpenMesh::VertexHandle min_vhs;
+	double min_dis = std::numeric_limits<double>::max();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p = mesh.point(viter);
+		double dis = (p - source).length();
+		if (dis < min_dis)
+		{
+			min_dis = dis;
+			min_vhs = viter;
+		}
+	}
+	res_vh = min_vhs;
 }
 bool CGeoAlg::RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::VertexHandle & res_vh)
 {
@@ -561,8 +885,18 @@ void CGeoAlg::SeparateDisconnectedParts(COpenMeshT &mesh, std::vector<COpenMeshT
 		t++;
 	}
 
-	
-	SeparateMeshByVertexTag(mesh, mmark, res_meshes, vid_orig);
+	std::map<int, COpenMeshT*>tmp_meshes;
+	std::map<int, std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>tmp_vid_orig;
+	SeparateMeshByVertexTag(mesh, mmark, tmp_meshes, tmp_vid_orig);
+	res_meshes.clear();
+	for (auto iter = tmp_meshes.begin(); iter != tmp_meshes.end(); iter++)
+	{
+		res_meshes.push_back(iter->second);
+	}
+	for (auto iter = tmp_vid_orig.begin(); iter != tmp_vid_orig.end(); iter++)
+	{
+		vid_orig.push_back(iter->second);
+	}
 	
 
 

@@ -9,6 +9,9 @@
 #include<igl/writeDMAT.h>
 #include"numerical_base_alg.h"
 #include <igl/grad.h>
+#include"morphlogic_operation.h"
+#include"geo_base_alg.h"
+#include"geo_alg.h"
 bool CHarmonicFieldSeg::IsConcave(COpenMeshT &mesh, COpenMeshT::VertexHandle vh)
 {
 	double theta = 0.01;
@@ -66,6 +69,10 @@ void CHarmonicFieldSeg::GetConcavityAwareLaplacianMatrix(COpenMeshT &mesh, std::
 			{
 				w *= beta;
 				//mesh.data(*hiter).SetUV(OpenMesh::Vec2f(0.8, 0.8));
+			}
+			else
+			{
+				//w *= 10;
 			}
 		//	else
 				//mesh.data(*hiter).SetUV(OpenMesh::Vec2f(0.1, 0.1));
@@ -193,6 +200,264 @@ void CHarmonicFieldSeg::SegOneTeeth(COpenMeshT&mesh, std::vector<COpenMeshT::Ver
 	}
 
 }
+void CHarmonicFieldSeg::RefineToothGingivaSeg(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&tooth_vhs, std::vector<COpenMeshT::VertexHandle>&res_tooth)
+{
+	std::vector<bool>tags_teeth(mesh.n_vertices(),false), tags_gingiva(mesh.n_vertices(),false);
+	for (int i = 0; i < tooth_vhs.size(); i++)
+	{
+		tags_teeth[tooth_vhs[i].idx()] = true;
+	}
+	for (int i = 0; i < tags_teeth.size(); i++)
+	{
+		if (tags_teeth[i] == false)
+			tags_gingiva[i] = true;
+	}
+	
+	int mcount = 3;
+	while (mcount--)
+	{
+		CMorphlogicOperation::Erode(mesh, tags_teeth);
+
+	}
+	mcount = 8;
+	while (mcount--)
+	{
+		CMorphlogicOperation::Erode(mesh, tags_gingiva);
+	}
+
+	std::vector<OpenMesh::VertexHandle>teeth_edges, gingiva_edges;
+	CGeoBaseAlg::GetEdgeVertexs(mesh, tags_teeth, teeth_edges);
+	CGeoBaseAlg::GetEdgeVertexs(mesh, tags_gingiva, gingiva_edges);
+	std::vector<std::pair<COpenMeshT::VertexHandle, double>>cons;
+	for (int i = 0; i < teeth_edges.size(); i++)
+	{
+		cons.push_back(std::make_pair(teeth_edges[i], 0.01));
+	}
+	for (int i = 0; i < gingiva_edges.size(); i++)
+	{
+		cons.push_back(std::make_pair(gingiva_edges[i], 0.99));
+	}
+	Eigen::VectorXd harmonic_field;
+	CHarmonicFieldSeg harmonicSeg;
+	harmonicSeg.ComputeConcavityAwareHarmonicField(mesh, cons, harmonic_field);
+
+	CNumericalBaseAlg::NormalizeScalarField(harmonic_field);
+
+	std::vector<std::pair<double, double>>bins;
+	std::vector<std::vector<int>>bin_vids;
+	double bin_size = 0.0006;
+	CNumericalBaseAlg::ComputeHistgram(harmonic_field, bin_size, bins, bin_vids);
+	double bin_start = bins[0].first;
+
+
+	double max_threshold = 0.8;
+
+	Eigen::MatrixXd vertexs;
+	Eigen::MatrixXi faces;
+
+	CConverter::ConvertFromOpenMeshToIGL(mesh, vertexs, faces);
+	Eigen::SparseMatrix<double> G;
+	igl::grad(vertexs, faces, G);
+	// Compute gradient of U
+	Eigen::MatrixXd fgrad_harmonic = Eigen::Map<const Eigen::MatrixXd>((G*harmonic_field).eval().data(), faces.rows(), 3);
+	Eigen::VectorXd fgrad_harmonic_mag = fgrad_harmonic.rowwise().norm();
+
+	std::vector<double>ave_bin_grad(bin_vids.size(), 0);
+	std::vector<int>bin_count(bin_vids.size(), 0);
+
+	for (auto fiter = mesh.faces_begin(); fiter != mesh.faces_end(); fiter++)
+	{
+		double fharmonic_min = std::numeric_limits<double>::max();
+		double fharmonic_max = std::numeric_limits<double>::min();
+		int fid = fiter->idx();
+		for (auto fviter = mesh.fv_begin(fiter); fviter != mesh.fv_end(fiter); fviter++)
+		{
+			double value = harmonic_field(fviter->idx());
+			if (value > fharmonic_max)
+				fharmonic_max = value;
+			if (value < fharmonic_min)
+				fharmonic_min = value;
+		}
+		int sbin_id = (fharmonic_min - bin_start) / bin_size;
+		int ebin_id = (fharmonic_max - bin_start) / bin_size;
+		for (int i = sbin_id; i <= ebin_id; i++)
+		{
+			ave_bin_grad[i] += fgrad_harmonic_mag(fid);
+			if (mesh.is_boundary(fiter))
+			{
+				ave_bin_grad[i] = -99999;
+			}
+			bin_count[i]++;
+		}
+
+	}
+	for (int i = 0; i < bin_count.size(); i++)
+	{
+		ave_bin_grad[i] /= bin_count[i];
+	}
+	int max_bin_id = 0;
+	for (int i = 0; i < ave_bin_grad.size(); i++)
+	{
+		if ((i + 1)*bin_size + bin_start > max_threshold)
+		{
+			if (ave_bin_grad[i] > ave_bin_grad[max_bin_id])
+			{
+				max_bin_id = i;
+			}
+		}
+
+	}
+	double threshold = bin_size*(max_bin_id + 1) + bin_start;
+	res_tooth.clear();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		int vid = viter->idx();
+
+		if (harmonic_field(vid) < threshold)
+		{
+			res_tooth.push_back(viter);
+		}
+
+	}
+	std::cerr << res_tooth.size() << std::endl;
+}
+void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs_tooth, std::vector<COpenMeshT::VertexHandle>&vhs_gingiva, std::vector<COpenMeshT::VertexHandle>&res_tooth, std::vector<COpenMeshT::VertexHandle>&res_gingiva)
+{
+
+	res_tooth.clear();
+	std::vector<std::pair<COpenMeshT::VertexHandle, double>>cons;
+	std::set<COpenMeshT::VertexHandle>tooth_vhs_set,gingiva_vhs_set;
+	for (int i = 0; i < vhs_tooth.size(); i++)
+	{
+		std::vector<COpenMeshT::VertexHandle>neis;
+		CGeoAlg::ExtractNRing(mesh, vhs_tooth[i], 2, neis);
+		if (tooth_vhs_set.find(vhs_tooth[i]) == tooth_vhs_set.end())
+		{
+			tooth_vhs_set.insert(vhs_tooth[i]);
+			cons.push_back(std::make_pair(vhs_tooth[i], 0.001));
+		}
+		for (int j = 0; j < neis.size(); j++)
+		{
+			if (tooth_vhs_set.find(neis[j]) == tooth_vhs_set.end())
+			{
+				tooth_vhs_set.insert(neis[j]);
+				cons.push_back(std::make_pair(neis[j], 0.001));
+			}
+		}
+		
+		
+	}
+	for (int i = 0; i < vhs_gingiva.size(); i++)
+	{
+
+		if (gingiva_vhs_set.find(vhs_gingiva[i]) == gingiva_vhs_set.end())
+		{
+			gingiva_vhs_set.insert(vhs_gingiva[i]);
+			cons.push_back(std::make_pair(vhs_gingiva[i], 0.999));
+		}
+	}
+	Eigen::VectorXd harmonic_field;
+	ComputeConcavityAwareHarmonicField(mesh, cons, harmonic_field);
+	//for (auto hiter = mesh.halfedges_begin(); hiter != mesh.halfedges_end(); hiter++)
+	//{
+	//auto vh = mesh.to_vertex_handle(hiter);
+	//mesh.data(hiter).SetUV(OpenMesh::Vec2f(harmonic_field(vh.idx()), harmonic_field(vh.idx())));
+	//}
+
+	//return;
+	CNumericalBaseAlg::NormalizeScalarField(harmonic_field);
+
+	std::vector<std::pair<double, double>>bins;
+	std::vector<std::vector<int>>bin_vids;
+	double bin_size = 0.0006;
+	CNumericalBaseAlg::ComputeHistgram(harmonic_field, bin_size, bins, bin_vids);
+	double bin_start = bins[0].first;
+	
+
+	double mid_threshold =0.2,max_threshold=0.7;
+
+	Eigen::MatrixXd vertexs;
+	Eigen::MatrixXi faces;
+
+	CConverter::ConvertFromOpenMeshToIGL(mesh, vertexs, faces);
+	Eigen::SparseMatrix<double> G;
+	igl::grad(vertexs, faces, G);
+	// Compute gradient of U
+	Eigen::MatrixXd fgrad_harmonic = Eigen::Map<const Eigen::MatrixXd>((G*harmonic_field).eval().data(), faces.rows(), 3);
+	Eigen::VectorXd fgrad_harmonic_mag = fgrad_harmonic.rowwise().norm();
+
+	std::vector<double>ave_bin_grad(bin_vids.size(), 0);
+	std::vector<int>bin_count(bin_vids.size(), 0);
+
+	for (auto fiter = mesh.faces_begin(); fiter != mesh.faces_end(); fiter++)
+	{
+		double fharmonic_min = std::numeric_limits<double>::max();
+		double fharmonic_max = std::numeric_limits<double>::min();
+		int fid = fiter->idx();
+		for (auto fviter = mesh.fv_begin(fiter); fviter != mesh.fv_end(fiter); fviter++)
+		{
+			double value = harmonic_field(fviter->idx());
+			if (value > fharmonic_max)
+				fharmonic_max = value;
+			if (value < fharmonic_min)
+				fharmonic_min = value;
+		}
+		int sbin_id = (fharmonic_min - bin_start) / bin_size;
+		int ebin_id = (fharmonic_max - bin_start) / bin_size;
+		for (int i = sbin_id; i <= ebin_id; i++)
+		{
+			ave_bin_grad[i] += fgrad_harmonic_mag(fid);
+			if (mesh.is_boundary(fiter))
+			{
+				ave_bin_grad[i] = -99999;
+			}
+			bin_count[i]++;
+		}
+
+	}
+	for (int i = 0; i < bin_count.size(); i++)
+	{
+		ave_bin_grad[i] /= bin_count[i];
+	}
+	int max_bin_id0=0,max_bin_id1=0;
+	for (int i = 0; i < ave_bin_grad.size(); i++)
+	{
+		if ((i+1)*bin_size+bin_start<mid_threshold)
+		{
+			if (ave_bin_grad[i] > ave_bin_grad[max_bin_id0])
+			{
+				max_bin_id0 = i;
+			}
+		}
+		if (i*bin_size + bin_start > max_threshold)
+		{
+			if (ave_bin_grad[i] > ave_bin_grad[max_bin_id1])
+			{
+				max_bin_id1 = i;
+			}
+		}
+		
+	}
+	double threshold0 = bin_size*(max_bin_id0 + 1) + bin_start;
+	double threshold1 = bin_size*(max_bin_id1 + 1) + bin_start;
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		int vid = viter->idx();
+
+		if (harmonic_field(vid) <= threshold0)
+		{
+			res_tooth.push_back(viter);
+		}
+		if (harmonic_field(vid) >= threshold1)
+		{
+			res_gingiva.push_back(viter);
+		}
+		
+	}
+	std::cerr << res_tooth.size() << std::endl;
+}
+
+
 void CHarmonicFieldSeg::SegTwoTooth(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1, std::vector<COpenMeshT::VertexHandle>&res_teeth0, std::vector<COpenMeshT::VertexHandle>&res_teeth1)
 {
 	res_teeth1.clear();

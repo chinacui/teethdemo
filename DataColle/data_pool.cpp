@@ -48,7 +48,19 @@ void DataPool::Init()
 	mesh_object_max_id_ = 0;
 	curve_object_max_id_ = 0;
 }
-
+bool DataPool::DeleteMeshObject(int id)
+{
+	if (mesh_object_pool_.find(id) != mesh_object_pool_.end())
+	{
+		mesh_object_pool_.erase(id);
+		return true;
+	}
+	return false;
+}
+void DataPool::DeleteAllCurveObjects()
+{
+	curve_object_pool_.clear();
+}
 bool DataPool::DeleteCurveObject(int id)
 {
 	if (curve_object_pool_.find(id) != curve_object_pool_.end())
@@ -78,6 +90,7 @@ int DataPool::AddCurveObject(CCurveObject *curve)
 		return curve_object_max_id_ - 1;
 	}
 }
+
 CCurveObject *DataPool::GetCurveObject(int id)
 {
 	auto iter = curve_object_pool_.find(id);

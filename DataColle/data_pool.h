@@ -18,6 +18,7 @@ protected:
 	static int curve_object_max_id_;
 public:
 	static int AddMeshObject(CMeshObject *mesh);// add CMeshObject to mesh_object_pool_
+	static bool DeleteMeshObject(int id);
 	static CMeshObject * GetMeshObject(int id);
 	static void Init();//initialization
 	static std::map<int, std::shared_ptr<CMeshObject>>& GetMeshObjectPool();
@@ -25,6 +26,7 @@ public:
 
 	static int AddCurveObject(CCurveObject *curve);
 	static bool DeleteCurveObject(int id);
+	static void DeleteAllCurveObjects();
 	static CCurveObject *GetCurveObject(int id);
 	static std::map<int, std::shared_ptr<CCurveObject>>& GetCurveObjectPool();
 };

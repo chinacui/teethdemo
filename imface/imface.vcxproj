@@ -91,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(TQTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(TQTDIR)\include\QtCore;$(TQTDIR)\include\QtGui;$(TQTDIR)\include\QtOpenGL;$(TQTDIR)\include\QtWidgets;$(TQGLVIEWER_DIR);$(TQTDIR)\include\QtXml;$(TEIGEN_ROOT);$(TOPEN_MESH_DIR)\include;$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(TQTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(TQTDIR)\include\QtCore;$(TQTDIR)\include\QtGui;$(TQTDIR)\include\QtOpenGL;$(TQTDIR)\include\QtWidgets;$(TQGLVIEWER_DIR);$(TQTDIR)\include\QtXml;$(TEIGEN_ROOT);$(TOPEN_MESH_DIR)\include;$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);$(TOPENCV_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -101,9 +101,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(TQTDIR)\lib;$(TQGLVIEWER_DIR)\QGLViewer;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TQTDIR)\lib;$(TQGLVIEWER_DIR)\QGLViewer;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPEN_MESH_DIR)\lib;$(TOPENCV_DIR)\x64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;QGLViewerd2.lib;Qt5Xmld.lib;DataColle.lib;AlgColle.lib;OpenMeshToolsd.lib;OpenMeshCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;QGLViewerd2.lib;Qt5Xmld.lib;DataColle.lib;AlgColle.lib;OpenMeshToolsd.lib;OpenMeshCored.lib;opencv_core310d.lib;opencv_highgui310d.lib;opencv_imgcodecs310d.lib;opencv_imgproc310d.lib;opencv_xphoto310d.lib;opencv_photo310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +125,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(TQTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(TQTDIR)\include\QtCore;$(TQTDIR)\include\QtGui;$(TQTDIR)\include\QtOpenGL;$(TQTDIR)\include\QtWidgets;$(TQGLVIEWER_DIR);$(TQTDIR)\include\QtXml;$(TEIGEN_ROOT);$(TOPEN_MESH_DIR)\include;$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(TQTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(TQTDIR)\include\QtCore;$(TQTDIR)\include\QtGui;$(TQTDIR)\include\QtOpenGL;$(TQTDIR)\include\QtWidgets;$(TQGLVIEWER_DIR);$(TQTDIR)\include\QtXml;$(TEIGEN_ROOT);$(TOPEN_MESH_DIR)\include;$(TLIBIGL_INCLDUEDIR);$(TLIBIGL_DIR);$(TOPENCV_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -134,9 +134,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(TQTDIR)\lib;$(TQGLVIEWER_DIR)\QGLViewer;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TQTDIR)\lib;$(TQGLVIEWER_DIR)\QGLViewer;$(SolutionDir)$(Platform)\$(Configuration)\;$(TOPEN_MESH_DIR)\lib;$(TOPENCV_DIR)\x64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;QGLViewer2.lib;Qt5Xml.lib;DataColle.lib;AlgColle.lib;OpenMeshCore.lib;OpenMeshTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;QGLViewer2.lib;Qt5Xml.lib;DataColle.lib;AlgColle.lib;OpenMeshCore.lib;OpenMeshTools.lib;opencv_core310.lib;opencv_imgcodecs310.lib;opencv_highgui310.lib;opencv_imgproc310.lib;opencv_xphoto310.lib;opencv_photo310.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -189,7 +189,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing imface_window.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing imface_window.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -197,7 +197,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing imface_window.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include"</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -277,7 +277,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing action_base.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing action_base.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -285,7 +285,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing action_base.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES  "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include"</Command>
     </CustomBuild>
     <ClInclude Include="action_manager.h" />
     <ClInclude Include="camera.h" />

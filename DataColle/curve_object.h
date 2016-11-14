@@ -16,6 +16,7 @@ public:
 	bool IsChanged();
 	void SetChanged(bool is_changed = true); 
 	std::vector<OpenMesh::Vec3d>&GetCurve();
+	void SetCurve(std::vector<OpenMesh::Vec3d>& curve);
 	OpenMesh::Vec3d GetColor();
 	void SetColor(OpenMesh::Vec3d color);
 

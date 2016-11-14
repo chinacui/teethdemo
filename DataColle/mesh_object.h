@@ -37,6 +37,7 @@ public:
 	void CopyFrom(CMeshObject& b);
 	bool& UseTexture() { return use_texture_; }
 	COpenMeshT& GetMesh() { return mesh_; }
+	void SetMeshColor(OpenMesh::Vec3d color);
 
 	CMeshObject();
 	CMeshObject(CMeshObject &b);
@@ -49,7 +50,8 @@ public:
 	void SetAABBTree(CAABBTree* t) { aabb_tree_ = t; }
 
 	CXWGeodesic*GetGeodesicModel() { return geodesic_model_; }
-	void SetGeodesicModel(CXWGeodesic *g) { geodesic_model_ = g; }
+	void SetGeodesicModel(CXWGeodesic *model) { geodesic_model_ = model; }
+	
 
 	int& TextureId() { return texture_id_; }
 };

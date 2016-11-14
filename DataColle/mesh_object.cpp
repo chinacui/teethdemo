@@ -66,6 +66,13 @@ CMeshObject::CMeshObject()
 	is_changed_ = true;
 	tot_surface_area_ = -1;
 }
+void CMeshObject::SetMeshColor(OpenMesh::Vec3d color)
+{
+	for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
+	{
+		mesh_.set_color(viter, color);
+	}
+}
 void CMeshObject::NormalizeUV()
 {
 	OpenMesh::Vec2f mmin(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());

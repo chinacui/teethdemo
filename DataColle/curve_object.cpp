@@ -15,6 +15,10 @@ void CCurveObject::SetChanged(bool is_changed)
 {
 	is_changed_ = is_changed;
 }
+void CCurveObject::SetCurve(std::vector<OpenMesh::Vec3d>&curve)
+{
+	curve_ = curve;
+}
 std::vector<OpenMesh::Vec3d>& CCurveObject::GetCurve()
 {
 	return curve_;

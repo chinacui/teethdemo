@@ -12,14 +12,15 @@ protected:
 	static CScene* scene_;
 	static CImfaceWindow* main_window_;
 	static int selected_mesh_object_id_;
+	static int color_stripe_texture_id_;
 	static int color_bar_texture_id_;
 public:
 	static CScene* GetScene();
 	static void Init();
 	static int GetSelectedMeshObjectId();
 	static void SetSelectedMeshObjectId(int id);
+	static int &ColorStripeTextureId() { return color_stripe_texture_id_; }
 	static int &ColorBarTextureId() { return color_bar_texture_id_; }
-
 
 
 	static std::map<int, TextureWraper*>textures_;

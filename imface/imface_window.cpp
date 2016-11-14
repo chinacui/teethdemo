@@ -11,7 +11,8 @@ CImfaceWindow::CImfaceWindow(QWidget *parent)
 	/*connect(ui.button_load_model, SIGNAL(clicked()), this, SLOT(OnClickButtonLoadData()));*/
 
 	ui.model_viewer->SetScene(CUIContext::GetScene());
-
+	//ui.base_cut_slilder->hide();
+	//ui.region_threshold_slilder->hide();
 	this->connect(ui.base_cut_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustBaseCuttingPlane(int)));
 	this->connect(ui.region_threshold_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustSmallRegionThreshold(int)));
 	
