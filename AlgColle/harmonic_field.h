@@ -16,8 +16,12 @@ public:
 	void ComputeConcavityAwareHarmonicField(COpenMeshT&mesh, std::vector<std::pair<COpenMeshT::VertexHandle, double>>&cons,Eigen::VectorXd &res_u);
 	void SegOneTeeth(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs, std::vector<COpenMeshT::VertexHandle>&res_teeth);
 	void SegTwoTooth(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1, std::vector<COpenMeshT::VertexHandle>&res_teeth0, std::vector<COpenMeshT::VertexHandle>&res_teeth1);
+	void RefineSegTwoTooth(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1);
+	void SegTwoSet(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1, std::vector<COpenMeshT::VertexHandle>&res_vhs0, std::vector<COpenMeshT::VertexHandle>&res_vhs1);
 	void SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs_tooth, std::vector<COpenMeshT::VertexHandle>&vhs_gingiva, std::vector<COpenMeshT::VertexHandle>&res_tooth, std::vector<COpenMeshT::VertexHandle>&res_gingiva);
 	void RefineToothGingivaSeg(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&tooth_vhs, std::vector<COpenMeshT::VertexHandle>&res_tooth);
+	void RefineTeethGingivaSeg(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&teeth_vhs, std::vector<COpenMeshT::VertexHandle>&res_teeth);
+	void RefineTeethGingivaSeg(COpenMeshT &mesh, std::vector<int>&teeth_mark);//teeth_mark:mark of each teeth, -1 means gingiva
 };
 
 #endif

@@ -10,6 +10,7 @@
 #include"curve_base_alg.h"
 #include"morphlogic_operation.h"
 #include"../DataColle/data_pool.h"
+#include <Eigen/Geometry>
 void CDentalBaseAlg::ComputePCAFrameFromHighCurvaturePoints(COpenMeshT&mesh, double threshold, OpenMesh::Vec3d&mean, std::vector<OpenMesh::Vec3d>&res_frame)
 {
 	Eigen::MatrixXd curvatures_vec;
@@ -38,6 +39,12 @@ void CDentalBaseAlg::ComputePCAFrameFromHighCurvaturePoints(COpenMeshT&mesh, dou
 
 	CGeoAlg::PointSetPCA3D(feature_points, mean, res_frame, eigen_values);
 
+
+	OpenMesh::Vec3d bound_mean;
+	ComputeHoleVertMean(mesh, bound_mean);
+	bound_mean = bound_mean - mean;
+	if (res_frame[2][0] * bound_mean[0] + res_frame[2][1] * bound_mean[1] + res_frame[2][2] * bound_mean[2] > 0)
+		res_frame[2] = -res_frame[2];
 
 }
 
@@ -863,6 +870,89 @@ void CDentalBaseAlg::ComputeTeethFeaturePointsUsingSmoothedMesh(COpenMeshT &mesh
 	{
 		res_vhs.push_back(mesh.vertex_handle(tmp_vhs[i].idx()));
 	}
+}
+void CDentalBaseAlg::PCABasedOrientationCorrection(COpenMeshT& mesh)
+{
+	OpenMesh::Vec3d mean;
+	std::vector<OpenMesh::Vec3d>frame;
+	
+	ComputePCAFrameFromHighCurvaturePoints(mesh, 10, mean, frame);
+	frame[0].normalize();
+	frame[1].normalize();
+	frame[2].normalize();
+	frame[1] = -frame[1];
+
+	std::vector<Eigen::Vector3d>eigen_frame(3);
+	eigen_frame[0] = Eigen::Vector3d(frame[0][0], frame[0][1], frame[0][2]);
+	eigen_frame[1] = Eigen::Vector3d(frame[1][0], frame[1][1], frame[1][2]);
+	eigen_frame[2] = Eigen::Vector3d(frame[2][0], frame[2][1], frame[2][2]);
+
+	
+	Eigen::Vector3d view_up_dir(0, 1, 0);
+	Eigen::Vector3d rot_axis0 = eigen_frame[2].cross(view_up_dir);
+	//std::cerr << "rot axis " << rot_axis0 << std::endl;
+	/*CCurveObject *caxis = new CCurveObject();
+	caxis->GetCurve().push_back(mean);
+	caxis->GetCurve().push_back(mean +OpenMesh::Vec3d( rot_axis0[0],rot_axis0[1],rot_axis0[2]));
+	OpenMesh::Vec3d color(1, 1, 0);
+
+	caxis->SetColor(color);
+	DataPool::AddCurveObject(caxis);
+
+
+	caxis = new CCurveObject();
+	caxis->GetCurve().push_back(mean);
+	caxis->GetCurve().push_back(mean + OpenMesh::Vec3d(0, 1, 0));
+
+
+	caxis->SetColor(OpenMesh::Vec3d(1, 0, 1));
+	DataPool::AddCurveObject(caxis);*/
+
+	rot_axis0.normalize();
+	double rot_degree0 = std::acos(eigen_frame[2].dot(view_up_dir));
+	Eigen::Matrix3d rot_mat0;
+	rot_mat0=Eigen::AngleAxisd(rot_degree0, rot_axis0);
+
+	for (int i = 0; i < 3; i++)
+	{
+		eigen_frame[i] = rot_mat0*eigen_frame[i];
+	}
+
+
+	Eigen::Vector3d view_front_dir(0, 0, 1);
+	Eigen::Vector3d rot_axis1 = eigen_frame[1].cross(view_front_dir);
+	rot_axis1.normalize();
+	double rot_degree1 = std::acos(eigen_frame[1].dot(view_front_dir));
+	Eigen::Matrix3d rot_mat1;
+	rot_mat1 = Eigen::AngleAxisd(rot_degree1, rot_axis1);
+
+
+	Eigen::Matrix3d rot_mat = rot_mat1*rot_mat0;
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p = mesh.point(viter);
+		p = p - mean;
+		Eigen::Vector3d ep(p[0], p[1], p[2]);
+		ep = rot_mat*(ep);
+		p = OpenMesh::Vec3d(ep[0], ep[1], ep[2]);
+		mesh.set_point(viter, p);
+	}
+//#define PCABasedOrientationCorrection_RENDER_AXIS
+#ifdef PCABasedOrientationCorrection_RENDER_AXIS
+
+	for (int i = 0; i < 3; i++)
+	{
+		eigen_frame[i] = rot_mat1*eigen_frame[i];
+		CCurveObject *caxis = new CCurveObject();
+		caxis->GetCurve().push_back(OpenMesh::Vec3d(0, 0, 0));
+		caxis->GetCurve().push_back(OpenMesh::Vec3d(eigen_frame[i][0],eigen_frame[i][1],eigen_frame[i][2]));
+		OpenMesh::Vec3d color(0, 0, 0);
+		color[i] = 1;
+		caxis->SetColor(color);
+		DataPool::AddCurveObject(caxis);
+
+	}
+#endif
 }
 void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs)
 {

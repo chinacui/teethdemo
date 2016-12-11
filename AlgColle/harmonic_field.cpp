@@ -29,6 +29,164 @@ bool CHarmonicFieldSeg::IsConcave(COpenMeshT &mesh, COpenMeshT::VertexHandle vh)
 	}
 	return false;
 }
+void CHarmonicFieldSeg::RefineSegTwoTooth(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1)
+{
+
+
+	std::vector<bool>teeth_mark0(mesh.n_vertices(), false);
+	std::vector<bool>teeth_mark1(mesh.n_vertices(), false);
+	for (int i = 0; i < vhs0.size(); i++)
+	{
+		teeth_mark0[vhs0[i].idx()] = true;
+	}
+	for (int i = 0; i < vhs1.size(); i++)
+	{
+		teeth_mark1[vhs1[i].idx()] = true;
+	}
+
+	int ecount = 6;
+	while (ecount--)
+	{
+		CMorphlogicOperation::Erode(mesh, teeth_mark0);
+	}
+	ecount = 6;
+	while (ecount--)
+	{
+		CMorphlogicOperation::Erode(mesh, teeth_mark1);
+	}
+	std::vector<COpenMeshT::VertexHandle>tmp_orig_teeth_vhs0(0);
+	std::vector<COpenMeshT::VertexHandle>tmp_orig_teeth_vhs1(0);
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		if (teeth_mark0[viter->idx()] == true)
+		{
+			tmp_orig_teeth_vhs0.push_back(viter);
+		}
+		if (teeth_mark1[viter->idx()] == true)
+		{
+			tmp_orig_teeth_vhs1.push_back(viter);
+		}
+		mesh.set_color(viter, OpenMesh::Vec3d(1, 0, 0));
+	}
+	SegTwoTooth(mesh, tmp_orig_teeth_vhs0, tmp_orig_teeth_vhs1,vhs0,vhs1);
+	/*for (int i = 0; i < vhs0.size(); i++)
+	{
+		mesh.set_color(vhs0[i], OpenMesh::Vec3d(0,1, 0));
+	}
+	for (int i = 0; i < vhs1.size(); i++)
+	{
+		mesh.set_color(vhs1[i], OpenMesh::Vec3d(0, 0, 1));
+	}*/
+
+}
+void CHarmonicFieldSeg::RefineTeethGingivaSeg(COpenMeshT &mesh, std::vector<int>&teeth_mark)
+{
+	std::map<int, std::vector<COpenMeshT::VertexHandle>>teeth_vhs_map;
+	teeth_vhs_map.clear();
+	for(auto viter=mesh.vertices_begin();viter!=mesh.vertices_end();viter++)
+	{
+		int vid = viter->idx();
+		int tid = teeth_mark[vid];
+		if (tid == -1)
+			continue;
+		if (teeth_vhs_map.find(tid) == teeth_vhs_map.end())
+		{
+			teeth_vhs_map[tid] = std::vector<COpenMeshT::VertexHandle>();
+		}
+		teeth_vhs_map[tid].push_back(viter);
+	}
+	int minmum_teeth_num = 10;
+	std::vector<int>tobe_del;
+	for (auto iter = teeth_vhs_map.begin(); iter != teeth_vhs_map.end(); iter++)
+	{
+		if (iter->second.size() < minmum_teeth_num)
+			tobe_del.push_back(iter->first);
+	}
+	for (int i = 0; i < tobe_del.size(); i++)
+	{
+		teeth_vhs_map.erase(tobe_del[i]);
+	}
+	teeth_mark.resize(mesh.n_vertices(), -1);
+	auto iter_pre = teeth_vhs_map.begin();
+	auto iter = iter_pre;
+	iter++;
+	for (; iter != teeth_vhs_map.end()&&iter_pre!=teeth_vhs_map.end(); iter++)
+	{
+		RefineSegTwoTooth(mesh, teeth_vhs_map[iter_pre->first], teeth_vhs_map[iter->first]);
+
+		for (int i = 0; i < teeth_vhs_map[iter_pre->first].size(); i++)
+		{
+			mesh.set_color(teeth_vhs_map[iter_pre->first][i], OpenMesh::Vec3d(0, 1, 0));
+		}
+		for (int i = 0; i < teeth_vhs_map[iter->first].size(); i++)
+		{
+			mesh.set_color(teeth_vhs_map[iter->first][i], OpenMesh::Vec3d(0, 0, 1));
+		}
+		iter++;
+		iter_pre = iter;
+	}
+	if (iter == teeth_vhs_map.end()&&iter_pre!=teeth_vhs_map.end()&&iter_pre!=teeth_vhs_map.begin())
+	{
+		RefineSegTwoTooth(mesh, teeth_vhs_map[iter_pre->first], teeth_vhs_map[teeth_vhs_map.begin()->first]);
+	
+	}
+	for (int i = 0; i < teeth_mark.size(); i++)
+	{
+		teeth_mark[i] = -1;
+	}
+	for (auto iter = teeth_vhs_map.begin(); iter != teeth_vhs_map.end(); iter++)
+	{
+		std::vector<COpenMeshT::VertexHandle>&vhs = iter->second;
+		for (int i = 0; i < vhs.size(); i++)
+		{
+			teeth_mark[vhs[i].idx()] = iter->first;
+		}
+	}
+}
+void CHarmonicFieldSeg::RefineTeethGingivaSeg(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&orig_teeth_vhs, std::vector<COpenMeshT::VertexHandle>&res_teeth)
+{
+	std::vector<COpenMeshT::VertexHandle>tmp_orig_teeth_vhs(0); 
+	std::vector<COpenMeshT::VertexHandle>tmp_orig_gingiva_vhs(0);
+
+	std::vector<bool>teeth_mark(mesh.n_vertices(), false);
+	std::vector<bool>gingiva_mark(mesh.n_vertices(), true);
+	for (int i = 0; i < orig_teeth_vhs.size(); i++)
+	{
+		teeth_mark[orig_teeth_vhs[i].idx()] = true;
+		gingiva_mark[orig_teeth_vhs[i].idx()] = false;
+	}
+
+	int ecount = 6;
+	while (ecount--)
+	{
+		CMorphlogicOperation::Erode(mesh, teeth_mark);
+	}
+	ecount = 4;
+	while (ecount--)
+	{
+		CMorphlogicOperation::Erode(mesh, gingiva_mark);
+	}
+	
+
+	for (int i = 0; i < orig_teeth_vhs.size(); i++)
+	{
+		if (teeth_mark[orig_teeth_vhs[i].idx()])
+		{
+			tmp_orig_teeth_vhs.push_back(orig_teeth_vhs[i]);
+		}
+	}
+	for(auto viter=mesh.vertices_begin();viter!=mesh.vertices_end();viter++)
+	{
+		if (gingiva_mark[viter->idx()] == true)
+		{
+			tmp_orig_gingiva_vhs.push_back(viter);
+		}
+	}
+
+	std::vector<COpenMeshT::VertexHandle>res_gingiva_vhs;
+	SegTwoSet(mesh, tmp_orig_teeth_vhs, tmp_orig_gingiva_vhs, res_teeth, res_gingiva_vhs);
+	
+}
 void CHarmonicFieldSeg::GetConcavityAwareLaplacianMatrix(COpenMeshT &mesh, std::vector<Eigen::Triplet<double>>&triplets)
 {
 	triplets.clear();
@@ -374,7 +532,7 @@ void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT:
 	double bin_start = bins[0].first;
 	
 
-	double mid_threshold =0.2,max_threshold=0.7;
+	double mid_threshold =0.4,max_threshold=0.7;
 
 	Eigen::MatrixXd vertexs;
 	Eigen::MatrixXi faces;
@@ -457,11 +615,17 @@ void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT:
 	std::cerr << res_tooth.size() << std::endl;
 }
 
-
+void CHarmonicFieldSeg::SegTwoSet(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1, std::vector<COpenMeshT::VertexHandle>&res_vhs0, std::vector<COpenMeshT::VertexHandle>&res_vhs1)
+{
+	SegTwoTooth(mesh, vhs0, vhs1, res_vhs0, res_vhs1);
+}
 void CHarmonicFieldSeg::SegTwoTooth(COpenMeshT&mesh, std::vector<COpenMeshT::VertexHandle>&vhs0, std::vector<COpenMeshT::VertexHandle>&vhs1, std::vector<COpenMeshT::VertexHandle>&res_teeth0, std::vector<COpenMeshT::VertexHandle>&res_teeth1)
 {
 	res_teeth1.clear();
 	res_teeth0.clear();
+	std::cerr << "seg two tooth" << std::endl;
+	std::cerr << vhs0.size() << std::endl;
+	std::cerr << vhs1.size() << std::endl;
 	std::vector<std::pair<COpenMeshT::VertexHandle, double>>cons;
 	for (int i = 0; i < vhs0.size(); i++)
 	{
@@ -475,13 +639,14 @@ void CHarmonicFieldSeg::SegTwoTooth(COpenMeshT&mesh, std::vector<COpenMeshT::Ver
 	}
 	Eigen::VectorXd harmonic_field;
 	ComputeConcavityAwareHarmonicField(mesh, cons, harmonic_field);
-	/*for (auto hiter = mesh.halfedges_begin(); hiter != mesh.halfedges_end(); hiter++)
+	for (auto hiter = mesh.halfedges_begin(); hiter != mesh.halfedges_end(); hiter++)
 	{
 		auto vh = mesh.to_vertex_handle(hiter);
 		mesh.data(hiter).SetUV(OpenMesh::Vec2f(harmonic_field(vh.idx()), harmonic_field(vh.idx())));
 	}
-	return;*/
+	
 	CNumericalBaseAlg::NormalizeScalarField(harmonic_field);
+	
 	
 	std::vector<std::pair<double, double>>bins;
 	std::vector<std::vector<int>>bin_vids;
@@ -571,15 +736,18 @@ void CHarmonicFieldSeg::SegTwoTooth(COpenMeshT&mesh, std::vector<COpenMeshT::Ver
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		int vid = viter->idx();
-
+		//mesh.set_color(viter, OpenMesh::Vec3d(1, 1, 1));
 		if (harmonic_field(vid) <= threshold0)
 		{
 			res_teeth0.push_back(viter);
+			//mesh.set_color(viter, OpenMesh::Vec3d(1, 0, 0));
 		}
 		if (harmonic_field(vid) >= threshold1)
 		{
 			res_teeth1.push_back(viter);
+			//mesh.set_color(viter, OpenMesh::Vec3d(0, 0, 1));
 		}
+
 	}
 	/*std::cerr << "threshold " << threshold0 << " " << threshold1 << std::endl;
 	std::cerr << "res_t" << res_teeth0.size() << " " << res_teeth1.size() << std::endl;*/

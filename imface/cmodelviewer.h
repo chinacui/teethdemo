@@ -21,7 +21,7 @@ protected:
 	virtual void init();//called automatically when the viewer is initialized
 	virtual void initializeGL();//called automatically when the opengl context is initialized
 
-	void InitCamera();// init parameters of the camera_
+	
 	void keyPressEvent(QKeyEvent *e);
 	void keyReleaseEvent(QKeyEvent*e);
 	void mousePressEvent(QMouseEvent *);
@@ -30,6 +30,7 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent *);
 	void wheelEvent(QWheelEvent *);
 public:
+	void InitCamera();// init parameters of the camera_
 	CModelViewer(QWidget *parent);
 	~CModelViewer();
 	void SetScene(CScene* scene);

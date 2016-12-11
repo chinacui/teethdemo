@@ -6,6 +6,7 @@ class CEditFeatureEdgeAction:public CActionBase
 {
 protected:
 	std::vector<COpenMeshT::VertexHandle>picked_vhs_;
+	bool is_pick_ = false;
 protected:
 
 	void MousePressEvent(QMouseEvent *e);

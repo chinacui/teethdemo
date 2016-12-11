@@ -6,6 +6,9 @@ int DataPool::mesh_object_max_id_;
 
 std::map<int, std::shared_ptr<CCurveObject>> DataPool::curve_object_pool_;
 int DataPool::curve_object_max_id_;
+
+std::map<int, std::shared_ptr<CVolumeDataObject>> DataPool::volume_data_object_pool_;
+int DataPool::volume_data_object_max_id_;
 std::map<int, std::shared_ptr<CMeshObject>>& DataPool::GetMeshObjectPool()
 {
 	return mesh_object_pool_;
@@ -106,4 +109,57 @@ CCurveObject *DataPool::GetCurveObject(int id)
 std::map<int, std::shared_ptr<CCurveObject>>& DataPool::GetCurveObjectPool()
 {
 	return curve_object_pool_;
+}
+
+
+
+
+int DataPool::AddVolumeDataObject(CVolumeDataObject *volume_data_obj)
+{
+	if (volume_data_obj->GetId() != -1 && (volume_data_object_pool_.find(volume_data_obj->GetId()) == volume_data_object_pool_.end()))
+	{
+		if (volume_data_object_max_id_ < volume_data_obj->GetId())
+		{
+			volume_data_object_max_id_ = volume_data_obj->GetId() + 1;
+		}
+
+		volume_data_object_pool_.insert(std::pair<int, std::shared_ptr<CVolumeDataObject>>(volume_data_obj->GetId(), std::shared_ptr<CVolumeDataObject>(volume_data_obj)));
+		return volume_data_obj->GetId();
+	}
+	else
+	{
+		volume_data_obj->SetId(volume_data_object_max_id_);
+		volume_data_object_pool_.insert(std::pair<int, std::shared_ptr<CVolumeDataObject>>(volume_data_object_max_id_, std::shared_ptr<CVolumeDataObject>(volume_data_obj)));
+		volume_data_object_max_id_++;
+		return volume_data_object_max_id_ - 1;
+	}
+}
+bool DataPool::DeleteVolumeDataObject(int id)
+{
+	if (volume_data_object_pool_.find(id) != volume_data_object_pool_.end())
+	{
+		volume_data_object_pool_.erase(id);
+		return true;
+	}
+	return false;
+}
+void DataPool::DeleteAllVolumeDataObjects()
+{
+	volume_data_object_pool_.clear();
+}
+CVolumeDataObject *DataPool::GetVolumeDataObject(int id)
+{
+	auto iter = volume_data_object_pool_.find(id);
+	if (iter == volume_data_object_pool_.end())
+	{
+		return NULL;
+	}
+	else
+	{
+		return iter->second.get();
+	}
+}
+std::map<int, std::shared_ptr<CVolumeDataObject>>& DataPool::GetVolumeDataObjectPool()
+{
+	return volume_data_object_pool_;
 }

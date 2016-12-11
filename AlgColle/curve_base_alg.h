@@ -11,6 +11,6 @@ public:
 	static void ComputeBoundingBoxOf2dCurve(std::vector<OpenMesh::Vec2d>&curve,OpenMesh::Vec2d &bbox_min,OpenMesh::Vec2d &bbox_max);
 	static void ComputeClosestPoint(std::vector<OpenMesh::Vec2d>&curve, OpenMesh::Vec2d p, int &res_pid);
 
-	//static void QuadraticCurveFitting(std::vector<OpenMesh::Vec2d>&points, double&res_a, double &res_b, double &res_c, double &res_error);
+	static void QuadraticCurveFitting(std::vector<OpenMesh::Vec2d>&points, double&res_a, double &res_b, double &res_c, double &res_error);
 };
 #endif

@@ -9,9 +9,9 @@ class CHarmonicFieldSegmentation :public CActionBase
 protected:
 	std::vector<COpenMeshT::VertexHandle>picked_vhs_fore_,picked_vhs_back_;
 	std::set<COpenMeshT::VertexHandle>picked_vhs_fore_mark_, picked_vhs_back_mark_;
-
+	
 	std::set<OpenMesh::Vec3d>rand_color_set_;
-	std::vector<int>teeth_seg_mark_;//mark of each vertex
+	std::vector<int>teeth_seg_mark_;//mark of each vertex -1 means gingiva
 	std::vector<int>gingiva_seg_mark_;
 	int teeth_seg_mark_id_;
 	std::map<int,int>teeth_seg_count_;
@@ -25,8 +25,14 @@ protected:
 	OpenMesh::Vec3d pca_mean_;
 	std::vector<OpenMesh::Vec3d>pca_frame_;
 	OpenMesh::Vec3d GetRandColor();
-	void RenderFeature();
+	
+
+	int dental_mesh_id_;
+	int seg_tooth_mesh_id_;
+	std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle> all_seg_tooth_orig_vhs_map_;
+
 protected:
+	void RenderFeature();
 	void Init();
 	void MousePressEvent(QMouseEvent *e);
 	void MouseMoveEvent(QMouseEvent *e);

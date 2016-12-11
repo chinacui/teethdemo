@@ -24,6 +24,11 @@ void CScene::Render( CCamera camera)
 	{
 		iter->second->Render(camera);
 	}
+
+	for (auto iter = scene_volumedata_.begin(); iter != scene_volumedata_.end(); iter++)
+	{
+		iter->second->Render(camera);
+	}
 }
 void CScene::UpdateScene()
 {
@@ -48,6 +53,8 @@ void CScene::UpdateScene()
 	}
 	for (int i = 0; i < mto_be_removed.size(); i++)
 		scene_mesh_.erase(mto_be_removed[i]);
+
+
 	auto curve_obj_pool = DataPool::GetCurveObjectPool();
 	for (auto iter = curve_obj_pool.begin(); iter != curve_obj_pool.end(); iter++)
 	{
@@ -72,4 +79,29 @@ void CScene::UpdateScene()
 		scene_curve_.erase(cto_be_removed[i]);
 	}
 
+
+
+	auto volume_data_obj_pool = DataPool::GetVolumeDataObjectPool();
+	for (auto iter = volume_data_obj_pool.begin(); iter != volume_data_obj_pool.end(); iter++)
+	{
+		
+		if (scene_volumedata_.find(iter->first) == scene_volumedata_.end())
+		{
+			CSceneVolumeObject *p_scene_volumedata_obj = new CSceneVolumeObject((std::weak_ptr<CVolumeDataObject>)iter->second);
+			scene_volumedata_[iter->first] = p_scene_volumedata_obj;
+		}
+	}
+	std::vector<int>vto_be_removed;
+	for (auto iter = scene_volumedata_.begin(); iter != scene_volumedata_.end(); ++iter)
+	{
+		//need to be removed from scene
+		if (scene_volumedata_.find(iter->first) == scene_volumedata_.end())
+		{
+			vto_be_removed.push_back(iter->first);
+		}
+	}
+	for (int i = 0; i < vto_be_removed.size(); i++)
+	{
+		scene_volumedata_.erase(vto_be_removed[i]);
+	}
 }

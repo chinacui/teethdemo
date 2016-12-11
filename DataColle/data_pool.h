@@ -7,6 +7,7 @@
 #include<vector>
 #include"mesh_object.h"
 #include"curve_object.h"
+#include"volume_data_object.h"
 #include<memory>
 class DATACOLLE_CLASS DataPool
 {
@@ -16,6 +17,9 @@ protected:
 
 	static std::map<int, std::shared_ptr<CCurveObject>>curve_object_pool_;
 	static int curve_object_max_id_;
+
+	static std::map<int, std::shared_ptr<CVolumeDataObject>>volume_data_object_pool_;
+	static int volume_data_object_max_id_;
 public:
 	static int AddMeshObject(CMeshObject *mesh);// add CMeshObject to mesh_object_pool_
 	static bool DeleteMeshObject(int id);
@@ -29,5 +33,12 @@ public:
 	static void DeleteAllCurveObjects();
 	static CCurveObject *GetCurveObject(int id);
 	static std::map<int, std::shared_ptr<CCurveObject>>& GetCurveObjectPool();
+
+
+	static int AddVolumeDataObject(CVolumeDataObject *volume_data_obj);
+	static bool DeleteVolumeDataObject(int id);
+	static void DeleteAllVolumeDataObjects();
+	static CVolumeDataObject *GetVolumeDataObject(int id);
+	static std::map<int, std::shared_ptr<CVolumeDataObject>>& GetVolumeDataObjectPool();
 };
 #endif

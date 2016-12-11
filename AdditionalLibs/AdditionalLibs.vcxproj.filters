@@ -19,6 +19,12 @@
     <Filter Include="Source Files\XWGeodesic">
       <UniqueIdentifier>{adcd8c48-0d40-4818-b4aa-931fb194e860}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\libicp">
+      <UniqueIdentifier>{d6718d49-ec16-4bd8-b96b-147ff03b66b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libicp">
+      <UniqueIdentifier>{f6f7c29f-522a-4be4-8c89-dd985469ca0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XWGeodesic\Extremity_Point_Utils.h">
@@ -66,6 +72,24 @@
     <ClInclude Include="XWGeodesic\xw_geodesic_wrapper.h">
       <Filter>Header Files\XWGeodesic</Filter>
     </ClInclude>
+    <ClInclude Include="libicp\icpPointToPlane.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
+    <ClInclude Include="libicp\matrix.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
+    <ClInclude Include="libicp\icp.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
+    <ClInclude Include="libicp\icpPointToPoint.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
+    <ClInclude Include="libicp\kdtree.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
+    <ClInclude Include="libicp\libicp_wrapper.h">
+      <Filter>Header Files\libicp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XWGeodesic\ComputeGeodesics.cpp">
@@ -103,6 +127,27 @@
     </ClCompile>
     <ClCompile Include="XWGeodesic\xw_geodesic_wrapper.cpp">
       <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\kdtree.cpp">
+      <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\matrix.cpp">
+      <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\icpPointToPlane.cpp">
+      <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\icpPointToPoint.cpp">
+      <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\icp.cpp">
+      <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\libicp_wrapper.cpp">
+      <Filter>Header Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="libicp\demo.cpp">
+      <Filter>Source Files\libicp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

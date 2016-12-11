@@ -27,6 +27,7 @@ void CMorphlogicOperation::Dilate(COpenMeshT &mesh, std::vector<bool>&labels)
 		}
 	}
 }
+
 void CMorphlogicOperation::Erode(COpenMeshT &mesh, std::vector<bool>&labels)
 {
 std::vector<bool>in_labels = labels;

@@ -12,7 +12,7 @@ class CImfaceWindow : public QMainWindow
 public:
 	CImfaceWindow(QWidget *parent = 0);
 	~CImfaceWindow();
-
+	CModelViewer* GetModelViewer() { return ui.model_viewer; }
 
 protected:
 	Ui::ImfaceWindow ui;

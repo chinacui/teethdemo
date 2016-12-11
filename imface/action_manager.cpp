@@ -4,6 +4,8 @@
 #include"hot_key_action.h"
 #include"edit_feature_edge_action.h"
 #include"harmonic_field_segmentation_action.h"
+#include"volume_data_segmentation_action.h"
+#include"teeth_reconstruction_action.h"
 void CActionManager::Init(CModelViewer* viewer)
 {
 	viewer_ = viewer;
@@ -17,6 +19,8 @@ void CActionManager::Init(CModelViewer* viewer)
 	actions_.push_back(new CHotKeyAction());
 	actions_.push_back(new CEditFeatureEdgeAction());
 	actions_.push_back(new CHarmonicFieldSegmentation());
+	actions_.push_back(new CVolumeDataSegmentationAction());
+	actions_.push_back(new CTeethReconstruction());
 	for (int i = 0; i < actions_.size(); i++)
 	{
 		actions_[i]->SetViewer(viewer_);
@@ -103,6 +107,17 @@ void CActionManager::KeyPressEvent(QKeyEvent *e)
 			{
 				actions_[i]->KeyPressEvent(e);
 			}
+		}
+	}
+}
+void CActionManager::SetCurrentActionType(CActionType t)
+{
+	current_action_type_ = t;
+	for (int i = 0; i < actions_.size(); i++)
+	{
+		if (actions_[i]->GetType() == current_action_type_)
+		{
+			actions_[i]->Init();
 		}
 	}
 }

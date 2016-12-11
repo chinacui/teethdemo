@@ -11,7 +11,8 @@
 #include "qfiledialog.h"
 #include"cmodelviewer.h"
 #include"action_manager.h"
-
+#include"../AlgColle/dental_base_alg.h"
+#include"imface_window.h"
 void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 {
 
@@ -66,7 +67,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		{
 		delete resmeshes[i];
 		}
-		CGeoBaseAlg::NormalizeMeshSize(mesh);
+		
 		
 		//CGeoAlg::FillHoles(mesh);
 		CGeoBaseAlg::RemoveNonManifold(mesh);
@@ -82,119 +83,22 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		{
 			mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
 		}
+		CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
+		CGeoBaseAlg::NormalizeMeshSize(mesh);
 		meshobj->SetChanged();
 		int id = DataPool::AddMeshObject(meshobj);
 		CUIContext::SetSelectedMeshObjectId(id);
 		if (CUIContext::msdm_seg_ == NULL)
 			CUIContext::msdm_seg_ = new CMorphSkelDentalMeshSeg(*meshobj);
-		break;
-	}
-	case Qt::Key_D:
-	{
-		CUIContext::msdm_seg_->TestDilate();
-	
-		break;
-	}
-	case Qt::Key_E:
-	{
-		CUIContext::msdm_seg_->TestErode();
-	
-		break;
-	}
-	case Qt::Key_R:
-	{
-		CUIContext::msdm_seg_->TestRemoveSmallFeatureRegions();
+
 		
 		break;
 	}
-	
-	case Qt::Key_P:
-	{
-		std::cerr << "please input the prarm you want to adjust" << std::endl;
-		std::cerr << "0: curvature" << std::endl;
-		std::cerr << "1: small region num" << std::endl;
-		int id;
-		std::cin >> id;
-		if (id == 0)
-		{
-			CUIContext::cm_current_adjust_param_ = "Curvature";
-		}
-		else if (id == 1)
-		{
-			CUIContext::cm_current_adjust_param_ = "SmallRegion";
-		}
-		break;
-	}
-	case 16777237:
-	{
-		if (CUIContext::cm_current_adjust_param_ == "Curvature")
-		{
-			CUIContext::msdm_seg_->TestGetCurvatureThreshold() -= 1;
-			CUIContext::msdm_seg_->TestCurvature();
-			std::cerr << "current curvature threshold " << CUIContext::msdm_seg_->TestGetCurvatureThreshold() << std::endl;
-			
 
-		}
-		else if (CUIContext::cm_current_adjust_param_ == "SmallRegion")
-		{
-			CUIContext::msdm_seg_->TestGetSmallRegionThreshold() -= 1;
 
-			std::cerr << "current small region threshold " << CUIContext::msdm_seg_->TestGetSmallRegionThreshold() << std::endl;
-		
-		}
-		break;
-	}
-	case Qt::Key_G:
+	case Qt::Key_Space:
 	{
-		CUIContext::msdm_seg_->TestTagGingiva();
-		
-		break;
-	}
-	case 16777235:
-	{
-		if (CUIContext::cm_current_adjust_param_ == "Curvature")
-		{
-			CUIContext::msdm_seg_->TestGetCurvatureThreshold() += 1;
-			CUIContext::msdm_seg_->TestCurvature();
-			std::cerr << "current curvature threshold " << CUIContext::msdm_seg_->TestGetCurvatureThreshold() << std::endl;
-		
-
-		}
-		else if (CUIContext::cm_current_adjust_param_ == "SmallRegion")
-		{
-			CUIContext::msdm_seg_->TestGetSmallRegionThreshold() += 1;
-
-			std::cerr << "current small region threshold " << CUIContext::msdm_seg_->TestGetSmallRegionThreshold() << std::endl;
-			
-		}
-		break;
-	}
-	case Qt::Key_F:
-	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		auto p_mesh_object = DataPool::GetMeshObject(mid);
-		if (CUIContext::msdm_seg_ == NULL)
-			CUIContext::msdm_seg_ = new CMorphSkelDentalMeshSeg(*p_mesh_object);
-		CUIContext::msdm_seg_->TestCurvature();
-	
-		break;
-	}
-	case Qt::Key_S:
-	{
-		CUIContext::msdm_seg_->TestSkeletonize();
-		
-		break;
-	}
-	case Qt::Key_C://compute mean curvature
-	{
-		std::cout << "compute mean curvature" << std::endl;
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		auto p_mesh_object = DataPool::GetMeshObject(mid);
-		if (CUIContext::msdm_seg_ == NULL)
-			CUIContext::msdm_seg_ = new CMorphSkelDentalMeshSeg(*p_mesh_object);
-
-		CUIContext::msdm_seg_->ComputeSegmentation(true);
-
+		CUIContext::GetMainWindow()->GetModelViewer()->InitCamera();
 		break;
 	}
 	case Qt::Key_M:
@@ -203,32 +107,30 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		std::cerr << "switch to edit feature edge action" << std::endl;
 		break;
 	}
-
+	case Qt::Key_J:
+	{
+		manager_->SetCurrentActionType(VolumeDataSegmentation);
+		std::cerr << "switch to volume segmentation action" << std::endl;
+		break;
+	
+	}
 	case Qt::Key_H:
 	{
 		manager_->SetCurrentActionType(HarmonicFieldSegmentation);
 		std::cerr << "switch to harmonic action" << std::endl;
 		break;
+	
+	}
+	case Qt::Key_C:
+	{
+		DataPool::DeleteAllCurveObjects();
+	
 		break;
 	}
-	case Qt::Key_T:
+	case Qt::Key_P:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		auto p_mesh_object = DataPool::GetMeshObject(mid);
-		std::map<int,COpenMeshT*>meshes;
-		std::vector<int>tags;
-		for (int i = 0; i < CUIContext::msdm_seg_->tags_.size(); i++)
-		{
-			if (CUIContext::msdm_seg_->tags_[i] == CMorphSkelDentalMeshSeg::CTag::Teeth || CUIContext::msdm_seg_->tags_[i] == CMorphSkelDentalMeshSeg::CTag::Feature)
-				tags.push_back(1);
-			else
-				tags.push_back(0);
-			
-		}
-		CGeoAlg::SeparateMeshByVertexTag(p_mesh_object->GetMesh(), tags, meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>());
-		CMeshObject m;
-		m.GetMesh() = *meshes[1];
-		CDataIO::WriteMesh("res0.obj", m);
+		manager_->SetCurrentActionType(CPanoramaMeshRegistration);
+	std::cerr << "switch to panoramia registration action" << std::endl;
 		break;
 	}
 	case Qt::Key_O://

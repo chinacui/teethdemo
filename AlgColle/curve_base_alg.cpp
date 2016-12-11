@@ -33,7 +33,10 @@ void CCurveBaseAlg::ComputeClosestPoint(std::vector<OpenMesh::Vec2d>&curve, Open
 		}
 	}
 }
+void CCurveBaseAlg::QuadraticCurveFitting(std::vector<OpenMesh::Vec2d>&points, double&res_a, double &res_b, double &res_c, double &res_error)
+{
 
+}
 void CCurveBaseAlg::ComputeBoundingBoxOf2dCurve(std::vector<OpenMesh::Vec2d>&curve, OpenMesh::Vec2d &bbox_min, OpenMesh::Vec2d &bbox_max)
 {
 	bbox_max = OpenMesh::Vec2d(std::numeric_limits<double>::min(), std::numeric_limits<double>::min());

@@ -25,7 +25,7 @@ public:
 	virtual void MouseDoubleClickEvent(QMouseEvent * e);
 
 	CActionType GetCurrentActionType() { return current_action_type_; }
-	void SetCurrentActionType(CActionType t) { current_action_type_ = t; }
+	void SetCurrentActionType(CActionType t);
 	void Init(CModelViewer* viewer);
 	CActionManager() {};
 

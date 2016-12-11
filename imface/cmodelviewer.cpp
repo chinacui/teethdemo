@@ -37,11 +37,11 @@ CModelViewer::CModelViewer(QWidget *parent)
 }
 void CModelViewer::InitCamera()
 {
-	
-	camera_.setAspectRatio(1);
+	camera_.setType(qglviewer::Camera::Type::ORTHOGRAPHIC);
+	//camera_.setAspectRatio(1);
 	camera_.setPosition(qglviewer::Vec(0, 0, 1));
 	camera_.lookAt(qglviewer::Vec(0, 0, 0));
-
+	camera_.setUpVector(qglviewer::Vec(0, 1, 0));
 }
 void CModelViewer::keyReleaseEvent(QKeyEvent*e)
 {
@@ -105,7 +105,7 @@ void CModelViewer::init()
 	setCamera(&camera_);
 	setMouseBinding(Qt::ControlModifier, Qt::LeftButton, QGLViewer::CAMERA, QGLViewer::ROTATE);
 	setMouseBinding(Qt::ControlModifier, Qt::RightButton, QGLViewer::CAMERA, QGLViewer::TRANSLATE);
-	setMouseBinding(Qt::ControlModifier, Qt::MidButton, QGLViewer::CAMERA, QGLViewer::ZOOM);
+	//setMouseBinding(Qt::ControlModifier, Qt::MidButton, QGLViewer::CAMERA, QGLViewer::ZOOM);
 	setWheelBinding(Qt::ControlModifier, QGLViewer::CAMERA, QGLViewer::ZOOM);
 
 	action_manager_ = new CActionManager();

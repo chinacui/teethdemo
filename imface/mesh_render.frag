@@ -10,6 +10,7 @@ uniform highp vec4 u_light_spec;
 uniform highp vec4 u_light_amb;
 uniform float u_spec_power;
 uniform int use_texture;
+uniform int is_shinning;
 uniform sampler2D u_sampler_exture;
 varying vec2 v_texcoords;
 
@@ -37,6 +38,8 @@ void main(void)
 	vec4 specular = pow(max(dot(R,V), 0.0), u_spec_power) * u_light_spec;
 		
 	gl_FragColor = vcolor*u_light_amb + diffuse ;//+ specular;
+	if(is_shinning==1)
+	gl_FragColor=vec4(gl_FragColor.x*1.3,gl_FragColor.y*1.0,gl_FragColor.z*1.1,gl_FragColor.a);
 
 	
 }

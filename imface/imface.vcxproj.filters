@@ -92,6 +92,18 @@
     <ClCompile Include="scene_curve_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scene_volume_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="volume_data_segmentation_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="visual_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teeth_reconstruction_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="imface.qrc">
@@ -144,6 +156,18 @@
     <ClInclude Include="scene_curve_object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scene_volume_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="volume_data_segmentation_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="visual_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teeth_reconstruction_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="mesh_render.vert">
@@ -156,6 +180,30 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="curve_render.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="back_texcoord_render.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="back_texcoord_render.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="depth_renderer.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="depth_renderer.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="front_texcoord_render.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="front_texcoord_render.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="volumeRender.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="volumeRender.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

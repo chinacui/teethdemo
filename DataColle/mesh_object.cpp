@@ -39,25 +39,39 @@ void CMeshObject::SetChanged(bool is_changed)
 		tot_surface_area_ = -1;
 		mesh_.update_normals();
 	}
-
 	
+	if (vtag_.size() != mesh_.n_vertices())
+	{
+		vtag_.clear();
 
+		for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
+		{
+			vtag_[viter->idx()] = -1;
+		}
+
+	}
 	
 	
 }
 void CMeshObject::CopyFrom(CMeshObject& b)
 {
 	mesh_ = b.mesh_;
+	is_visiable_ = b.is_visiable_;
+	vtag_ = b.vtag_;
+	is_shinning_ = b.is_shinning_;
 	SetChanged();
 }
 CMeshObject::CMeshObject(CMeshObject &b)
 {
 	mesh_ = b.mesh_;
 	texture_id_ = b.TextureId();
+	is_visiable_ = b.is_visiable_;
 	use_texture_ = false;
+	vtag_ = b.vtag_;
+	is_shinning_ = b.is_shinning_;
 	SetChanged();
 }
-CMeshObject::CMeshObject()
+CMeshObject::CMeshObject():CBaseObject()
 {
 
 	mesh_id_ = -1;
@@ -65,6 +79,13 @@ CMeshObject::CMeshObject()
 	use_texture_ = false;
 	is_changed_ = true;
 	tot_surface_area_ = -1;
+	is_visiable_ = true;
+	vtag_.clear();
+	is_shinning_ = false;
+	for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
+	{
+		vtag_[viter->idx()] = -1;
+	}
 }
 void CMeshObject::SetMeshColor(OpenMesh::Vec3d color)
 {

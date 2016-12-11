@@ -88,7 +88,8 @@ void CSceneMeshObject::UpdateRenderInfo()
 }
 void CSceneMeshObject::Render( CCamera camera)
 {
-
+	if (mesh_.lock().get()->IsVisiable() == false)
+		return;
 	UpdateRenderInfo();
 	vao_.bind();
 	rendering_program_.bind();
@@ -137,6 +138,10 @@ void CSceneMeshObject::Render( CCamera camera)
 
 	rendering_program_.setUniformValue(use_texture_loc, use_texture_);
 	rendering_program_.setUniformValue("u_sampler_exture", 0);
+	if(mesh_.lock().get()->IsShinning())
+		rendering_program_.setUniformValue("is_shinning",1);
+	else
+		rendering_program_.setUniformValue("is_shinning", 0);
 	rendering_program_.setUniformValue(light_pos_loc, light_pos);
 	rendering_program_.setUniformValue(mvp_mat_loc, mvpMatrix);
 	rendering_program_.setUniformValue(mv_mat_loc, mvMatrix);

@@ -17,7 +17,9 @@ protected:
 	double tot_surface_area_;
 	int texture_id_;
 	bool use_texture_;
-
+	bool is_visiable_;
+	std::map<int,int>vtag_;
+	bool is_shinning_=false;
 protected:
 	COpenMeshT mesh_;
 
@@ -27,7 +29,9 @@ protected:
 
 
 public:
-
+	std::map<int,int>&GetVertexTags() { return vtag_; }
+	bool& IsVisiable() { return is_visiable_; }
+	bool &IsShinning() { return is_shinning_; }
 	int GetId();//get id of mesh object
 	void SetId(int id);//set id of mesh object
 	bool IsChanged();

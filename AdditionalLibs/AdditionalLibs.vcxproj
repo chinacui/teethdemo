@@ -19,6 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libicp\icp.h" />
+    <ClInclude Include="libicp\icpPointToPlane.h" />
+    <ClInclude Include="libicp\icpPointToPoint.h" />
+    <ClInclude Include="libicp\kdtree.h" />
+    <ClInclude Include="libicp\libicp_wrapper.h" />
+    <ClInclude Include="libicp\matrix.h" />
     <ClInclude Include="prereq.h" />
     <ClInclude Include="XWGeodesic\BaseModel.h" />
     <ClInclude Include="XWGeodesic\Chen_Han.h" />
@@ -36,6 +42,13 @@
     <ClInclude Include="XWGeodesic\xw_geodesic_wrapper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="libicp\demo.cpp" />
+    <ClCompile Include="libicp\icp.cpp" />
+    <ClCompile Include="libicp\icpPointToPlane.cpp" />
+    <ClCompile Include="libicp\icpPointToPoint.cpp" />
+    <ClCompile Include="libicp\kdtree.cpp" />
+    <ClCompile Include="libicp\libicp_wrapper.cpp" />
+    <ClCompile Include="libicp\matrix.cpp" />
     <ClCompile Include="XWGeodesic\BaseModel.cpp" />
     <ClCompile Include="XWGeodesic\Chen_Han.cpp" />
     <ClCompile Include="XWGeodesic\ComputeGeodesics.cpp" />
@@ -120,11 +133,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_USRDLL;ADDITIONALLIBS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;$(TEIGEN_ROOT);$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;$(BOOST_LIBRARYDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenMeshToolsd.lib;OpenMeshCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -153,13 +166,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_USRDLL;ADDITIONALLIBS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;$(TEIGEN_ROOT);$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;$(BOOST_LIBRARYDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenMeshTools.lib;OpenMeshCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

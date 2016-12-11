@@ -27,6 +27,7 @@ public:
 	static void SeparateMeshByVertexTag(COpenMeshT &mesh_obj, std::vector<int>&v_tag,std::map<int,COpenMeshT*>&res_meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_orig);//v_tag should be continues, start from 0
 	static bool RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::FaceHandle & res_fh, OpenMesh::Vec3d &res_bary_coord);
 	static bool RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::VertexHandle & res_vh);
+	static int PickMesh(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, std::map<int, std::shared_ptr<CMeshObject>>&data_pool,bool is_visiable);
 	static void ComputeClosestVertex(OpenMesh::Vec3d source, CMeshObject &mesh_obj, OpenMesh::VertexHandle &res_vh);
 	static bool ComputeGeodesicPath(CMeshObject &mesh_obj,int svid,int tvid, std::vector<COpenMeshT::FaceHandle>&res_fhs, std::vector<OpenMesh::Vec3d>&res_bary_coords);
 	static bool ComputeGeodesicPath(CMeshObject &mesh_obj, int svid, int tvid, std::vector<OpenMesh::Vec3d>&path);
@@ -38,8 +39,10 @@ public:
 	static void ComputeGradientOfScalarField(COpenMeshT &mesh, Eigen::VectorXd &scalars, Eigen::MatrixXd & res_grad);
 	static void SimplifyMesh(OpenMesh::TriMesh_ArrayKernelT<COMTraits> &mesh,int edgenum);
 	static void ExtractNRing(COpenMeshT &mesh, COpenMeshT::VertexHandle vh,int ringnum, std::vector<COpenMeshT::VertexHandle>&res_vhs);//except vh
+	static void ExtractNeiByDis(COpenMeshT &mesh, COpenMeshT::VertexHandle vh, double ring_dis, std::vector<COpenMeshT::VertexHandle>&res_vhs);
 	static void ComputeLocalExtremum(COpenMeshT &mesh, Eigen::VectorXd &scalars, int neighbor_num,std::vector<COpenMeshT::VertexHandle>&res_vhs);
 	static void ComputeLocalExtremum(COpenMeshT &mesh, std::vector<double> &scalars, int neighbor_num, std::vector<COpenMeshT::VertexHandle>&res_vhs);
 	static void LaplacianSmooth(COpenMeshT &mesh, int epoch, double step);
+	static void GetOrderedRegionBound(COpenMeshT&mesh, std::vector<int>&region_tags,COpenMeshT::VertexHandle start_vh, std::vector<COpenMeshT::VertexHandle>&res_bound_vhs);
 };
 #endif

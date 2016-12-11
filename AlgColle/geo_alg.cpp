@@ -47,8 +47,43 @@ void CGeoAlg::PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&r
 			res_eigen_vects[i][j] = pca_analysis.eigenvectors.at<double>(i, j);
 		}
 		res_eigen_values[i]= pca_analysis.eigenvalues.at<double>(i, 0);
-		
+		//std::cerr << "eig value " << res_eigen_values[i] << std::endl;
 	}
+
+}
+int CGeoAlg::PickMesh(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, std::map<int, std::shared_ptr<CMeshObject>>&data_pool,bool is_visiable)
+{
+	double min_dis = std::numeric_limits<double>::max();
+	int mi=-1;
+	for (auto iter = data_pool.begin(); iter != data_pool.end(); iter++)
+	{
+		/*auto camera = viewer_->GetCamera();
+		OpenMesh::Vec3d orig, dir;
+		camera.ConvertClickToLine(e->pos(), orig, dir);*/
+
+		CMeshObject* meshobj = iter->second.get();
+		if (meshobj->IsVisiable() != is_visiable)
+			continue;
+		COpenMeshT&mesh = meshobj->GetMesh();
+		COpenMeshT::FaceHandle fh;
+		OpenMesh::Vec3d barycoord;
+	
+		//std::cerr << "start ray" << std::endl;
+	//	std::cerr << source << " " << dir << std::endl;
+		if (CGeoAlg::RayMeshIntersection(source, dir, *meshobj,fh, barycoord))
+		{
+			//std::cerr << "inter" << std::endl;
+			OpenMesh::Vec3d p = CGeoBaseAlg::ComputeVPosFromBaryCoord(mesh,fh, barycoord);
+			
+			double dis=(p - source).length();
+			if (min_dis > dis)
+			{
+				min_dis = dis;
+				mi = iter->first;
+			}
+		}
+	}
+	return mi;
 
 }
 void CGeoAlg::ComputeGradientOfScalarField(COpenMeshT &mesh, Eigen::VectorXd &scalars, Eigen::MatrixXd & res_grad)
@@ -354,6 +389,11 @@ void CGeoAlg::ComputeLocalExtremum(COpenMeshT &mesh, Eigen::VectorXd &scalars, i
 		}
 	}
 }
+void CGeoAlg::GetOrderedRegionBound(COpenMeshT&mesh, std::vector<int>&region_tags, COpenMeshT::VertexHandle start_vh, std::vector<COpenMeshT::VertexHandle>&res_bound_vhs)
+{
+
+}
+
 void CGeoAlg::LaplacianSmooth(COpenMeshT &mesh, int epoch, double step)
 {
 	COpenMeshT tmp_mesh[2];
@@ -388,6 +428,7 @@ void CGeoAlg::LaplacianSmooth(COpenMeshT &mesh, int epoch, double step)
 		mesh.set_point(viter, pv);
 	}
 }
+
 void CGeoAlg::ComputeLocalExtremum(COpenMeshT &mesh, std::vector<double> &scalars, int neighbor_num, std::vector<COpenMeshT::VertexHandle>&res_vhs)
 {
 	res_vhs.clear();
@@ -411,6 +452,7 @@ void CGeoAlg::ComputeLocalExtremum(COpenMeshT &mesh, std::vector<double> &scalar
 		}
 	}
 }
+
 void CGeoAlg::ExtractNRing(COpenMeshT &mesh, COpenMeshT::VertexHandle vh, int ringnum, std::vector<COpenMeshT::VertexHandle>&res_vhs)
 {
 	std::queue<std::pair<COpenMeshT::VertexHandle,int>>Q;
@@ -738,12 +780,17 @@ bool CGeoAlg::RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, 
 }
 bool CGeoAlg::RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::FaceHandle & res_fh, OpenMesh::Vec3d &res_bary_coord)
 {
-	//std::cerr << "intersection start" << std::endl;
+	
 	igl::Hit hit;
-	auto invmat = mesh_obj.GetMatrix().inverse();
-	auto lsource= invmat*Eigen::Vector4d(source[0], source[1], source[2], 1);
-	auto ldir = invmat*Eigen::Vector4d(dir[0], dir[1], dir[2], 1);
+	Eigen::Matrix4d invmat = mesh_obj.GetMatrix().inverse();
+	Eigen::Vector4d lsource= Eigen::Vector4d(source[0], source[1], source[2], 1);
+	Eigen::Vector4d ldir = Eigen::Vector4d(dir[0], dir[1], dir[2], 1);
 	COpenMeshT &mesh = mesh_obj.GetMesh();
+	
+	lsource = invmat*lsource;
+	ldir = invmat*ldir;
+	
+	
 	auto aabb_tree = mesh_obj.GetAABBTree();
 
 	if (aabb_tree == NULL)
@@ -773,6 +820,7 @@ bool CGeoAlg::RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, 
 	Point orig(lsource[0], lsource[1], lsource[2]);
 	
 	Ray ray_query(orig, to);
+
 	std::list<Ray_intersection> intersections;
 	
 	try

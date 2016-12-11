@@ -17,6 +17,7 @@ public:
 public:
 	static void Dilate(COpenMeshT &mesh, std::vector<bool>&labels);
 	static void Erode(COpenMeshT &mesh, std::vector<bool>&labels);
+
 	static void FloodFill(COpenMeshT &mesh, std::vector<bool>&label, bool roi_label, COpenMeshT::VertexHandle start_vh, int target_tag, std::vector<int>&res_region_tag);
 	static void Skeletonization(COpenMeshT& mesh, std::vector<bool>&labels);
 };

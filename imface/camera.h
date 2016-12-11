@@ -13,6 +13,8 @@ public:
 	CCamera(const CCamera& c);
 	CCamera & CCamera::operator=(const CCamera &b);
 	void ConvertClickToLine(QPoint p, OpenMesh::Vec3d &orig, OpenMesh::Vec3d &dir);
+	qreal zNear() const { return 0.001; };
+	qreal zFar() const { return 100.0; };
 	
 
 };

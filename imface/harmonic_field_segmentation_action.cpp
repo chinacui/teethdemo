@@ -20,12 +20,13 @@
 #include"../AlgColle/morphlogic_operation.h"
 #include "qfiledialog.h"
 #include"../DataColle/data_io.h"
+
 void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 {
 	if (is_drawing_)
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			OpenMesh::Vec3d  curve_color;
@@ -96,8 +97,8 @@ void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 	{
 		if (e->button() == Qt::LeftButton)
 		{
-			int mid = CUIContext::GetSelectedMeshObjectId();
-			CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+			CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 			if (meshobj != NULL)
 			{
 				auto camera = viewer_->GetCamera();
@@ -138,8 +139,8 @@ void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 	{
 		if (e->button() == Qt::LeftButton)
 		{
-			int mid = CUIContext::GetSelectedMeshObjectId();
-			CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+			CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 			if (meshobj != NULL)
 			{
 				auto camera = viewer_->GetCamera();
@@ -177,8 +178,8 @@ void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 		}
 		else
 		{
-			int mid = CUIContext::GetSelectedMeshObjectId();
-			CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+			CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 			if (meshobj != NULL)
 			{
 				auto camera = viewer_->GetCamera();
@@ -198,8 +199,8 @@ void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 }
 void CHarmonicFieldSegmentation::RenderFeature()
 {
-	int mid = CUIContext::GetSelectedMeshObjectId();
-	CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+
+	CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 	if (meshobj != NULL)
 	{
 		COpenMeshT &mesh = meshobj->GetMesh();
@@ -230,8 +231,8 @@ void CHarmonicFieldSegmentation::MouseMoveEvent(QMouseEvent *e)
 
 	if (is_drawing_)
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			auto camera = viewer_->GetCamera();
@@ -310,13 +311,14 @@ void CHarmonicFieldSegmentation::Init()
 	teeth_seg_count_.clear();
 	teeth_seg_mark_id_ = 0;
 
-	int mid = CUIContext::GetSelectedMeshObjectId();
-	CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+	dental_mesh_id_ = CUIContext::GetSelectedMeshObjectId();
+	CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 	if (meshobj != NULL)
 	{
 		meshobj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
 		meshobj->SetAttrChanged();
 	}
+	seg_tooth_mesh_id_ = -1;
 }
 void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 {
@@ -332,7 +334,56 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_Q:
 	{
+		std::cerr << "switch to common action" << std::endl;
 		manager_->SetCurrentActionType(CActionType::Common);
+		break;
+	}
+	case Qt::Key_O:
+	{
+		QString path = QFileDialog::getSaveFileName((QWidget*)CUIContext::GetMainWindow(), "save seg result");
+
+		if (path.length() == 0)
+		{
+			std::cerr << "unable to open path\n" << std::endl;
+			return;
+		}
+
+		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
+		if (p_mesh_obj_ != NULL)
+		{
+
+			
+			std::string fname,ftagname;
+			fname = path.toStdString();
+			if (fname.length() - 4>=0&&fname[fname.length() - 4] != '.')
+			{
+				ftagname = fname + ".dmat";
+				fname += ".obj";
+			}
+			else
+			{
+				ftagname = fname.substr(0,fname.length()-4) + ".dmat";
+			}
+			CDataIO::WriteMesh(fname, *p_mesh_obj_);
+			COpenMeshT &mesh = p_mesh_obj_->GetMesh();
+			Eigen::VectorXi tags(mesh.n_vertices());
+			std::map<int, int>&vtags = p_mesh_obj_->GetVertexTags();
+	
+			for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+			{
+
+				tags(viter->idx()) =vtags[viter->idx()];
+			//	std::cerr << vtags[viter] << std::endl;
+			}
+
+			//for (int i = 0; i < tags.size(); i++)
+			//{
+			//	std::cerr << tags(i) << std::endl;
+			//}
+			igl::writeDMAT(ftagname, tags);
+			std::cerr << "save " << fname << "successfully" << std::endl;
+		}
+	
 		break;
 	}
 	case Qt::Key_Z:
@@ -352,6 +403,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	case  Qt::Key_C:
 	{
 		Init();
+		DataPool::DeleteAllCurveObjects();
 		std::cerr << "clear" << std::endl;
 		break;
 	}
@@ -361,64 +413,64 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		std::cerr << "is pick fore " << is_pick_fore_ << std::endl;
 		break;
 	}
+	case Qt::Key_Space:
+	{
+		e->setAccepted(false);
+		break;
+	}
+
 	case Qt::Key_S:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+	
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
+			
 			COpenMeshT&mesh = meshobj->GetMesh();
-		
-			CDentalBaseAlg::ComputePCAFrameFromHighCurvaturePoints(mesh,10, pca_mean_,pca_frame_);
-			//OpenMesh::Vec3d dir = pca_frame_[2];
-			//CPlane cplane(pca_mean_, dir);
-			//CMeshObject *plane_obj = new CMeshObject();
-			//CAuxGeoUtils::GetPlaneMeshFromPointAndAxis(cplane.p(), pca_frame_[0], pca_frame_[1], pca_frame_[2], 1.2, plane_obj->GetMesh());
-			//plane_obj->SetChanged();
-			//DataPool::AddMeshObject(plane_obj);
+			std::cerr << "seg gingiva from teeth" << std::endl;
+			
 
 			std::map<int, COpenMeshT*>sep_meshes;
-			std::map<int, std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>vid_orig;
-			//CGeoAlg::SeparateMeshByVertexTag(mesh, teeth_seg_mark_, sep_meshes, vid_orig);
-			CGeoAlg::SeparateMeshByVertexTag(mesh, gingiva_seg_mark_, sep_meshes, vid_orig);
+			std::map<int, std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>> vid_org_map_;
+			//CGeoAlg::SeparateMeshByVertexTag(mesh, teeth_seg_mark_, sep_meshes, vid_org_map_);
+			CGeoAlg::SeparateMeshByVertexTag(mesh, gingiva_seg_mark_, sep_meshes, vid_org_map_);
+			all_seg_tooth_orig_vhs_map_.clear();
+	
+			//all_seg_tooth_orig_vhs_map_ = vid_org_map_[-1];
 			for(auto iter=sep_meshes.begin();iter!=sep_meshes.end();iter++)
 			{
 				int tid = iter->first;
 				if (tid == -1)
 				{
-					CMeshObject* p_mesh_obj = new CMeshObject();
-				/*	std::vector<COpenMeshT*>res_meshes;
-					CGeoAlg::SeparateDisconnectedParts(*sep_meshes[tid], res_meshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>());
-					int max_i=0;
-					for (int i = 0; i < res_meshes.size(); i++)
+					CMeshObject* p_seg_tooth_mesh = new CMeshObject();
+				
+				//	CGeoBaseAlg::RemoveNonManifold(*iter->second);
+					p_seg_tooth_mesh->GetMesh() = *iter->second;
+					for (auto viter = vid_org_map_[-1].begin(); viter != vid_org_map_[-1].end(); viter++)
 					{
-						if (res_meshes[i]->n_vertices() > res_meshes[max_i]->n_vertices())
-						{
-							max_i = i;
-						}
+						all_seg_tooth_orig_vhs_map_[p_seg_tooth_mesh->GetMesh().vertex_handle(viter->first.idx())] = viter->second;
 					}
-					p_mesh_obj->GetMesh() = *res_meshes[max_i];*/
-					CGeoBaseAlg::RemoveNonManifold(*iter->second);
-					p_mesh_obj->GetMesh() = *iter->second;
 				//	CGeoAlg::SimplifyMesh(p_mesh_obj->GetMesh(), 10000);
 					//CGeoAlg::FillHoles(p_mesh_obj->GetMesh());
 					delete sep_meshes[tid];
-					p_mesh_obj->SetMeshColor(teeth_seg_color_[tid]);
-					p_mesh_obj->SetChanged();
-					p_mesh_obj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
-					CUIContext::SetSelectedMeshObjectId(DataPool::AddMeshObject(p_mesh_obj));
+					p_seg_tooth_mesh->SetMeshColor(teeth_seg_color_[tid]);
+					p_seg_tooth_mesh->SetChanged();
+					p_seg_tooth_mesh->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
+
+					seg_tooth_mesh_id_=DataPool::AddMeshObject(p_seg_tooth_mesh);
 				}
 				
 
 			}
-			DataPool::DeleteMeshObject(meshobj->GetId());
+			meshobj->IsVisiable() = false;
+			//DataPool::DeleteMeshObject(meshobj->GetId());
 		}
 		break;
 	}
 	case Qt::Key_U:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			meshobj->UseTexture() = !meshobj->UseTexture();
@@ -427,8 +479,8 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_P:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
@@ -540,8 +592,8 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_K:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
@@ -641,8 +693,8 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_Y://smooth
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
@@ -653,8 +705,8 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_F:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
@@ -695,10 +747,11 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		}
 		break;
 	}
+
 	case Qt::Key_V:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
+		
+		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
@@ -836,21 +889,55 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		CUIContext::SetSelectedMeshObjectId(id);
 		break;
 	}
+	case Qt::Key_I:
+	{
+	
+		std::map<int, int>&vtags = p_mesh_obj_->GetVertexTags();
+
+		CMeshObject *dental_mesh_obj = DataPool::GetMeshObject(dental_mesh_id_);
+		if (dental_mesh_obj != NULL)
+		{
+			std::cerr << "refine teeth seg" << std::endl;
+			COpenMeshT&mesh = dental_mesh_obj->GetMesh();
+			CHarmonicFieldSeg harmonic_seg;
+			harmonic_seg.RefineTeethGingivaSeg(mesh, teeth_seg_mark_);
+			for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+			{
+				int vid = viter->idx();
+				
+				int tid = teeth_seg_mark_[vid];
+				if(tid!=-1)
+				mesh.set_color(viter, teeth_seg_color_[tid]);
+				else
+				{
+					mesh.set_color(viter,OpenMesh::Vec3d(0.8,0.8,0.8));
+				}
+				vtags[viter->idx()] = tid;
+			
+			}
+			
+			dental_mesh_obj->SetAttrChanged();
+
+			
+		}
+		break;
+	}
 	case Qt::Key_G:
 	{
-		int mid = CUIContext::GetSelectedMeshObjectId();
-		CMeshObject *meshobj = DataPool::GetMeshObject(mid);
-		if (meshobj != NULL)
+		std::map<int, int>&vtags = p_mesh_obj_->GetVertexTags();
+
+		CMeshObject *tooth_mesh_obj = DataPool::GetMeshObject(seg_tooth_mesh_id_);
+		if (tooth_mesh_obj != NULL)
 		{
-			COpenMeshT&mesh = meshobj->GetMesh();
+			COpenMeshT&tooth_mesh = tooth_mesh_obj->GetMesh();
 			std::vector<std::vector<COpenMeshT::VertexHandle>>inside_vhs, outside_vhs;
-			CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(*meshobj, inside_vhs, outside_vhs);
-			meshobj->UseTexture() = false;
-			meshobj->SetAttrChanged();
+			CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(*tooth_mesh_obj, inside_vhs, outside_vhs);
+			tooth_mesh_obj->UseTexture() = false;
+			tooth_mesh_obj->SetAttrChanged();
 		
-			CDentalBaseAlg::MergeCuttingPointsByDis(mesh, inside_vhs, outside_vhs, 0.02);
+			CDentalBaseAlg::MergeCuttingPointsByDis(tooth_mesh, inside_vhs, outside_vhs, 0.02);
 			std::vector<CDentalBaseAlg::CCuttingPath>cutting_paths;
-			CDentalBaseAlg::ComputeCuttingPath(*meshobj, inside_vhs, outside_vhs, cutting_paths);
+			CDentalBaseAlg::ComputeCuttingPath(*tooth_mesh_obj, inside_vhs, outside_vhs, cutting_paths);
 			for (int i = 0; i < cutting_paths.size(); i++)
 			{
 				CCurveObject *ccobj = new CCurveObject();
@@ -861,27 +948,69 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			}
 			std::vector<int>tooth_tags;
 			
-			int tagnum=CDentalBaseAlg::TagToothByCuttingPath(mesh, cutting_paths, tooth_tags);
-			std::map<int,OpenMesh::Vec3d>tag_colors;
-			for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+			int tagnum=CDentalBaseAlg::TagToothByCuttingPath(tooth_mesh, cutting_paths, tooth_tags);
+		
+
+			CMeshObject *dental_mesh_obj = DataPool::GetMeshObject(dental_mesh_id_);
+			COpenMeshT &dental_mesh = dental_mesh_obj->GetMesh();
+			dental_mesh_obj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
+
+			if (teeth_seg_mark_.size() != dental_mesh.n_vertices())
+			{
+				teeth_seg_mark_.resize(dental_mesh.n_vertices(), -1);
+				teeth_seg_color_.clear();
+				rand_color_set_.clear();
+				teeth_seg_count_.clear();
+				teeth_seg_mark_id_ = 0;
+			}
+		
+			for (auto viter = tooth_mesh.vertices_begin(); viter != tooth_mesh.vertices_end(); viter++)
 			{
 				int tid = tooth_tags[viter->idx()];
+				vtags[all_seg_tooth_orig_vhs_map_[viter].idx()] = tid;
+				teeth_seg_mark_[all_seg_tooth_orig_vhs_map_[viter].idx()] = tid;
+				//std::cerr << all_seg_tooth_orig_vhs_map_[viter].idx()<<" "<<teeth_seg_mark_[all_seg_tooth_orig_vhs_map_[viter].idx()] << std::endl;
+				if (teeth_seg_mark_id_ < tid)
+					teeth_seg_mark_id_ = tid;
+
+				if (teeth_seg_count_.find(tid) == teeth_seg_count_.end())
+					teeth_seg_count_[tid] = 0;
+				else
+					teeth_seg_count_[tid]++;
+
+
+				if (teeth_seg_color_.find(tid) == teeth_seg_color_.end())
+				{
+					auto c = GetRandColor();
+					if (rand_color_set_.find(c) != rand_color_set_.end())
+						c = GetRandColor();
+					teeth_seg_color_[tid] = c;
+					rand_color_set_.insert(c);
+				}
+
 				if (tid == -1)
 				{
-					mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
+					tooth_mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
+					dental_mesh.set_color(all_seg_tooth_orig_vhs_map_[viter], OpenMesh::Vec3d(0.8, 0.8, 0.8));
 				}
 				else
 				{
-					if (tag_colors.find(tid) == tag_colors.end())
-						tag_colors[tid] = GetRandColor();
-					mesh.set_color(viter, tag_colors[tid]);
+					
+						
+					
+					tooth_mesh.set_color(viter, teeth_seg_color_[tid]);
+					dental_mesh.set_color(all_seg_tooth_orig_vhs_map_[viter], teeth_seg_color_[tid]);
 				}
 			}
 		
+			
+			dental_mesh_obj->IsVisiable() = true;
+			dental_mesh_obj->UseTexture() = false;
+			dental_mesh_obj->SetAttrChanged();
 
-
-			meshobj->UseTexture() =false;
-			meshobj->SetAttrChanged();
+			tooth_mesh_obj->IsVisiable() = false;
+			tooth_mesh_obj->UseTexture() =false;
+			tooth_mesh_obj->SetAttrChanged();
 		}
 		
 		
@@ -889,7 +1018,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_X:
 	{
-		p_mesh_obj_ = DataPool::GetMeshObject(CUIContext::GetSelectedMeshObjectId());
+		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
 		//p_mesh_obj_->TextureId() = CUIContext::ColorBarTextureId();
 		//if (p_mesh_obj_->TextureId() == -1)
 		//{
@@ -945,7 +1074,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_R:
 	{
-		p_mesh_obj_ = DataPool::GetMeshObject(CUIContext::GetSelectedMeshObjectId());
+		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
 
 
 		/*p_mesh_obj_->TextureId() = CUIContext::ColorBarTextureId();
@@ -957,6 +1086,9 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		{
 			p_mesh_obj_->UseTexture() = true;
 		}*/
+		std::map<int, int>&vtags = p_mesh_obj_->GetVertexTags();
+
+	
 		COpenMeshT &mesh = p_mesh_obj_->GetMesh();
 		if (teeth_seg_mark_.size() != mesh.n_vertices())
 		{
@@ -1000,6 +1132,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 				}
 			}
 			teeth_seg_mark_[vh.idx()] = teeth_seg_mark_id_;
+			vtags[vh.idx()] = teeth_seg_mark_id_;
 			teeth_seg_count_[teeth_seg_mark_id_]= teeth_seg_count_[teeth_seg_mark_id_]+1;
 		}
 
@@ -1026,6 +1159,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 				}
 			}
 			teeth_seg_mark_[vh.idx()] = teeth_seg_mark_id_;
+			vtags[vh.idx()] = teeth_seg_mark_id_;
 			teeth_seg_count_[teeth_seg_mark_id_] = teeth_seg_count_[teeth_seg_mark_id_] + 1;
 		}
 		teeth_seg_mark_id_++;
@@ -1041,6 +1175,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 					teeth_seg_count_[seg_id] = 0;
 					seg_id = -1;
 					teeth_seg_mark_[viter->idx()] = -1;
+					vtags[viter->idx()] = -1;
 				}
 			
 			}
@@ -1070,7 +1205,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	/*case Qt::Key_F:
 	{
-		p_mesh_obj_ = DataPool::GetMeshObject(CUIContext::GetSelectedMeshObjectId());
+		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
 
 
 		p_mesh_obj_->TextureId() = CUIContext::ColorBarTextureId();
@@ -1109,61 +1244,61 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		is_eliminating_feature_ = true;
 		break;
 	}
-	case Qt::Key_D:
-	{
+	//case Qt::Key_D:
+	//{
 
-		p_mesh_obj_ = DataPool::GetMeshObject(CUIContext::GetSelectedMeshObjectId());
+	//	p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
 
 
-		p_mesh_obj_->TextureId() = CUIContext::ColorStripeTextureId();
-		if (p_mesh_obj_->TextureId() == -1)
-		{
-			std::cerr << "color bar texture is NULL" << std::endl;
-		}
-		else
-		{
-			p_mesh_obj_->UseTexture() = true;
-		}
-		COpenMeshT &mesh = p_mesh_obj_->GetMesh();
-		CHarmonicFieldSeg harmonicSeg;
-		std::vector<std::pair<COpenMeshT::VertexHandle, double>>cons;
-		for (int i = 0; i < picked_vhs_fore_.size(); i++)
-		{
-			cons.push_back(std::pair<COpenMeshT::VertexHandle, double>(picked_vhs_fore_[i], 1));
-		}
-	
-		std::set<COpenMeshT::VertexHandle>vhset;
-		for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
-		{
-		if (mesh.is_boundary(viter))
-		{
-		cons.push_back(std::make_pair(viter, 0));
-		for (auto vviter = mesh.vv_begin(viter); vviter != mesh.vv_end(viter); vviter++)
-		{
-		if (mesh.is_boundary(vviter)==false&&vhset.find(vviter) == vhset.end())
-		{
-		vhset.insert(vviter);
-		cons.push_back(std::make_pair(vviter,0));
-		}
-		}
-		}
-		}
-		Eigen::VectorXd res_u;
-		harmonicSeg.ComputeConcavityAwareHarmonicField(mesh, cons, res_u);
-		//p_mesh_obj_->NormalizeUV();
-		//igl::writeDMAT("res_u.dmat", res_u);
-		for (auto hiter = mesh.halfedges_begin(); hiter != mesh.halfedges_end(); hiter++)
-		{
-			auto vh = mesh.to_vertex_handle(hiter);
-			mesh.data(*hiter).SetUV(OpenMesh::Vec2f(res_u(vh.idx()), res_u(vh.idx())));
-		}
-		p_mesh_obj_->SetAttrChanged();
-		break;
-	}
+	//	p_mesh_obj_->TextureId() = CUIContext::ColorStripeTextureId();
+	//	if (p_mesh_obj_->TextureId() == -1)
+	//	{
+	//		std::cerr << "color bar texture is NULL" << std::endl;
+	//	}
+	//	else
+	//	{
+	//		p_mesh_obj_->UseTexture() = true;
+	//	}
+	//	COpenMeshT &mesh = p_mesh_obj_->GetMesh();
+	//	CHarmonicFieldSeg harmonicSeg;
+	//	std::vector<std::pair<COpenMeshT::VertexHandle, double>>cons;
+	//	for (int i = 0; i < picked_vhs_fore_.size(); i++)
+	//	{
+	//		cons.push_back(std::pair<COpenMeshT::VertexHandle, double>(picked_vhs_fore_[i], 1));
+	//	}
+	//
+	//	std::set<COpenMeshT::VertexHandle>vhset;
+	//	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	//	{
+	//	if (mesh.is_boundary(viter))
+	//	{
+	//	cons.push_back(std::make_pair(viter, 0));
+	//	for (auto vviter = mesh.vv_begin(viter); vviter != mesh.vv_end(viter); vviter++)
+	//	{
+	//	if (mesh.is_boundary(vviter)==false&&vhset.find(vviter) == vhset.end())
+	//	{
+	//	vhset.insert(vviter);
+	//	cons.push_back(std::make_pair(vviter,0));
+	//	}
+	//	}
+	//	}
+	//	}
+	//	Eigen::VectorXd res_u;
+	//	harmonicSeg.ComputeConcavityAwareHarmonicField(mesh, cons, res_u);
+	//	//p_mesh_obj_->NormalizeUV();
+	//	//igl::writeDMAT("res_u.dmat", res_u);
+	//	for (auto hiter = mesh.halfedges_begin(); hiter != mesh.halfedges_end(); hiter++)
+	//	{
+	//		auto vh = mesh.to_vertex_handle(hiter);
+	//		mesh.data(*hiter).SetUV(OpenMesh::Vec2f(res_u(vh.idx()), res_u(vh.idx())));
+	//	}
+	//	p_mesh_obj_->SetAttrChanged();
+	//	break;
+	//}
 	case Qt::Key_E:
 	{
 		
-		p_mesh_obj_ = DataPool::GetMeshObject(CUIContext::GetSelectedMeshObjectId());
+		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
 		
 
 		p_mesh_obj_->TextureId() = CUIContext::ColorStripeTextureId();
