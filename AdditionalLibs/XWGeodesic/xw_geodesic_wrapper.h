@@ -22,8 +22,10 @@ public:
 	CXWGeodesic() {  }
 	void SetModel(std::vector<CPoint3D>& vertexs, std::vector<CBaseModel::CFace>&faces);
 	void GeodesicDis(int svid, std::vector<int>&tvids, std::vector<double>&dis);
+	void GeodesicDis(std::vector<int>&svids, std::vector<double>&dis);
 	void GeodesicPath(int svid, int tvid, std::vector<CGeoFacePoint>&path);
 	void GeodesicPath(int svid, std::vector<int>&tvids, std::vector<CGeoFacePoint>&path);
+	void GeodesicPath(std::vector<int>&svids, std::vector<int>&tvids, std::vector<std::vector<CGeoFacePoint>>&path);
 	~CXWGeodesic();
 
 };

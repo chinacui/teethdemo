@@ -66,7 +66,7 @@ void CModelViewer::mousePressEvent(QMouseEvent *e)
 {
 	if (e->modifiers() == Qt::Modifier::CTRL)
 		QGLViewer::mousePressEvent(e);
-	else
+
 	action_manager_->MousePressEvent(e);
 	this->update();
 }
@@ -74,7 +74,7 @@ void CModelViewer::mouseMoveEvent(QMouseEvent *e)
 {
 	if (e->modifiers() == Qt::Modifier::CTRL)
 		QGLViewer::mouseMoveEvent(e);
-	else
+	
 	action_manager_->MouseMoveEvent(e);
 	this->update();
 }
@@ -82,7 +82,7 @@ void CModelViewer::mouseReleaseEvent(QMouseEvent *e)
 {
 	if (e->modifiers() == Qt::Modifier::CTRL)
 		QGLViewer::mouseMoveEvent(e);
-	else
+	
 	action_manager_->MouseReleaseEvent(e);
 	this->update();
 }

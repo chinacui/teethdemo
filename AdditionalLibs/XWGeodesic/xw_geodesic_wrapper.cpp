@@ -9,6 +9,20 @@ void CXWGeodesic::SetModel(std::vector<CPoint3D>& vertexs, std::vector<CBaseMode
 	model_->SetModel(vertexs, faces);
 	//model_->SaveObjFile("test.obj");
 }
+void CXWGeodesic::GeodesicDis(std::vector<int>&svids, std::vector<double>&dis)
+{
+	std::set<int>set_tvids;
+	for (int i = 0; i < svids.size(); i++)
+		set_tvids.insert(svids[i]);
+	CXin_Wang alg(*model_, set_tvids);
+	alg.Execute();
+	const std::vector<double>&dis_field = alg.GetDistanceField();
+	dis.resize(dis_field.size());
+	for (int i = 0; i < dis.size(); i++)
+	{
+		dis[i] = dis_field[i];
+	}
+}
 void CXWGeodesic::GeodesicDis(int svid, std::vector<int>&tvids, std::vector<double>&dis)
 {
 	std::set<int>srcs, dsts;
@@ -27,6 +41,60 @@ void CXWGeodesic::GeodesicDis(int svid, std::vector<int>&tvids, std::vector<doub
 		dis[i] = dis_field[tvids[i]];
 	}
 
+}
+void CXWGeodesic::GeodesicPath(std::vector<int>&svids, std::vector<int>&tvids, std::vector<std::vector<CGeoFacePoint>>&paths)
+{
+	std::set<int>set_tvids;
+	for (int i = 0; i < tvids.size(); i++)
+		set_tvids.insert(tvids[i]);
+	CXin_Wang alg(*model_, set_tvids);
+	alg.Execute();
+	paths.resize(svids.size());
+	const std::vector<double>&dis_field = alg.GetDistanceField();
+	for (int i = 0; i < svids.size(); i++)
+	{
+		std::vector<EdgePoint> epath = alg.BacktraceShortestPath(svids[i]);
+		std::reverse(epath.begin(), epath.end());
+		paths[i].resize(epath.size());
+		for (int j = 0; j < epath.size(); j++)
+		{
+			int eid = epath[j].index;
+			auto edge = model_->Edge(eid);
+			if (epath[j].isVertex)
+			{
+				eid = model_->Neigh(epath[j].index)[0].first;
+				edge = model_->Edge(eid);
+			}
+			int fid = edge.indexOfFrontFace;
+			auto point3d = epath[j].Get3DPoint(*model_);
+			auto face = model_->Face(fid);
+			//point3d = model_->m_Verts[face.verts[0]];
+			paths[i][j].pos_[0] = point3d.x;
+			paths[i][j].pos_[1] = point3d.y;
+			paths[i][j].pos_[2] = point3d.z;
+
+			paths[i][j].vids_[0] = face.verts[0];
+			paths[i][j].vids_[1] = face.verts[1];
+			paths[i][j].vids_[2] = face.verts[2];
+
+			for (int k = 0; k < 3; k++)
+			{
+				if (face.verts[k] == edge.indexOfOppositeVert)
+				{
+					paths[i][j].fid_ = fid;
+					paths[i][j].ls_[k] = 0;
+					paths[i][j].ls_[(k + 1) % 3] = 1 - epath[j].proportion;
+					paths[i][j].ls_[(k + 2) % 3] = epath[j].proportion;
+
+
+					break;
+				}
+			}
+		}
+	}
+	
+
+	
 }
 void CXWGeodesic::GeodesicPath(int svid, std::vector<int>&tvids, std::vector<CGeoFacePoint>&path)
 {

@@ -1,12 +1,12 @@
 #include"aux_geo_utils.h"
 #include<iostream>
-void CAuxGeoUtils::GetPlaneMeshFromPointAndAxis(OpenMesh::Vec3d p, OpenMesh::Vec3d axis_a, OpenMesh::Vec3d axis_b, OpenMesh::Vec3d axis_dir, double scale, COpenMeshT &mesh)
+void CAuxGeoUtils::GetPlainMeshFromPointAndAxis(OpenMesh::Vec3d p, OpenMesh::Vec3d axis_a, OpenMesh::Vec3d axis_b, OpenMesh::Vec3d axis_dir, double scale, COpenMeshT &mesh)
 {
 	
-	axis_a.normalize();
+	//axis_a.normalize();
 	double half_scale =scale/2;
 	axis_a = axis_a*half_scale;
-	axis_b.normalize();
+	//axis_b.normalize();
 	axis_b = axis_b*half_scale;
 	OpenMesh::Vec3d vs[4];
 	vs[0] = p+axis_a + axis_b;

@@ -15,7 +15,39 @@ bool CMeshObject::IsChanged()
 {
 	return is_changed_;
 }
-
+void CMeshObject::RestoreCurrentVPos()
+{
+	for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
+	{
+		restore_pos_[viter] = mesh_.point(viter);
+		//OpenMesh::Vec3d p = this->TransformPointByLocalMatrix(mesh_.point(viter));
+		
+	}
+}
+void CMeshObject::RecoverCurrentVPos()
+{
+	for (auto iter = restore_pos_.begin(); iter != restore_pos_.end(); iter++)
+	{
+		mesh_.set_point(iter->first, iter->second);
+	}
+	SetChanged();
+	
+}
+OpenMesh::Vec3d CMeshObject::TransformPointByLocalMatrix(OpenMesh::Vec3d p)
+{
+	Eigen::Vector4d p_eigen(p[0], p[1], p[2],1);
+	Eigen::Vector4d res_p=mat_*p_eigen;
+	return OpenMesh::Vec3d(res_p(0), res_p(1), res_p(2));
+}
+void CMeshObject::ApplyTransform()
+{
+	for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p=this->TransformPointByLocalMatrix(mesh_.point(viter));
+		mesh_.set_point(viter,p);
+	}
+	mat_.setIdentity();
+}
 void CMeshObject::SetAttrChanged(bool is_attrchanged)
 {
 	is_changed_ = is_attrchanged;

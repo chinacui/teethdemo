@@ -5,7 +5,7 @@ void CImageBaseAlg::Curve2dToGrayImage(std::vector<OpenMesh::Vec2d>&curve, int d
 {
 	std::cerr << "curve size" << curve.size() << std::endl;
 	std::cerr << "Curve2dToGrayImage" << std::endl;
-	res_gray_image=cv::Mat(dim_len0,dim_len1,CV_8UC1);
+	res_gray_image=cv::Mat(dim_len1, dim_len0,CV_8UC1);
 	res_gray_image.setTo(background_color);
 	OpenMesh::Vec2d bbox_min, bbox_max;
 	CCurveBaseAlg::ComputeBoundingBoxOf2dCurve(curve, bbox_min, bbox_max);

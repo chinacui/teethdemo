@@ -104,6 +104,9 @@
     <ClCompile Include="teeth_reconstruction_action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="manipulation_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="imface.qrc">
@@ -166,6 +169,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="teeth_reconstruction_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="manipulation_action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,6 +23,7 @@ CBaseModel::CBaseModel(const string& filename) : m_filename(filename)
 }
 void CBaseModel::NormalizeModel()
 {
+	std::cerr << "normalize geodis model" << std::endl;
 	double totArea = 0;
 	for (int i = 0; i < GetNumOfFaces(); i++)
 	{

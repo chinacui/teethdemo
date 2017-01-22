@@ -57,6 +57,21 @@
     <ClInclude Include="linear_algebra_alg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="correspondence_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hmm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="compute_voronoi_diagram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arap_deform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cgal_arap_deform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="geo_alg.cpp">
@@ -96,6 +111,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="linear_algebra_alg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="correspondence_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compute_voronoi_diagram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arap_deform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cgal_arap_deform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

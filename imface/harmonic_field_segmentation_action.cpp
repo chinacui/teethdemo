@@ -7,8 +7,12 @@
 #include"../AlgColle/geo_base_alg.h"
 #include<qimage.h>
 #include"../AlgColle/harmonic_field.h"
+#include <OpenMesh/Core/IO/MeshIO.hh>
 #include<igl/writeDMAT.h>
+#include"../DataColle/cgal_igl_converter.h"
 #include<igl/readDMAT.h>
+#include<igl/writeSTL.h>
+#include<igl/writeOBJ.h>
 #include<set>
 #include<time.h>
 #include"../AlgColle/dental_base_alg.h"
@@ -20,7 +24,7 @@
 #include"../AlgColle/morphlogic_operation.h"
 #include "qfiledialog.h"
 #include"../DataColle/data_io.h"
-
+#include<sstream>
 void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 {
 	if (is_drawing_)
@@ -349,6 +353,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		}
 
 		p_mesh_obj_ = DataPool::GetMeshObject(dental_mesh_id_);
+		p_mesh_obj_->RecoverCurrentVPos();
 		if (p_mesh_obj_ != NULL)
 		{
 
@@ -367,12 +372,14 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			CDataIO::WriteMesh(fname, *p_mesh_obj_);
 			COpenMeshT &mesh = p_mesh_obj_->GetMesh();
 			Eigen::VectorXi tags(mesh.n_vertices());
+			std::vector<int>vtags_vec;
 			std::map<int, int>&vtags = p_mesh_obj_->GetVertexTags();
-	
+			vtags_vec.resize(vtags.size());
 			for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 			{
 
 				tags(viter->idx()) =vtags[viter->idx()];
+				vtags_vec[viter->idx()] = vtags[viter->idx()];
 			//	std::cerr << vtags[viter] << std::endl;
 			}
 
@@ -382,6 +389,35 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			//}
 			igl::writeDMAT(ftagname, tags);
 			std::cerr << "save " << fname << "successfully" << std::endl;
+
+
+			std::map<int, COpenMeshT*>crowns;
+			CGeoAlg::SeparateMeshByVertexTag(p_mesh_obj_->GetMesh(), vtags_vec, crowns,std::map<int, std::map<OpenMesh::VertexHandle, OpenMesh::VertexHandle>>());
+			int cid = 0;
+			for (auto iter = crowns.begin(); iter != crowns.end(); iter++)
+			{
+				std::stringstream sstr;
+				if (fname.length() - 4 >= 0 && fname[fname.length() - 4] != '.')
+				{
+					sstr << fname;
+				}
+				else
+				{
+					sstr<< fname.substr(0, fname.length() - 4) ;
+				}
+				sstr << "_" << cid++ << ".stl";
+				Eigen::MatrixXd v;
+				Eigen::MatrixXi f;
+				CConverter::ConvertFromOpenMeshToIGL(*(iter->second), v, f);
+				//igl::writeSTL(sstr.str(), v, f);
+				//igl::writeOBJ(fname, v, f);
+				if (!OpenMesh::IO::write_mesh(*(iter->second), sstr.str()))
+				{
+					std::cerr << "write error\n";
+					
+				}
+			}
+			
 		}
 	
 		break;
@@ -446,13 +482,16 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 				
 				//	CGeoBaseAlg::RemoveNonManifold(*iter->second);
 					p_seg_tooth_mesh->GetMesh() = *iter->second;
+				
 					for (auto viter = vid_org_map_[-1].begin(); viter != vid_org_map_[-1].end(); viter++)
 					{
 						all_seg_tooth_orig_vhs_map_[p_seg_tooth_mesh->GetMesh().vertex_handle(viter->first.idx())] = viter->second;
 					}
+					//CGeoAlg::RefineMeshBoundary(p_seg_tooth_mesh->GetMesh());
 				//	CGeoAlg::SimplifyMesh(p_mesh_obj->GetMesh(), 10000);
 					//CGeoAlg::FillHoles(p_mesh_obj->GetMesh());
 					delete sep_meshes[tid];
+				
 					p_seg_tooth_mesh->SetMeshColor(teeth_seg_color_[tid]);
 					p_seg_tooth_mesh->SetChanged();
 					p_seg_tooth_mesh->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
@@ -930,6 +969,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		if (tooth_mesh_obj != NULL)
 		{
 			COpenMeshT&tooth_mesh = tooth_mesh_obj->GetMesh();
+		
 			std::vector<std::vector<COpenMeshT::VertexHandle>>inside_vhs, outside_vhs;
 			CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(*tooth_mesh_obj, inside_vhs, outside_vhs);
 			tooth_mesh_obj->UseTexture() = false;

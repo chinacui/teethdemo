@@ -532,7 +532,7 @@ void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT:
 	double bin_start = bins[0].first;
 	
 
-	double mid_threshold =0.4,max_threshold=0.7;
+	double mid_threshold =0.3,max_threshold=0.7;
 
 	Eigen::MatrixXd vertexs;
 	Eigen::MatrixXi faces;
@@ -598,6 +598,7 @@ void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT:
 	}
 	double threshold0 = bin_size*(max_bin_id0 + 1) + bin_start;
 	double threshold1 = bin_size*(max_bin_id1 + 1) + bin_start;
+	
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		int vid = viter->idx();
@@ -606,9 +607,24 @@ void CHarmonicFieldSeg::SegToothGingiva(COpenMeshT&mesh, std::vector<COpenMeshT:
 		{
 			res_tooth.push_back(viter);
 		}
-		if (harmonic_field(vid) >= threshold1)
+		else if (harmonic_field(vid) >= threshold1)
 		{
 			res_gingiva.push_back(viter);
+		}
+		else
+		{
+			int c = 0;
+			for (auto vviter = mesh.vv_begin(viter); vviter != mesh.vv_end(viter); vviter++)
+			{
+				if (harmonic_field(vviter->idx()) < threshold1)
+				{
+					c++;
+				}
+			}
+			if (c <= 2)
+			{
+				res_gingiva.push_back(viter);
+			}
 		}
 		
 	}

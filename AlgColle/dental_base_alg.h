@@ -73,7 +73,7 @@ protected:
 public:
 	class CCuttingPath
 	{
-		double len_=0;
+		double len_=-1;
 	public:
 		COpenMeshT::VertexHandle start_vh_, end_vh_;
 		std::vector<COpenMeshT::FaceHandle> path_fhs_;
@@ -99,6 +99,7 @@ public:
 			end_vh_ = b.end_vh_;
 			path_fhs_ = b.path_fhs_;
 			path_barycoords_ = b.path_barycoords_;
+			len_ = b.len_;
 		}
 		CCuttingPath(COpenMeshT&mesh,COpenMeshT::VertexHandle start_vh, COpenMeshT::VertexHandle end_vh, std::vector<COpenMeshT::FaceHandle>&path_fhs, std::vector<OpenMesh::Vec3d>& path_barycoords)
 		{
@@ -130,8 +131,24 @@ public:
 			OpenMesh::Vec3d ev = mesh_->point(end_vh_);
 			return (sv - ev).length();
 		}
+		int GetSize()
+		{
+			return path_fhs_.size();
+		}
 		double GetLength()
 		{
+			if (len_ == -1)
+			{
+				len_ = 0;
+				OpenMesh::Vec3d prev = CGeoBaseAlg::ComputePointFromBaryCoord(*mesh_, path_fhs_[0], path_barycoords_[0]);
+
+				for (int i = 1; i < path_fhs_.size(); i++)
+				{
+					OpenMesh::Vec3d pv = CGeoBaseAlg::ComputePointFromBaryCoord(*mesh_, path_fhs_[i], path_barycoords_[i]);
+					len_ += (pv - prev).length();
+
+				}
+			}
 			return len_;
 		}
 
@@ -142,6 +159,7 @@ public:
 	static void ComputeGingivaVhs(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs);
 	static void ComputeHoleVertMean(COpenMeshT&mesh, OpenMesh::Vec3d &res_mean);
 	static void ComputeExtremePointsOfClosedCurve(std::vector<OpenMesh::Vec2d>&curve, std::vector<int>&res_ids);
+	static void DetectRootOfTeethSilhouette(std::vector<OpenMesh::Vec2d>&curve,std::vector<int>&root_pids);
 	static void ComputeTwoSideBoundsOfToothMesh(COpenMeshT&mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_inside_bounds, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_outside_bounds);
 	static void ComputeBoundCuttingPointsOfToothMesh(CMeshObject&mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_inside_vhs, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_outside_vhs);
 	static void MergeCuttingPointsByDis(COpenMeshT&mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&inside_vhs, std::vector<std::vector<COpenMeshT::VertexHandle>>&outside_vhs,double threshold);

@@ -86,7 +86,7 @@ void CDentalBaseAlg::ComputeExtremePointsOfClosedCurve(std::vector<OpenMesh::Vec
 	unsigned char back_color = 0, fore_color = 255;
 	int width = 400, height = 400;
 	CImageBaseAlg::Curve2dToGrayImage(curve_2d, width, height, fore_color, back_color, bound_cur_img);
-		//cv::imshow("a", bound_cur_img);
+	//	cv::imshow("a", bound_cur_img);
 	//cv::waitKey(0);
 	for (int i = 0; i < bound_cur_img.rows; i++)
 	{
@@ -129,7 +129,7 @@ void CDentalBaseAlg::ComputeExtremePointsOfClosedCurve(std::vector<OpenMesh::Vec
 		}
 	}
 	//cv::imshow("b", bound_cur_img);
-	//cv::waitKey(0);
+//	cv::waitKey(0);
 	cv::circle(bound_cur_img, extreme_points[max_disi], 4, 200);
 	cv::circle(bound_cur_img, extreme_points[max_disj], 4, 200);
 	OpenMesh::Vec2d curve2d_bboxmin, curve2d_bboxmax;
@@ -150,13 +150,101 @@ void CDentalBaseAlg::ComputeExtremePointsOfClosedCurve(std::vector<OpenMesh::Vec
 	}
 
 }
+void CDentalBaseAlg::DetectRootOfTeethSilhouette(std::vector<OpenMesh::Vec2d>&curve_2d, std::vector<int>&root_pids)
+{
+	cv::Mat bound_cur_img;
+	unsigned char back_color = 0, fore_color = 255;
+	OpenMesh::Vec2d bbox_min, bbox_max;
+	CCurveBaseAlg::ComputeBoundingBoxOf2dCurve(curve_2d, bbox_min, bbox_max);
+	double width = bbox_max[0] - bbox_min[0];
+	double height = bbox_max[1] - bbox_min[1];
+	width = width*(400.0 / height);
+	height = 400;
+	CImageBaseAlg::Curve2dToGrayImage(curve_2d, width, height, fore_color, back_color, bound_cur_img);
+	cv::imshow("a", bound_cur_img);
+	//cv::waitKey(0);
+	for (int i = 0; i < bound_cur_img.rows; i++)
+	{
+		if (bound_cur_img.at<uchar>(i, 0) == fore_color)
+			cv::floodFill(bound_cur_img, cv::Point(0, i), back_color);
+		if (bound_cur_img.at<uchar>(i, width - 1) == fore_color)
+			cv::floodFill(bound_cur_img, cv::Point(width - 1, i), back_color);
+	} 
+
+	for (int i = 0; i < bound_cur_img.cols; i++)
+	{
+		if (bound_cur_img.at<uchar>(0, i) == fore_color)
+			cv::floodFill(bound_cur_img, cv::Point(i, 0), back_color);
+		if (bound_cur_img.at<uchar>(height - 1, i) == fore_color)
+			cv::floodFill(bound_cur_img, cv::Point(i, height - 1), back_color);
+	}
+	CImageBaseAlg::MorphSkeleton(bound_cur_img);
+	
+
+
+	std::vector<cv::Point>extreme_points;
+	CImageBaseAlg::GetExtremePoints(bound_cur_img, fore_color, extreme_points);
+	if (extreme_points.size() < 2)
+	{
+		std::cerr << "no extreme points found" << std::endl;
+	
+		return;
+	}
+	//for (int i = 0; i < extreme_points.size(); i++)
+	//{
+	//	cv::circle(bound_cur_img, extreme_points[i], 4, 200);
+	//}
+	
+	OpenMesh::Vec2d curve2d_len = bbox_max - bbox_min;
+	
+	std::vector<double>dis;
+	double max_dis = -1;
+	int max_disi, max_disj;
+	for (int i = 0; i < extreme_points.size(); i++)
+	{
+		CImageBaseAlg::ShortestDis(bound_cur_img, extreme_points[i], extreme_points, dis);
+			for (int j = 0; j < dis.size(); j++)
+			{
+				if (dis[j] > max_dis)
+				{
+					max_dis = dis[j];
+					max_disi = i;
+					max_disj = j;
+				}
+			}
+	}
+
+	//cv::circle(bound_cur_img, extreme_points[max_disi], 4, 200);
+//	cv::circle(bound_cur_img, extreme_points[max_disj], 4, 200);
+	cv::imshow("root", bound_cur_img);
+
+	OpenMesh::Vec2d om_extreme_points[2];
+	om_extreme_points[0] = OpenMesh::Vec2d(extreme_points[max_disi].x*1.0 / width*curve2d_len[0] + bbox_min[0], extreme_points[max_disi].y*1.0 / height*curve2d_len[1] + bbox_min[1]);
+	om_extreme_points[1] = OpenMesh::Vec2d(extreme_points[max_disj].x*1.0 / width*curve2d_len[0] + bbox_min[0], extreme_points[max_disj].y*1.0 / height*curve2d_len[1] + bbox_min[1]);
+	root_pids.resize(2);
+	std::vector<OpenMesh::Vec2d>curve_normals;
+	CCurveBaseAlg::ComputeCurveNormals(curve_2d, curve_normals);
+
+	CCurveBaseAlg::ComputeClosestPoint(curve_2d, om_extreme_points[0], root_pids[0]);
+	CCurveBaseAlg::ComputeClosestPoint(curve_2d, om_extreme_points[1], root_pids[1]);
+	std::cerr << root_pids[0] << " " << root_pids[1] << std::endl;
+	if (OpenMesh::dot(curve_normals[root_pids[0]], curve_normals[root_pids[1]]) < 0)
+	{
+		if (OpenMesh::dot(curve_normals[root_pids[0]], OpenMesh::Vec2d(0, 1)) > 0)
+		{
+			root_pids[0] = root_pids[1];
+		}
+		root_pids.pop_back();
+	}
+
+}
 void CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(CMeshObject&meshobj, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_inside_vhs, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_outside_vhs)
 {
 	COpenMeshT &mesh = meshobj.GetMesh();
 
 	std::vector<std::vector<COpenMeshT::VertexHandle>>inside_bounds, outside_bounds;
 	CDentalBaseAlg::ComputeTwoSideBoundsOfToothMesh(mesh, inside_bounds, outside_bounds);
-
+	
 	std::vector<std::vector<COpenMeshT::VertexHandle>>tmp_inside_vhs(inside_bounds.size()), tmp_outside_vhs(outside_bounds.size());
 	std::map<COpenMeshT::VertexHandle, std::pair<int,int>> path_from;
 	std::vector<bool>is_cuttingpoint(mesh.n_vertices(), false);
@@ -168,18 +256,24 @@ void CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(CMeshObject&meshobj, s
 		std::vector<COpenMeshT::VertexHandle>& bound0 = inside_bounds[t];
 		std::vector<COpenMeshT::VertexHandle>& bound1 = outside_bounds[t];
 
-		std::vector<COpenMeshT::FaceHandle>res_fhs;
+		std::vector<std::vector<COpenMeshT::FaceHandle>>res_fhs;
 
-		
+		std::vector<std::vector<OpenMesh::Vec3d>> barycoords;
 
 
 		std::set<COpenMeshT::VertexHandle>oppovhs_set;
 		int step = 3;
+		std::vector<COpenMeshT::VertexHandle>sampled_bound0;
 		for (int i = 0; i < bound0.size(); i += step)
 		{
+			sampled_bound0.push_back(bound0[i]);
+		}
+		CGeoAlg::ComputeGeodesicPath(meshobj, sampled_bound0, bound1, res_fhs, barycoords);
+		for(int i=0;i<sampled_bound0.size();i++)
+		{
 
-			std::vector<OpenMesh::Vec3d> barycoords;
-			CGeoAlg::ComputeGeodesicPath(meshobj, bound0[i], bound1, res_fhs, barycoords);
+			
+			
 			/*CCurveObject *ccobj = new CCurveObject();
 			std::vector<OpenMesh::Vec3d> &curve = ccobj->GetCurve();
 			curve.clear();
@@ -192,8 +286,8 @@ void CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(CMeshObject&meshobj, s
 			DataPool::AddCurveObject(ccobj);*/
 
 
-			auto tfh = res_fhs.back();
-			auto tbary = barycoords.back();
+			auto tfh = res_fhs[i].back();
+			auto tbary = barycoords[i].back();
 			double max_bary = -1;
 			int mi;
 			for (int j = 0; j < 3; j++)
@@ -229,14 +323,19 @@ void CDentalBaseAlg::ComputeBoundCuttingPointsOfToothMesh(CMeshObject&meshobj, s
 			}
 			
 		}
-		
+		//std::cerr << "path_from " << path_from.size() << std::endl;
+
+		std::vector<COpenMeshT::VertexHandle>sampled_bound1;
 		for (int i = 0; i < bound1.size(); i += step)
 		{
-
-			std::vector<OpenMesh::Vec3d> barycoords;
-			CGeoAlg::ComputeGeodesicPath(meshobj, bound1[i], bound0, res_fhs, barycoords);
-			auto tfh = res_fhs.back();
-			auto tbary = barycoords.back();
+			sampled_bound1.push_back(bound1[i]);
+		}
+		CGeoAlg::ComputeGeodesicPath(meshobj, sampled_bound1, bound0, res_fhs, barycoords);
+		for (int i = 0; i<sampled_bound1.size(); i++)
+		{
+			
+			auto tfh = res_fhs[i].back();
+			auto tbary = barycoords[i].back();
 			double max_bary = -1;
 			int mi;
 			for (int j = 0; j < 3; j++)
@@ -402,130 +501,258 @@ void CDentalBaseAlg::ComputeCuttingPath(CMeshObject&meshobj, std::vector<std::ve
 {
 	res_cuttingpath.clear();
 	COpenMeshT &mesh = meshobj.GetMesh();
+	std::vector<COpenMeshT::VertexHandle>svhs;
+	std::vector<COpenMeshT::VertexHandle>tvhs;
 	for (int i = 0; i < inside_cutting_vhs.size(); i++)
+	{
+		for (int j = 0; j < inside_cutting_vhs[i].size(); j++)
+		{
+			mesh.set_color(inside_cutting_vhs[i][j], OpenMesh::Vec3d(0, 0, 1));
+		}
+		for (int j = 0; j < inside_cutting_vhs[i].size(); j++)
+		{
+			svhs.push_back(inside_cutting_vhs[i][j]);
+		}
+	}
+	for (int i = 0; i < outside_cutting_vhs.size(); i++)
 	{
 		for (int j = 0; j < outside_cutting_vhs[i].size(); j++)
 		{
 			mesh.set_color(outside_cutting_vhs[i][j], OpenMesh::Vec3d(1, 0, 1));
 		}
-		for (int j = 0; j < inside_cutting_vhs[i].size(); j++)
+		for (int j = 0; j < outside_cutting_vhs[i].size(); j++)
 		{
-			mesh.set_color(inside_cutting_vhs[i][j], OpenMesh::Vec3d(0, 0, 1));
+			tvhs.push_back(outside_cutting_vhs[i][j]);
 		}
-		std::map<COpenMeshT::VertexHandle,CCuttingPath>cuttingpath_oftvhs_map;
-		for (int j = 0; j < inside_cutting_vhs[i].size(); j++)
+	}
+	std::vector<std::vector<COpenMeshT::FaceHandle>>res_fhs;
+	std::vector<std::vector<OpenMesh::Vec3d>>res_bary_coords;
+	CGeoAlg::ComputeGeodesicPath(meshobj, svhs, tvhs, res_fhs, res_bary_coords);
+	std::map<COpenMeshT::VertexHandle, CCuttingPath>cuttingpath_oftvhs_map;
+	for (int i = 0; i < res_fhs.size(); i++)
+	{
+		COpenMeshT::VertexHandle tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, res_fhs[i].back(), res_bary_coords[i].back());
+
+		CCuttingPath cutting_path(mesh, svhs[i], tvh, res_fhs[i], res_bary_coords[i]);
+	
+		if (cuttingpath_oftvhs_map.find(tvh) == cuttingpath_oftvhs_map.end())
 		{
-			std::vector<COpenMeshT::FaceHandle>res_fhs;
-			std::vector<OpenMesh::Vec3d> res_bary_coords;
-			CGeoAlg::ComputeGeodesicPath(meshobj, inside_cutting_vhs[i][j], outside_cutting_vhs[i], res_fhs, res_bary_coords);
-			
-			COpenMeshT::VertexHandle tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh,res_fhs.back(),res_bary_coords.back());
 
-			CCuttingPath cutting_path(mesh, inside_cutting_vhs[i][j], tvh, res_fhs, res_bary_coords);
+			cuttingpath_oftvhs_map[tvh] = cutting_path;
+		}
+		else
+		{
 
-		
 
-			//res_cuttingpath.push_back(cutting_path);
-			if (cuttingpath_oftvhs_map.find(tvh) == cuttingpath_oftvhs_map.end())
+			if (cuttingpath_oftvhs_map[tvh].GetStraightLength() > cutting_path.GetStraightLength())
 			{
-			/*	CCurveObject *ccobj = new CCurveObject();
-				cutting_path.GetPathPoints(ccobj->GetCurve());
-				ccobj->SetChanged();
-				ccobj->SetColor(OpenMesh::Vec3d(1, 0, 1));
-				DataPool::AddCurveObject(ccobj);*/
+				COpenMeshT::VertexHandle presvh = cuttingpath_oftvhs_map[tvh].start_vh_;
+				std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
+				for (int k = 0; k < tvhs.size(); k++)
+				{
+					if (tvh.idx() != tvhs[k].idx())
+						tmp_dst.push_back(tvhs[k]);
+				}
+				std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
+				std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
+				CGeoAlg::ComputeGeodesicPath(meshobj, presvh, tmp_dst, tmpres_fhs, tmpres_bary_coords);
+				COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
+				CCuttingPath tmpcutting_path(mesh, presvh, tmp_tvh, tmpres_fhs, tmpres_bary_coords);
+				if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end() || cuttingpath_oftvhs_map[tmp_tvh].GetStraightLength() > tmpcutting_path.GetStraightLength())
+				{
+					cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
+
+
+
+
+				}
+
 				cuttingpath_oftvhs_map[tvh] = cutting_path;
+
+
 			}
 			else
 			{
-		/*		CCurveObject *ccobj = new CCurveObject();
-				cutting_path.GetPathPoints(ccobj->GetCurve());
+				std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
+				for (int k = 0; k <tvhs.size(); k += 1)
+				{
+					if (tvh.idx() != tvhs[k].idx())
+						tmp_dst.push_back(tvhs[k]);
+				}
+				for (int k = 0; k < tmp_dst.size(); k++)
+				{
+					std::cerr << tmp_dst[k].idx() << " ";
+				}
+				std::cerr << "//////////////" << std::endl;
+				std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
+				std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
+				CGeoAlg::ComputeGeodesicPath(meshobj, svhs[i], tmp_dst, tmpres_fhs, tmpres_bary_coords);
+				COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
+				CCuttingPath tmpcutting_path(mesh, svhs[i], tmp_tvh, tmpres_fhs, tmpres_bary_coords);
+				if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end())
+				{
+
+					cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
+
+
+				}
+				/*std::cerr << "tmpcutting_path " << tmpcutting_path.path_fhs_.size() << " tvh: " << tvh.idx() << " tmp_tvh: " << tmp_tvh.idx() << std::endl;
+				CCurveObject *ccobj = new CCurveObject();
+				tmpcutting_path.GetPathPoints(ccobj->GetCurve());
 				ccobj->SetChanged();
-				ccobj->SetColor(OpenMesh::Vec3d(0, 0, 0));
+				ccobj->SetColor(OpenMesh::Vec3d(0,0, 1));
 				DataPool::AddCurveObject(ccobj);*/
-
-				if (cuttingpath_oftvhs_map[tvh].GetStraightLength() > cutting_path.GetStraightLength())
-				{
-					COpenMeshT::VertexHandle presvh = cuttingpath_oftvhs_map[tvh].start_vh_;
-					std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
-					for (int k = 0; k < outside_cutting_vhs[i].size(); k++)
-					{
-						if (tvh.idx()!= outside_cutting_vhs[i][k].idx())
-							tmp_dst.push_back(outside_cutting_vhs[i][k]);
-					}
-					std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
-					std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
-					CGeoAlg::ComputeGeodesicPath(meshobj, presvh, tmp_dst, tmpres_fhs, tmpres_bary_coords);
-					COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
-					CCuttingPath tmpcutting_path(mesh, presvh, tmp_tvh, tmpres_fhs, tmpres_bary_coords);
-					if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end()|| cuttingpath_oftvhs_map[tmp_tvh].GetStraightLength() > tmpcutting_path.GetStraightLength())
-					{
-						cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
-				
-						
-
-						
-					}
-
-					cuttingpath_oftvhs_map[tvh] = cutting_path;
-				/*	CCurveObject *ccobj = new CCurveObject();
-					tmpcutting_path.GetPathPoints(ccobj->GetCurve());
-					ccobj->SetChanged();
-					ccobj->SetColor(OpenMesh::Vec3d(1, 0, 0));
-					DataPool::AddCurveObject(ccobj);*/
-					
-				}
-				else
-				{
-					std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
-					for (int k = 0; k <outside_cutting_vhs[i].size(); k+=1)
-					{
-						if (tvh.idx() != outside_cutting_vhs[i][k].idx())
-							tmp_dst.push_back(outside_cutting_vhs[i][k]);
-					}
-					for (int k = 0; k < tmp_dst.size(); k++)
-					{
-						std::cerr << tmp_dst[k].idx() << " ";
-					}
-					std::cerr <<"//////////////"<< std::endl;
-					std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
-					std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
-					CGeoAlg::ComputeGeodesicPath(meshobj, inside_cutting_vhs[i][j], tmp_dst, tmpres_fhs, tmpres_bary_coords);
-					COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
-					CCuttingPath tmpcutting_path(mesh, inside_cutting_vhs[i][j], tmp_tvh, tmpres_fhs, tmpres_bary_coords);
-					if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end())
-					{
-						
-						cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
-
-						
-					}
-					/*std::cerr << "tmpcutting_path " << tmpcutting_path.path_fhs_.size() << " tvh: " << tvh.idx() << " tmp_tvh: " << tmp_tvh.idx() << std::endl;
-					CCurveObject *ccobj = new CCurveObject();
-					tmpcutting_path.GetPathPoints(ccobj->GetCurve());
-					ccobj->SetChanged();
-					ccobj->SetColor(OpenMesh::Vec3d(0,0, 1));
-					DataPool::AddCurveObject(ccobj);*/
-				}
 			}
-			
-			/*CCurveObject *p_curve_obj = new CCurveObject();
-			std::vector<OpenMesh::Vec3d>&res_path = p_curve_obj->GetCurve();
-			res_path.clear();
-			for (int k = 0; k < res_fhs.size(); k++)
-			{
-				res_path.push_back(CGeoBaseAlg::GetFacePointFromBaryCoord(mesh, res_fhs[k], res_bary_coords[k]));
-			}
-			p_curve_obj->SetChanged();
-			p_curve_obj->SetColor(OpenMesh::Vec3d(0, 1, 1));
-			DataPool::AddCurveObject(p_curve_obj);*/
 		}
+	}
 
-		for (auto iter = cuttingpath_oftvhs_map.begin(); iter != cuttingpath_oftvhs_map.end(); iter++)
+
+	std::vector<COpenMeshT::VertexHandle>bound_vhs;
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		if (mesh.is_boundary(viter))
+		{
+			bound_vhs.push_back(viter);
+		}
+	}
+	std::vector<double>res_bound_dis;
+	CGeoAlg::ComputeGeodesicDis(meshobj, bound_vhs, res_bound_dis);
+	double mmax = -1;
+	for (int i = 0; i < res_bound_dis.size(); i++)
+	{
+		mmax = mmax < res_bound_dis[i] ? res_bound_dis[i] : mmax;
+	}
+	std::cerr << "max bound dis " << mmax << std::endl;
+	for (auto iter = cuttingpath_oftvhs_map.begin(); iter != cuttingpath_oftvhs_map.end(); iter++)
+	{
+		CCuttingPath &path = iter->second;
+		double path_len = path.GetLength();
+		double max_bound_dis = -1;
+		for (int i = 0; i < path.path_fhs_.size(); i++)
+		{
+			for (auto fviter = mesh.fv_begin(path.path_fhs_[i]); fviter != mesh.fv_end(path.path_fhs_[i]); fviter++)
+			{
+				int vid = fviter->idx();
+				if (res_bound_dis[vid] > max_bound_dis)
+				{
+					max_bound_dis = res_bound_dis[vid];
+				}
+			}
+		}
+		std::cerr << "dis " << max_bound_dis <<" "<<path_len <<" "<<max_bound_dis/path_len<< std::endl;
+		if (max_bound_dis / path_len>  0.015&&path.GetSize()>2)
 		{
 			res_cuttingpath.push_back(iter->second);
 		}
-
+		
+		
 	}
+	//for (int i = 0; i < inside_cutting_vhs.size(); i++)
+	//{
+	//
+	//	
+	//	std::map<COpenMeshT::VertexHandle,CCuttingPath>cuttingpath_oftvhs_map;
+	//	for (int j = 0; j < inside_cutting_vhs[i].size(); j++)
+	//	{
+	//		std::vector<COpenMeshT::FaceHandle>res_fhs;
+	//		std::vector<OpenMesh::Vec3d> res_bary_coords;
+	//		CGeoAlg::ComputeGeodesicPath(meshobj, inside_cutting_vhs[i][j], outside_cutting_vhs[i], res_fhs, res_bary_coords);
+	//		
+	//		COpenMeshT::VertexHandle tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh,res_fhs.back(),res_bary_coords.back());
+
+	//		CCuttingPath cutting_path(mesh, inside_cutting_vhs[i][j], tvh, res_fhs, res_bary_coords);
+
+	//	
+
+	//		//res_cuttingpath.push_back(cutting_path);
+	//		if (cuttingpath_oftvhs_map.find(tvh) == cuttingpath_oftvhs_map.end())
+	//		{
+	//		
+	//			cuttingpath_oftvhs_map[tvh] = cutting_path;
+	//		}
+	//		else
+	//		{
+	//	
+
+	//			if (cuttingpath_oftvhs_map[tvh].GetStraightLength() > cutting_path.GetStraightLength())
+	//			{
+	//				COpenMeshT::VertexHandle presvh = cuttingpath_oftvhs_map[tvh].start_vh_;
+	//				std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
+	//				for (int k = 0; k < outside_cutting_vhs[i].size(); k++)
+	//				{
+	//					if (tvh.idx()!= outside_cutting_vhs[i][k].idx())
+	//						tmp_dst.push_back(outside_cutting_vhs[i][k]);
+	//				}
+	//				std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
+	//				std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
+	//				CGeoAlg::ComputeGeodesicPath(meshobj, presvh, tmp_dst, tmpres_fhs, tmpres_bary_coords);
+	//				COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
+	//				CCuttingPath tmpcutting_path(mesh, presvh, tmp_tvh, tmpres_fhs, tmpres_bary_coords);
+	//				if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end()|| cuttingpath_oftvhs_map[tmp_tvh].GetStraightLength() > tmpcutting_path.GetStraightLength())
+	//				{
+	//					cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
+	//			
+	//					
+
+	//					
+	//				}
+
+	//				cuttingpath_oftvhs_map[tvh] = cutting_path;
+	//		
+	//				
+	//			}
+	//			else
+	//			{
+	//				std::vector<COpenMeshT::VertexHandle>tmp_dst(0);
+	//				for (int k = 0; k <outside_cutting_vhs[i].size(); k+=1)
+	//				{
+	//					if (tvh.idx() != outside_cutting_vhs[i][k].idx())
+	//						tmp_dst.push_back(outside_cutting_vhs[i][k]);
+	//				}
+	//				for (int k = 0; k < tmp_dst.size(); k++)
+	//				{
+	//					std::cerr << tmp_dst[k].idx() << " ";
+	//				}
+	//				std::cerr <<"//////////////"<< std::endl;
+	//				std::vector<COpenMeshT::FaceHandle>tmpres_fhs;
+	//				std::vector<OpenMesh::Vec3d> tmpres_bary_coords;
+	//				CGeoAlg::ComputeGeodesicPath(meshobj, inside_cutting_vhs[i][j], tmp_dst, tmpres_fhs, tmpres_bary_coords);
+	//				COpenMeshT::VertexHandle tmp_tvh = CGeoBaseAlg::GetClosestVhFromFacePoint(mesh, tmpres_fhs.back(), tmpres_bary_coords.back());
+	//				CCuttingPath tmpcutting_path(mesh, inside_cutting_vhs[i][j], tmp_tvh, tmpres_fhs, tmpres_bary_coords);
+	//				if (cuttingpath_oftvhs_map.find(tmp_tvh) == cuttingpath_oftvhs_map.end())
+	//				{
+	//					
+	//					cuttingpath_oftvhs_map[tmp_tvh] = tmpcutting_path;
+
+	//					
+	//				}
+	//				/*std::cerr << "tmpcutting_path " << tmpcutting_path.path_fhs_.size() << " tvh: " << tvh.idx() << " tmp_tvh: " << tmp_tvh.idx() << std::endl;
+	//				CCurveObject *ccobj = new CCurveObject();
+	//				tmpcutting_path.GetPathPoints(ccobj->GetCurve());
+	//				ccobj->SetChanged();
+	//				ccobj->SetColor(OpenMesh::Vec3d(0,0, 1));
+	//				DataPool::AddCurveObject(ccobj);*/
+	//			}
+	//		}
+	//		
+	//		/*CCurveObject *p_curve_obj = new CCurveObject();
+	//		std::vector<OpenMesh::Vec3d>&res_path = p_curve_obj->GetCurve();
+	//		res_path.clear();
+	//		for (int k = 0; k < res_fhs.size(); k++)
+	//		{
+	//			res_path.push_back(CGeoBaseAlg::GetFacePointFromBaryCoord(mesh, res_fhs[k], res_bary_coords[k]));
+	//		}
+	//		p_curve_obj->SetChanged();
+	//		p_curve_obj->SetColor(OpenMesh::Vec3d(0, 1, 1));
+	//		DataPool::AddCurveObject(p_curve_obj);*/
+	//	}
+
+	//	for (auto iter = cuttingpath_oftvhs_map.begin(); iter != cuttingpath_oftvhs_map.end(); iter++)
+	//	{
+	//		res_cuttingpath.push_back(iter->second);
+	//	}
+
+	//}
 }
 int CDentalBaseAlg::TagToothByCuttingPath(COpenMeshT&mesh, std::vector<CCuttingPath>&cutting_pathes, std::vector<int>&res_tags)
 {
@@ -704,7 +931,7 @@ void CDentalBaseAlg::MergeCuttingPointsByDis(COpenMeshT&mesh, std::vector<std::v
 void CDentalBaseAlg::ComputeTwoSideBoundsOfToothMesh(COpenMeshT&mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_inside_bounds, std::vector<std::vector<COpenMeshT::VertexHandle>>&res_outside_bounds)
 {
 	std::vector<std::vector<COpenMeshT::VertexHandle>>bounds;
-	CGeoBaseAlg::GetBoundary(mesh, bounds);
+	CGeoBaseAlg::GetOrderedBoundary(mesh, bounds);
 	res_inside_bounds.clear();
 	res_outside_bounds.clear();
 	OpenMesh::Vec3d pca_mean;
@@ -756,14 +983,14 @@ void CDentalBaseAlg::ComputeTwoSideBoundsOfToothMesh(COpenMeshT&mesh, std::vecto
 			res_outside_bounds[ri].push_back(bound[j]);
 		}
 		double inside2mean_dis = 0;
-		for (int j = 0; j < res_inside_bounds.size(); j++)
+		for (int j = 0; j < res_inside_bounds[ri].size(); j++)
 		{
 			OpenMesh::Vec3d p = mesh.point(res_inside_bounds[ri][j]);
 			inside2mean_dis += (p - bounds_mean).length();
 		}
 		inside2mean_dis /= res_inside_bounds[ri].size();
 		double outside2mean_dis = 0;
-		for (int j = 0; j < res_outside_bounds.size(); j++)
+		for (int j = 0; j < res_outside_bounds[ri].size(); j++)
 		{
 			OpenMesh::Vec3d p = mesh.point(res_outside_bounds[ri][j]);
 			outside2mean_dis += (p - bounds_mean).length();
@@ -865,6 +1092,15 @@ void CDentalBaseAlg::ComputeTeethFeaturePointsUsingSmoothedMesh(COpenMeshT &mesh
 	CGeoAlg::LaplacianSmooth(tmp_mesh, 40, 0.5);
 	std::vector<COpenMeshT::VertexHandle> tmp_vhs;
 	ComputeTeethFeaturePoints(tmp_mesh, tmp_vhs);
+	for (auto viter = tmp_mesh.vertices_begin(); viter != tmp_mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec2f uv=tmp_mesh.data(*tmp_mesh.vih_begin(viter)).GetUV();
+		COpenMeshT::VertexHandle vh = mesh.vertex_handle(viter->idx());
+		for (auto hiter = mesh.vih_begin(vh); hiter != mesh.vih_end(vh); hiter++)
+		{
+			mesh.data(*hiter).SetUV(uv);
+		}
+	}
 	res_vhs.clear();
 	for (int i = 0; i < tmp_vhs.size(); i++)
 	{
@@ -974,21 +1210,27 @@ void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COp
 		}
 	}*/
 //	curvatures_value = curvatures_value / max_curv;
-//	igl::writeDMAT("curvdmat0.dmat", curvatures_value);
+	igl::writeDMAT("curvdmat0.dmat", curvatures_value);
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		if (mesh.is_boundary(viter))
 		{
 			curvatures_value(viter->idx()) = 0;
 		}
+		if (curvatures_value(viter->idx()) < 10)
+		{
+			curvatures_value(viter->idx()) = 0;
+		}
+
 	}
+	igl::writeDMAT("curvdmat1.dmat", curvatures_value);
 	//CNumericalBaseAlg::NormalizeScalarField(curvatures_value);
 	for (int i = 0; i < curvatures_value.size(); i++)
 	{
 		curvatures_value(i) = CNumericalBaseAlg::Sigmoid(curvatures_value(i));
 	}
 	//curvatures_value /= 300;
-	//igl::writeDMAT("curvdmat.dmat", curvatures_value);
+	igl::writeDMAT("curvdmat.dmat", curvatures_value);
 	OpenMesh::Vec3d pca_mean;
 	std::vector<OpenMesh::Vec3d>pca_frame;
 	ComputePCAFrameFromHighCurvaturePoints(mesh, 10, pca_mean, pca_frame);
@@ -1054,6 +1296,7 @@ void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COp
 	{
 		if (z_values[maxi] - z_values[vhs_v[i].vh_.idx()] < 0.35)
 		{
+			if(mesh.is_boundary(vhs_v[i].vh_)==false)
 			res_vhs.push_back(vhs_v[i].vh_);
 		}
 	}

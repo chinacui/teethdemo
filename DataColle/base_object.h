@@ -3,6 +3,7 @@
 #define CBASE_OBJECT_H
 #include"prereq.h"
 #include<Eigen/Dense>
+#include"custom_openmesh_type.h"
 class DATACOLLE_CLASS CBaseObject
 {
 protected:
@@ -12,5 +13,7 @@ public:
 	~CBaseObject();
 	Eigen::Matrix4d & GetMatrix();
 	void SetMatrix(Eigen::Matrix4d &mat);
+	void Transform(OpenMesh::Vec3d trans);
+	void Rotate(OpenMesh::Vec3d axis,double angle,OpenMesh::Vec3d center=OpenMesh::Vec3d(0,0,0));
 };
 #endif

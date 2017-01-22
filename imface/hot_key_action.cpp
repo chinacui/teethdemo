@@ -83,6 +83,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		{
 			mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
 		}
+		meshobj->RestoreCurrentVPos();
 		CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
 		CGeoBaseAlg::NormalizeMeshSize(mesh);
 		meshobj->SetChanged();

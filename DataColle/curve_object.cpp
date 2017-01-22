@@ -28,6 +28,7 @@ CCurveObject::CCurveObject()
 {
 	curve_id_ = -1;
 	color_ = OpenMesh::Vec3d(0, 0, 0);
+	render_type_ = Default;
 }
 CCurveObject::CCurveObject(CCurveObject&b)
 {
@@ -35,6 +36,7 @@ CCurveObject::CCurveObject(CCurveObject&b)
 	curve_ = b.curve_;
 	is_changed_ = true;
 	color_ = b.color_;
+	render_type_ = b.render_type_;
 }
 OpenMesh::Vec3d CCurveObject::GetColor()
 {

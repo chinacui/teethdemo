@@ -8,6 +8,7 @@
 #include<queue>
 #include<igl/writeOBJ.h>
 #include<igl/writeDMAT.h>
+#include"geo_alg.h"
 void CGeoBaseAlg::ComputeMeanCurvatureValue(Eigen::MatrixXd& vertexs, Eigen::MatrixXi& faces, Eigen::VectorXd &res_curvature, bool is_signed)
 {
 	
@@ -46,6 +47,42 @@ OpenMesh::Vec3d CGeoBaseAlg::GetFacePointFromBaryCoord(COpenMeshT&mesh, COpenMes
 	//std::cerr << barycoord << std::endl;
 	//std::cerr << std::endl;
 	return resv ;
+}
+bool CGeoBaseAlg::ConvertFromOpenMeshROIToOpenMesh(COpenMeshT &mesh, std::vector<COpenMeshT::FaceHandle>&roifaces, COpenMeshT&res_mesh, std::map<COpenMeshT::FaceHandle, COpenMeshT::FaceHandle>*new_mesh_2_old_vmap)
+{
+	res_mesh.clear();
+	if (new_mesh_2_old_vmap != NULL)
+	{
+		new_mesh_2_old_vmap->clear();
+	}
+	std::vector<bool>old_vmask(mesh.n_vertices(), false);
+	std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>old2new_vmap;
+	for (int i = 0; i < roifaces.size(); i++)
+	{
+		for (auto viter = mesh.fv_begin(roifaces[i]); viter != mesh.fv_end(roifaces[i]); viter++)
+		{
+			if (old_vmask[viter->idx()] == false)
+			{
+				old2new_vmap[viter] = res_mesh.add_vertex(mesh.point(viter));
+				old_vmask[viter->idx()] = true;
+			}
+
+		}
+	}
+	for (int i = 0; i < roifaces.size(); i++)
+	{
+		std::vector<COpenMeshT::VertexHandle>fvhs;
+		for (auto viter = mesh.fv_begin(roifaces[i]); viter != mesh.fv_end(roifaces[i]); viter++)
+		{
+			fvhs.push_back(old2new_vmap[viter]);
+		}
+		COpenMeshT::FaceHandle fh = res_mesh.add_face(fvhs);
+		if (new_mesh_2_old_vmap != NULL)
+		{
+			(*new_mesh_2_old_vmap)[fh] = roifaces[i];
+		}
+	}
+	return true;
 }
 void CGeoBaseAlg::ComputeMeanCurvatureValue(COpenMeshT &mesh, Eigen::VectorXd &res_curvature, bool is_signed)
 {
@@ -126,7 +163,8 @@ OpenMesh::VertexHandle CGeoBaseAlg::GetClosestVhFromFacePoint(COpenMeshT&mesh, C
 	COpenMeshT::VertexHandle tvh = fvhs[maxi];
 	return tvh;
 }
-void CGeoBaseAlg::GetBoundary(COpenMeshT &mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&bounds)
+
+void CGeoBaseAlg::GetOrderedBoundary(COpenMeshT &mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&bounds)
 {
 	std::vector<bool>mmark(mesh.n_vertices(), 0);
 	bounds.clear();
@@ -143,17 +181,30 @@ void CGeoBaseAlg::GetBoundary(COpenMeshT &mesh, std::vector<std::vector<COpenMes
 			bounds[bid].push_back(viter);
 			mmark[viter->idx()] = true;
 			COpenMeshT::VertexHandle vh = viter;
+			COpenMeshT::VertexHandle pre_vh = vh;
 			int first_vid = viter->idx();
 			do {
+				bool flag = false;
 				for (auto nviter = mesh.vv_begin(vh); nviter != mesh.vv_end(vh); nviter++)
 				{
-					if (mesh.is_boundary(nviter))
+					if (mesh.is_boundary(nviter)&&(mmark[nviter->idx()]==false||(mesh.is_manifold(nviter)==false&&pre_vh!=nviter)))
 					{
+						//if (nviter->idx() < 0 || nviter->idx() >= mmark.size())
+						//	std::cerr<<"nviter->idx() " << nviter->idx() << std::endl;
 						mmark[nviter->idx()] = true;
+						//if (bid<0 || bid>=bounds.size())
+						//	std::cerr << "bid " << bid << std::endl;
 						bounds[bid].push_back(nviter);
+
+						pre_vh = vh;
 						vh = nviter;
+						flag = true;
 						break;
 					}
+				}
+				if (!flag)
+				{
+					break;
 				}
 				
 			} while (vh.idx() != first_vid);
@@ -178,6 +229,17 @@ OpenMesh::Vec3d CGeoBaseAlg::ComputePointFromBaryCoord(COpenMeshT &mesh, COpenMe
 		
 	}
 	return res;
+}
+OpenMesh::Vec3d CGeoBaseAlg::ComputeMeshCenter(COpenMeshT &mesh)
+{
+	OpenMesh::Vec3d center(0, 0, 0);
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p=mesh.point(viter);
+		center = center + p;
+	}
+	center = center / mesh.n_vertices();
+	return center;
 }
 void CGeoBaseAlg::NormalizeMeshSize(COpenMeshT &mesh)
 {
@@ -207,8 +269,8 @@ void CGeoBaseAlg::NormalizeMeshSize(COpenMeshT &mesh)
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		COpenMeshT::Point p = mesh.point(viter);
-		p = (p - mmin) / lens[mi];
-		p = p - COpenMeshT::Point(lens[0]/lens[mi] / 4.0, lens[1]/lens[mi] / 4.0, lens[2]/lens[mi]/2.0);
+		p = (p - mmin-(lens/2.0)) /( lens[mi]/2.0)*0.6;
+		//p = p - COpenMeshT::Point(lens[0]/lens[mi] / 4.0, lens[1]/lens[mi] / 4.0, lens[2]/lens[mi]/2.0);
 		mesh.set_point(viter, p);
 	}
 	//std::cerr << "mi " << mi <<" "<< lens[1] / lens[mi]<< std::endl;
@@ -265,6 +327,72 @@ void CGeoBaseAlg::RemoveNonManifold(COpenMeshT &mesh)
 	std::cerr << "mesh v num " << mesh.n_vertices() << std::endl;
 	std::cerr << "mesh f num " << mesh.n_faces() << std::endl;
 
+}
+double CGeoBaseAlg::Min_Dist_Point2_to_Line2(OpenMesh::Vec2d p, OpenMesh::Vec2d a, OpenMesh::Vec2d b)
+{
+	Point_2 cgal_p(p[0], p[1]);
+	Point_2 cgal_a(a[0], a[1]);
+	Point_2 cgal_b(b[0], b[1]);
+	Line_2 l(cgal_a, cgal_b);
+	Point_2 p_proj = l.projection(cgal_p);
+
+	double d_ppa = std::sqrt((p_proj- cgal_a).squared_length());
+	double d_ppb = std::sqrt((p_proj- cgal_b).squared_length());
+	double d_ab = std::sqrt((cgal_b- cgal_a).squared_length());
+
+	double min_dist = -1;
+
+	if (d_ppa < d_ab && d_ppb < d_ab)
+	{
+		// to p_proj
+		min_dist = std::sqrt((cgal_p- p_proj).squared_length());
+	}
+	else if (d_ppa < d_ppb)
+	{
+		// to a
+		min_dist = std::sqrt((cgal_p - cgal_a).squared_length());
+	}
+	//else if (d_ppb < d_ppa)
+	//{
+	//	// to b
+	//	min_dist = CCurveBaseAlg::TwoPointDistance(p, b);
+	//}
+	else
+	{
+		// to b
+		min_dist = std::sqrt((cgal_p- cgal_b).squared_length());
+		//std::cerr << "Error @ CCurveBaseAlg::Min_Dist_Point2_to_Line2" << std::endl;
+	}
+
+	return min_dist;
+
+}
+double CGeoBaseAlg::ComputeAverageEdgeLength(COpenMeshT&mesh)
+{
+
+	double len = 0;
+	int count = 0;
+	for (auto eiter = mesh.edges_begin(); eiter != mesh.edges_end(); eiter++)
+	{
+		COpenMeshT::VertexHandle vh0 = mesh.to_vertex_handle(mesh.halfedge_handle(eiter, 0));
+		COpenMeshT::VertexHandle vh1 = mesh.to_vertex_handle(mesh.halfedge_handle(eiter, 1));
+		OpenMesh::Vec3d p0 = mesh.point(vh0);
+		OpenMesh::Vec3d p1 = mesh.point(vh1);
+		len+=(p0 - p1).length();
+		count++;
+	}
+	len /= count;
+	return len;
+}
+void CGeoBaseAlg::ComputePerVertexNormal(COpenMeshT&mesh, std::map<COpenMeshT::VertexHandle, OpenMesh::Vec3d>& vh_normals)
+{
+	mesh.request_vertex_normals();
+	vh_normals.clear();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		vh_normals[viter] = mesh.normal(viter).normalized();
+		
+	}
 }
 void CGeoBaseAlg::ComputePerVertexNormal(COpenMeshT&mesh, Eigen::MatrixXd &res_normals)
 {

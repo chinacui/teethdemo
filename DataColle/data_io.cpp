@@ -8,19 +8,57 @@
 #include "itkGDCMSeriesFileNames.h"
 #include "itkImageSeriesReader.h"
 #include "itkImageFileWriter.h"
-bool CDataIO::ReadMesh(std::string fname, CMeshObject & res_mesh_obj)
+bool CDataIO::ReadMesh(std::string fname, CMeshObject & res_mesh_obj, OpenMesh::IO::Options io_options)
 {
-	if (!OpenMesh::IO::read_mesh(res_mesh_obj.GetMesh(), fname))
+	if (io_options != OpenMesh::IO::Options::Default)
 	{
-		std::cerr << "read error\n";
-		return false;
+		if (!OpenMesh::IO::read_mesh(res_mesh_obj.GetMesh(), fname, io_options))
+		{
+			std::cerr << "read error\n";
+			return false;
+		}
 	}
+	else
+	{
+		if (!OpenMesh::IO::read_mesh(res_mesh_obj.GetMesh(), fname))
+		{
+			std::cerr << "read error\n";
+			return false;
+		}
+	}
+	
 	COpenMeshT &mesh = res_mesh_obj.GetMesh();
-	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	if (io_options== OpenMesh::IO::Options::Default)
 	{
-		mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
+		for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+		{
+			mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
+		}
 	}
+	
 	res_mesh_obj.SetChanged();
+	return true;
+}
+bool CDataIO::LoadCurveFromObj(std::string fname, std::vector<OpenMesh::Vec3d> &curve)
+{
+	std::ifstream in(fname);
+	char buf[256];
+	curve.clear();
+	while (in.getline(buf, sizeof buf))
+	{
+		std::istringstream line(buf);
+		std::string word;
+		line >> word;
+		if (word == "v")
+		{
+			double x, y, z;
+			line >> x;
+			line >> y;
+			line >> z;
+			OpenMesh::Vec3d pt(x, y, z);
+			curve.push_back(pt);
+		}
+	}
 	return true;
 }
 bool CDataIO::ReadVolumeDataObjFromDICOMSeries(std::string dirname, CVolumeDataObject& volume_data_obj)

@@ -6,6 +6,7 @@
 #include"harmonic_field_segmentation_action.h"
 #include"volume_data_segmentation_action.h"
 #include"teeth_reconstruction_action.h"
+#include"manipulation_action.h"
 void CActionManager::Init(CModelViewer* viewer)
 {
 	viewer_ = viewer;
@@ -21,6 +22,7 @@ void CActionManager::Init(CModelViewer* viewer)
 	actions_.push_back(new CHarmonicFieldSegmentation());
 	actions_.push_back(new CVolumeDataSegmentationAction());
 	actions_.push_back(new CTeethReconstruction());
+	actions_.push_back(new CManipulationAction());
 	for (int i = 0; i < actions_.size(); i++)
 	{
 		actions_[i]->SetViewer(viewer_);
@@ -31,6 +33,7 @@ void CActionManager::Init(CModelViewer* viewer)
 }
 void CActionManager::MousePressEvent(QMouseEvent *e)
 {
+
 	for (int i = 0; i < actions_.size(); i++)
 	{
 		if (actions_[i]->GetType() == current_action_type_)

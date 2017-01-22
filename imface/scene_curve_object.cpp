@@ -54,7 +54,7 @@ void CSceneCurveObject::UpdateRenderInfo()
 void CSceneCurveObject::Render(CCamera camera)
 {
 
-	if (curve_.lock()->GetCurve().size() < 2)
+	if (curve_.lock()->GetCurve().size() < 2&& curve_.lock()->RendereType()==CCurveObject::Default)
 		return;
 	UpdateRenderInfo();
 	vao_.bind();
@@ -107,7 +107,15 @@ void CSceneCurveObject::Render(CCamera camera)
 	glLineWidth(6);
 	glPointSize(6);
 
-	glDrawArrays(GL_LINE_STRIP, 0, static_cast<GLsizei>(vertexs_pos_.size() / 3));
+	if (curve_.lock().get()->RendereType() == CCurveObject::CurveType::Default)
+	{
+		glDrawArrays(GL_LINE_STRIP, 0, static_cast<GLsizei>(vertexs_pos_.size() / 3));
+	}
+	else
+	{
+		glPointSize(10);
+		glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertexs_pos_.size() / 3));
+	}
 	
 	rendering_program_.release();
 	vao_.release();

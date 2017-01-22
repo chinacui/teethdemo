@@ -39,6 +39,7 @@ typedef Kernel::Segment_3 Segment_3;
 
 typedef CGAL::Polyhedron_3<Kernel, Polyhedron_items_with_attributes_3> Polyhedron;
 
+
 typedef Polyhedron::Vertex_handle   Vertex_handle;
 typedef Polyhedron::Halfedge_handle Halfedge_handle;
 typedef Polyhedron::Face_handle Face_handle;
