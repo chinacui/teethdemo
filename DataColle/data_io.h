@@ -13,6 +13,7 @@ protected:
 public:
 	
 	static bool LoadCurveFromObj(std::string fname, std::vector<OpenMesh::Vec3d> &curve);
+	static void SaveCurveToObj(std::string fname, std::vector<OpenMesh::Vec3d>&curve);
 	static bool ReadMesh(std::string fname, CMeshObject & res_mesh_obj, OpenMesh::IO::Options io_options= OpenMesh::IO::Options::Default);
 	static bool WriteMesh(std::string fname, CMeshObject & res_mesh_obj);
 	static ItkVolumeDataType::Pointer ReadVolumeDataFromDICOMSeries(std::string dirname);//return null if failed

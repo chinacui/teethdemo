@@ -9,6 +9,7 @@
 #include"custom_openmesh_type.h"
 class CXWGeodesic;
 class CAABBTree;
+class CObbWrapper;
 class DATACOLLE_CLASS CMeshObject:public CBaseObject
 {
 protected:
@@ -28,7 +29,7 @@ protected:
 
 	CAABBTree* aabb_tree_=NULL;
 	CXWGeodesic *geodesic_model_ = NULL;
-
+	CObbWrapper *obb_wrapper_;
 
 public:
 	void RestoreCurrentVPos();
@@ -43,10 +44,12 @@ public:
 	double GetTotSurfaceArea();
 	void SetChanged(bool is_changed=true); //if the geometry of mesh is changed, it should be true, and the opengl render will re - computes
 	void SetAttrChanged(bool is_attrchanged = true);
+	OpenMesh::Vec3d TransformPointToLocalMatrix(OpenMesh::Vec3d p);
 	OpenMesh::Vec3d TransformPointByLocalMatrix(OpenMesh::Vec3d p);
 	void CopyFrom(CMeshObject& b);
 	bool& UseTexture() { return use_texture_; }
 	COpenMeshT& GetMesh() { return mesh_; }
+	void SetMesh(COpenMeshT& mesh);
 	void SetMeshColor(OpenMesh::Vec3d color);
 	void ApplyTransform();
 	CMeshObject();
@@ -58,6 +61,8 @@ public:
 	void NormalizeUV();
 	CAABBTree* GetAABBTree() { return aabb_tree_; }
 	void SetAABBTree(CAABBTree* t) { aabb_tree_ = t; }
+	CObbWrapper* GetPqpObb() { return obb_wrapper_; }
+	void SetPqpObb(CObbWrapper* t) { obb_wrapper_ = t; }
 
 	CXWGeodesic*GetGeodesicModel() { return geodesic_model_; }
 	void SetGeodesicModel(CXWGeodesic *model) { geodesic_model_ = model; }

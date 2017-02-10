@@ -156,6 +156,7 @@
     <ClInclude Include="correspondence_builder.h" />
     <ClInclude Include="curve_base_alg.h" />
     <ClInclude Include="dental_base_alg.h" />
+    <ClInclude Include="dental_template_fitting.h" />
     <ClInclude Include="geo_alg.h" />
     <ClInclude Include="geo_base_alg.h" />
     <ClInclude Include="harmonic_field.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="image_base_alg.h" />
     <ClInclude Include="panoramic_alg.h" />
     <ClInclude Include="prereq.h" />
+    <ClInclude Include="rigid_icp.h" />
     <ClInclude Include="shape_deformation.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,7 @@
     <ClCompile Include="correspondence_builder.cpp" />
     <ClCompile Include="curve_base_alg.cpp" />
     <ClCompile Include="dental_base_alg.cpp" />
+    <ClCompile Include="dental_template_fitting.cpp" />
     <ClCompile Include="geo_alg.cpp" />
     <ClCompile Include="geo_base_alg.cpp" />
     <ClCompile Include="harmonic_field.cpp" />
@@ -187,6 +190,7 @@
     <ClCompile Include="non_rigid_icp.cpp" />
     <ClCompile Include="numerical_base_alg.cpp" />
     <ClCompile Include="panoramic_alg.cpp" />
+    <ClCompile Include="rigid_icp.cpp" />
     <ClCompile Include="shape_deformation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

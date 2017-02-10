@@ -120,6 +120,11 @@ OpenMesh::Vec3d CGeoBaseAlg::ComputeBaryCoordInTriFace(COpenMeshT &mesh, COpenMe
 	res[2] = 1 - res[0] - res[1];
 	return res;
 }
+double CGeoBaseAlg::ComputeDis(OpenMesh::Vec3d a, OpenMesh::Vec3d b)
+{
+	OpenMesh::Vec3d diff = a - b;
+	return std::sqrt(diff.sqrnorm());
+}
 double CGeoBaseAlg::ComputeVertexArea(COpenMeshT &mesh, COpenMeshT::VertexHandle vh)
 {
 	double area = 0;
@@ -163,7 +168,22 @@ OpenMesh::VertexHandle CGeoBaseAlg::GetClosestVhFromFacePoint(COpenMeshT&mesh, C
 	COpenMeshT::VertexHandle tvh = fvhs[maxi];
 	return tvh;
 }
-
+void CGeoBaseAlg::GetLargestOrderedBoundary(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_bounds)
+{
+	std::vector<std::vector<COpenMeshT::VertexHandle>>bounds;
+	CGeoBaseAlg::GetOrderedBoundary(mesh, bounds);
+	int max_num = -1;
+	int mi = 0;
+	for (int i = 0; i < bounds.size(); i++)
+	{
+		if (max_num < bounds[i].size())
+		{
+			max_num = bounds[i].size();
+			mi = i;
+		}
+	}
+	res_bounds = bounds[mi];
+}
 void CGeoBaseAlg::GetOrderedBoundary(COpenMeshT &mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&bounds)
 {
 	std::vector<bool>mmark(mesh.n_vertices(), 0);
@@ -230,6 +250,13 @@ OpenMesh::Vec3d CGeoBaseAlg::ComputePointFromBaryCoord(COpenMeshT &mesh, COpenMe
 	}
 	return res;
 }
+
+OpenMesh::Vec3d CGeoBaseAlg::Transform(Eigen::Matrix4d mat, OpenMesh::Vec3d p)
+{
+	Eigen::Vector4d ep(p[0], p[1], p[2], 1);
+	ep = mat*ep;
+	return OpenMesh::Vec3d(ep.x(), ep.y(), ep.z());
+}
 OpenMesh::Vec3d CGeoBaseAlg::ComputeMeshCenter(COpenMeshT &mesh)
 {
 	OpenMesh::Vec3d center(0, 0, 0);
@@ -240,6 +267,127 @@ OpenMesh::Vec3d CGeoBaseAlg::ComputeMeshCenter(COpenMeshT &mesh)
 	}
 	center = center / mesh.n_vertices();
 	return center;
+}
+void CGeoBaseAlg::GetNeighborFaces(COpenMeshT  &mesh, std::vector<COpenMeshT::VertexHandle>&vhs, int nei_num, std::vector<COpenMeshT::FaceHandle>&res_fhs)
+{
+	res_fhs.clear();
+	std::queue<COpenMeshT::FaceHandle>Q;
+	std::vector<int>fdis;
+	fdis.resize(mesh.n_faces(), -1);
+	for (int i = 0; i < vhs.size(); i++)
+	{
+		for (auto vfiter = mesh.vf_begin(vhs[i]); vfiter != mesh.vf_end(vhs[i]); vfiter++)
+		{
+			if (fdis[vfiter->idx()] == -1)
+			{
+				fdis[vfiter->idx()] = 1;
+				Q.push(vfiter);
+				res_fhs.push_back(vfiter);
+			}
+		}
+	}
+	while (!Q.empty())
+	{
+		COpenMeshT::FaceHandle pfh = Q.front();
+		Q.pop();
+		if (fdis[pfh.idx()] == nei_num)
+			continue;
+		for (auto ffiter = mesh.ff_begin(pfh); ffiter != mesh.ff_end(pfh); ffiter++)
+		{
+			if (fdis[ffiter->idx()] == -1)
+			{
+				fdis[ffiter->idx()] = fdis[pfh.idx()] + 1;
+				Q.push(ffiter);
+				res_fhs.push_back(ffiter);
+			}
+		}
+	}
+}
+void CGeoBaseAlg::GetNeighborVhs(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&vhs, int nei_num,std::vector<COpenMeshT::VertexHandle>&res_vhs)
+{
+	res_vhs.clear();
+	std::queue<COpenMeshT::VertexHandle>Q;
+	std::vector<int>vdis;
+	vdis.resize(mesh.n_vertices(), -1);
+	for (int i = 0; i < vhs.size(); i++)
+	{
+		Q.push(vhs[i]);
+		vdis[vhs[i].idx()] = 0;
+		res_vhs.push_back(vhs[i]);
+	}
+	while (!Q.empty())
+	{
+		COpenMeshT::VertexHandle pvh = Q.front();
+		Q.pop();
+		if (vdis[pvh.idx()] == nei_num)
+			continue;
+		for (auto vviter = mesh.vv_begin(pvh); vviter != mesh.vv_end(pvh); vviter++)
+		{
+			if (vdis[vviter->idx()] == -1)
+			{
+				vdis[vviter->idx()] = vdis[pvh.idx()] + 1;
+				Q.push(vviter);
+				res_vhs.push_back(vviter);
+			}
+		}
+		
+	}
+}
+bool CGeoBaseAlg::GetHalfedgeHandle(COpenMeshT &mesh, COpenMeshT::VertexHandle vh0, COpenMeshT::VertexHandle vh1, COpenMeshT::HalfedgeHandle &res_hh)
+{
+	std::set<COpenMeshT::HalfedgeHandle>hset;
+	for (auto vhiter = mesh.voh_begin(vh0); vhiter != mesh.voh_end(vh0); vhiter++)
+	{
+		hset.insert(vhiter);
+	}
+	for (auto vhiter = mesh.vih_begin(vh1); vhiter != mesh.vih_end(vh1); vhiter++)
+	{
+		if (hset.find(vhiter) != hset.end())
+		{
+			res_hh = vhiter;
+			return true;
+		}
+	}
+	return false;
+
+}
+bool CGeoBaseAlg::IsShareCommonVertex(COpenMeshT &mesh, COpenMeshT::FaceHandle fha, COpenMeshT::FaceHandle fhb,std::vector<COpenMeshT::VertexHandle>&res_comm_vhs)
+{
+	res_comm_vhs.clear();
+	std::set <COpenMeshT::VertexHandle > vh_set;
+	for (auto viter = mesh.fv_begin(fha); viter != mesh.fv_end(fha); viter++)
+	{
+		vh_set.insert(viter);
+	}
+	for (auto viter = mesh.fv_begin(fhb); viter != mesh.fv_end(fhb); viter++)
+	{
+		if (vh_set.find(viter) != vh_set.end())
+		{
+			res_comm_vhs.push_back(viter);
+		}
+	}
+	if (res_comm_vhs.size() > 0)
+		return true;
+	else
+	return false;
+}
+bool CGeoBaseAlg::IsShareCommonEdge(COpenMeshT &mesh, COpenMeshT::FaceHandle fha, COpenMeshT::FaceHandle fhb, COpenMeshT::EdgeHandle &res_common_edge)
+{
+	std::set<COpenMeshT::HalfedgeHandle>fh_set;
+	for (auto fhiter = mesh.fh_begin(fha); fhiter != mesh.fh_end(fha); fhiter++)
+	{
+		fh_set.insert(fhiter);
+		fh_set.insert(mesh.opposite_halfedge_handle(fhiter));
+	}
+	for (auto fhiter = mesh.fh_begin(fhb); fhiter != mesh.fh_end(fhb); fhiter++)
+	{
+		if (fh_set.find(fhiter)!=fh_set.end())
+		{
+			res_common_edge = mesh.edge_handle(fhiter);
+			return true;
+		}
+	}
+	return false;
 }
 void CGeoBaseAlg::NormalizeMeshSize(COpenMeshT &mesh)
 {
@@ -274,6 +422,23 @@ void CGeoBaseAlg::NormalizeMeshSize(COpenMeshT &mesh)
 		mesh.set_point(viter, p);
 	}
 	//std::cerr << "mi " << mi <<" "<< lens[1] / lens[mi]<< std::endl;
+}
+bool CGeoBaseAlg::GetCommonEdge(COpenMeshT &mesh, COpenMeshT::VertexHandle vha, COpenMeshT::VertexHandle vhb, COpenMeshT::EdgeHandle &res_h)
+{
+	std::set < COpenMeshT::EdgeHandle > eset;
+	for (auto eiter = mesh.ve_begin(vha); eiter != mesh.ve_end(vha); eiter++)
+	{
+		eset.insert(eiter);
+	}
+	for (auto eiter = mesh.ve_begin(vhb); eiter != mesh.ve_end(vhb); eiter++)
+	{
+		if (eset.find(eiter) != eset.end())
+		{
+			res_h = eiter;
+			return true;
+		}
+	}
+	return false;
 }
 bool CGeoBaseAlg::IsConcavity(COpenMeshT &mesh, COpenMeshT::VertexHandle vh)
 {
@@ -428,6 +593,10 @@ void CGeoBaseAlg::GetEdgeVertexs(COpenMeshT&mesh, std::vector<bool>&scalars,std:
 		}
 	}
 }
+OpenMesh::Vec3d CGeoBaseAlg::ComputeVPosFromBaryCoord(OpenMesh::Vec3d a, OpenMesh::Vec3d b, OpenMesh::Vec3d c, OpenMesh::Vec3d&bary_coord)
+{
+	return a*bary_coord[0] + b*bary_coord[1] + c*bary_coord[2];
+}
 OpenMesh::Vec3d CGeoBaseAlg::ComputeVPosFromBaryCoord(COpenMeshT&mesh, COpenMeshT::FaceHandle fh, OpenMesh::Vec3d&bary_coord)
 {
 	OpenMesh::Vec3d p(0, 0, 0);
@@ -435,7 +604,7 @@ OpenMesh::Vec3d CGeoBaseAlg::ComputeVPosFromBaryCoord(COpenMeshT&mesh, COpenMesh
 	for (auto viter = mesh.fv_begin(fh); viter != mesh.fv_end(fh); viter++)
 	{
 		OpenMesh::Vec3d v=mesh.point(viter);
-		return v;
+
 		p=p+v*bary_coord[count];
 		count++;
 	}

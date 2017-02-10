@@ -39,6 +39,24 @@ bool CDataIO::ReadMesh(std::string fname, CMeshObject & res_mesh_obj, OpenMesh::
 	res_mesh_obj.SetChanged();
 	return true;
 }
+void CDataIO::SaveCurveToObj(std::string fname, std::vector<OpenMesh::Vec3d>&curve)
+{
+	
+	std::ofstream out(fname);
+	out << "g line" << std::endl;
+	for (int i = 0; i < curve.size(); i++)
+	{
+		out <<"v "<< curve[i] << std::endl;
+	}
+
+	for (int i = 0; i < curve.size()-1; i++)
+	{
+		
+		out <<"l "<< i+1<<" "<<i+2<<std::endl;
+	}
+
+	out.close();
+}
 bool CDataIO::LoadCurveFromObj(std::string fname, std::vector<OpenMesh::Vec3d> &curve)
 {
 	std::ifstream in(fname);

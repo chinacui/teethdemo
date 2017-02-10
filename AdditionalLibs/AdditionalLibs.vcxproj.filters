@@ -25,6 +25,15 @@
     <Filter Include="Source Files\libicp">
       <UniqueIdentifier>{f6f7c29f-522a-4be4-8c89-dd985469ca0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\obb">
+      <UniqueIdentifier>{de395865-5393-436f-81c9-e0512b684ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\obb">
+      <UniqueIdentifier>{3fe428f4-cb9b-4488-a6fd-9922635b4446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\remesher">
+      <UniqueIdentifier>{9b77f6fe-5761-4091-8e21-374bf3ca7437}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XWGeodesic\Extremity_Point_Utils.h">
@@ -90,6 +99,57 @@
     <ClInclude Include="libicp\libicp_wrapper.h">
       <Filter>Header Files\libicp</Filter>
     </ClInclude>
+    <ClInclude Include="obb\MatVec.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\Tri.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\TriDist.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\RectDist.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\PQP_Internal.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\PQP.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\PQP_Compile.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\OBB_Disjoint.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\GetTime.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\BVTQ.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\BV.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\Build.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="obb\cpqp_obb_wrapper.h">
+      <Filter>Header Files\obb</Filter>
+    </ClInclude>
+    <ClInclude Include="Remesher\AdaptiveRemesherT.hh">
+      <Filter>Header Files\remesher</Filter>
+    </ClInclude>
+    <ClInclude Include="Remesher\BaseRemesherT.hh">
+      <Filter>Header Files\remesher</Filter>
+    </ClInclude>
+    <ClInclude Include="Remesher\MeshSelectionT.hh">
+      <Filter>Header Files\remesher</Filter>
+    </ClInclude>
+    <ClInclude Include="Remesher\UniformRemesherT.hh">
+      <Filter>Header Files\remesher</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XWGeodesic\ComputeGeodesics.cpp">
@@ -148,6 +208,21 @@
     </ClCompile>
     <ClCompile Include="libicp\demo.cpp">
       <Filter>Source Files\libicp</Filter>
+    </ClCompile>
+    <ClCompile Include="obb\TriDist.cpp">
+      <Filter>Source Files\obb</Filter>
+    </ClCompile>
+    <ClCompile Include="obb\PQP.cpp">
+      <Filter>Source Files\obb</Filter>
+    </ClCompile>
+    <ClCompile Include="obb\Build.cpp">
+      <Filter>Source Files\obb</Filter>
+    </ClCompile>
+    <ClCompile Include="obb\BV.cpp">
+      <Filter>Source Files\obb</Filter>
+    </ClCompile>
+    <ClCompile Include="obb\cpqp_obb_wrapper.cpp">
+      <Filter>Source Files\obb</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

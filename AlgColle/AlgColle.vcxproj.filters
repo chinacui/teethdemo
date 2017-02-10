@@ -72,6 +72,12 @@
     <ClInclude Include="cgal_arap_deform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dental_template_fitting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rigid_icp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="geo_alg.cpp">
@@ -123,6 +129,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cgal_arap_deform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dental_template_fitting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rigid_icp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

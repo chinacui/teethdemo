@@ -162,6 +162,7 @@
     <ClInclude Include="data_pool.h" />
     <ClInclude Include="geo_primit.h" />
     <ClInclude Include="mesh_object.h" />
+    <ClInclude Include="obb_type.h" />
     <ClInclude Include="Polyhedron_type.h" />
     <ClInclude Include="Polyhedron_type_fwd.h" />
     <ClInclude Include="prereq.h" />

@@ -13,6 +13,8 @@
 #include"action_manager.h"
 #include"../AlgColle/dental_base_alg.h"
 #include"imface_window.h"
+#include<igl\writeOBJ.h>
+
 void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 {
 
@@ -132,6 +134,23 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 	{
 		manager_->SetCurrentActionType(CPanoramaMeshRegistration);
 	std::cerr << "switch to panoramia registration action" << std::endl;
+		break;
+	}
+	case Qt::Key_R:
+	{
+		std::cerr << "test tri" << std::endl;
+		std::vector<Eigen::Vector3d>bounds,inner;
+		bounds.push_back(Eigen::Vector3d(0, 0,0));
+		bounds.push_back(Eigen::Vector3d( 0.00898122,-1.0842e-19,0));
+		bounds.push_back(Eigen::Vector3d(0.00776125, 0.00372481, 0));
+
+		bounds.push_back(Eigen::Vector3d(0.00833388,0.00197644, 0));
+		bounds.push_back(Eigen::Vector3d(0.00490583 ,0.000803329, 0));
+		Eigen::MatrixXd res_v;
+		Eigen::MatrixXi res_f;
+		CGeoAlg::DelaunayTriangulation3d(bounds, res_v, res_f);
+	
+		igl::writeOBJ("test_tri.obj", res_v, res_f);
 		break;
 	}
 	case Qt::Key_O://

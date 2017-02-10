@@ -175,7 +175,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="cmodelviewer.cpp" />
     <ClCompile Include="manipulation_action.cpp" />
-    <ClCompile Include="teeth_reconstruction_action.cpp" />
+    <ClCompile Include="teeth_reconstruction_test_action.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_curve_object.cpp" />
     <ClCompile Include="scene_mesh_object.cpp" />
@@ -275,7 +275,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="manipulation_action.h" />
-    <ClInclude Include="teeth_reconstruction_action.h" />
+    <ClInclude Include="teeth_reconstruction_test_action.h" />
     <ClInclude Include="visual_utils.h" />
     <ClInclude Include="volume_data_segmentation_action.h" />
     <CustomBuild Include="action_base.h">

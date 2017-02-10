@@ -101,10 +101,10 @@
     <ClCompile Include="visual_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="teeth_reconstruction_action.cpp">
+    <ClCompile Include="manipulation_action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="manipulation_action.cpp">
+    <ClCompile Include="teeth_reconstruction_test_action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -168,10 +168,10 @@
     <ClInclude Include="visual_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="teeth_reconstruction_action.h">
+    <ClInclude Include="manipulation_action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="manipulation_action.h">
+    <ClInclude Include="teeth_reconstruction_test_action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include"image_base_alg.h"
 #include"../DataColle/Polyhedron_type.h"
 #include<CGAL/squared_distance_2_1.h>
+#include"geo_base_alg.h"
 void CCurveBaseAlg::ProjectCurve2Plannar(std::vector<OpenMesh::Vec3d>&curve,  std::vector<OpenMesh::Vec3d> proj_dir, std::vector<OpenMesh::Vec2d>&curve_2d)
 {
 	std::cerr << "project" << std::endl;
@@ -107,6 +108,282 @@ double CCurveBaseAlg::ComputeLenOfCurve(std::vector<OpenMesh::Vec2d>&curve)
 		p = curve[i];
 	}
 	return len;
+}
+//void CCurveBaseAlg::ComputeClosedCurveNormal(std::vector<OpenMesh::Vec3d> &curve, OpenMesh::Vec3d &normal)
+//{
+//	double a_xy, a_zx, a_yz;
+//	a_xy = a_zx = a_yz = 0;
+//
+//	for (int i = 0; i < curve.size(); i++)
+//	{
+//		int j = (i + 1) % curve.size();
+//		OpenMesh::Vec3d v0, v1;
+//		v0 = curve[i];
+//		v1 = curve[j];
+//		a_xy += v0[0] * v1[1] - v1[0] * v0[1];
+//		a_zx += v0[2] * v1[0] - v1[2] * v0[0];
+//		a_yz += v0[1] * v1[2] - v1[1] * v0[2];
+//
+//
+//	}
+//
+//	a_xy /= 2;
+//	a_zx /= 2;
+//	a_yz /= 2;
+//	normal = OpenMesh::Vec3d(a_yz, a_zx, a_xy);
+//	normal = normal / sqrt(normal.sqrnorm());
+//}
+double CCurveBaseAlg::ComputeScalarOnSegment(OpenMesh::Vec3d seg0, OpenMesh::Vec3d seg1, OpenMesh::Vec3d p, double s0, double s1)
+{
+	OpenMesh::Vec3d diff = seg0 - seg1;
+	double len = std::sqrt(diff.sqrnorm());
+	OpenMesh::Vec3d diff2 = p - seg0;
+	double a = std::sqrt(diff2.sqrnorm());
+	a /= len;
+	double b = 1 - a;
+	double res = s0*b + s1 *a;
+	return res;
+}
+void CCurveBaseAlg::ComputeArclenParamOfAnchorPoints(std::vector<OpenMesh::Vec3d>&curve, std::vector<std::pair<int, OpenMesh::Vec3d>>&anchors, std::vector<double>&res_params, bool is_closed)
+{
+	if (curve.size() <= 1)
+		return;
+	std::vector<double>lens;
+	lens.push_back(0);
+	for (int i = 1; i < curve.size(); i++)
+	{
+		double pre_len = lens.back();
+		double dis=CGeoBaseAlg::ComputeDis(curve[i], curve[i - 1]);
+		lens.push_back(pre_len + dis);
+	}
+	double tot_len = lens.back();
+	if (is_closed)
+	{
+		tot_len += CGeoBaseAlg::ComputeDis(curve[0], curve.back());
+	}
+	res_params.resize(anchors.size(), 0);
+	for (int i = 0; i < anchors.size(); i++)
+	{
+		res_params[i] = (lens[anchors[i].first] + CGeoBaseAlg::ComputeDis(anchors[i].second, curve[anchors[i].first])) / tot_len;
+	}
+
+
+}
+bool CCurveBaseAlg::ComputeMatchingWithAnchorsFixed(std::vector<OpenMesh::Vec3d>&src_curve, std::vector<std::pair<int, OpenMesh::Vec3d>>&src_anchor, std::vector<OpenMesh::Vec3d>&target_curve, std::vector<std::pair<int, OpenMesh::Vec3d>>&target_anchor, std::vector<std::pair<int, double>>&correspond)
+{
+	if (src_anchor.size() != target_anchor.size())
+	{
+		std::cerr <<"anchors_vhs.size()!=anchor_sil.size()";
+		return false;
+	}
+
+	
+	
+	std::vector<std::pair<int, OpenMesh::Vec3d>>tmp_target_anchor, tmp_src_anchor;
+
+	std::vector<OpenMesh::Vec3d>tmp_target_curve, tmp_src_curve;
+	//make sure src and target have same orientation
+	bool is_flap = false;
+	tmp_target_curve = target_curve;
+	tmp_target_anchor = target_anchor;
+	if (src_anchor.size() >= 3)//may need flap
+	{
+		std::vector<double>src_anchor_params, target_anchor_params;
+		ComputeArclenParamOfAnchorPoints(src_curve, src_anchor, src_anchor_params);
+		ComputeArclenParamOfAnchorPoints(target_curve, target_anchor, target_anchor_params);
+		int src_anchor_orient = 0, target_anchor_orient = 0;
+		if ((src_anchor_params[1] > src_anchor_params[0] && src_anchor_params[2] < src_anchor_params[1]) || (src_anchor_params[1]<src_anchor_params[0] && src_anchor_params[2]>src_anchor_params[1]) || (src_anchor_params[1] < src_anchor_params[0] && src_anchor_params[2] < src_anchor_params[1]))
+		{
+			src_anchor_orient = 1;
+		}
+		if ((target_anchor_params[1] > target_anchor_params[0] && target_anchor_params[2] < target_anchor_params[1]) || (target_anchor_params[1]<target_anchor_params[0] && target_anchor_params[2]>target_anchor_params[1]) || (target_anchor_params[1] < target_anchor_params[0] && target_anchor_params[2] < target_anchor_params[1]))
+		{
+			target_anchor_orient = 1;
+		}
+		if (src_anchor_orient != target_anchor_orient)
+		{
+			is_flap = true;
+		}
+		if (is_flap ==false)
+		{
+			for (int i = 0; i < src_curve.size(); i++)
+			{
+				tmp_src_curve.push_back(src_curve[i]);
+			}
+			for (int i = 0; i < target_anchor.size(); i++)
+			{
+				tmp_src_anchor.push_back(src_anchor[i]);
+			}
+		}
+		else
+		{
+			for (int i = src_curve.size() - 1; i >= 0; i--)
+			{
+				tmp_src_curve.push_back(src_curve[i]);
+			}
+			for (int i = 0; i < src_anchor.size(); i++)
+			{
+				tmp_src_anchor.push_back(src_anchor[i]);
+				if (src_anchor[i].second != src_curve[src_anchor[i].first])
+				{
+					tmp_src_anchor.back().first = tmp_src_curve.size() - 1 - (tmp_src_anchor[i].first + 1) % tmp_src_curve.size();
+				}
+				else
+				{
+					tmp_src_anchor.back().first = tmp_src_curve.size() - 1 - (tmp_src_anchor[i].first ) % tmp_src_curve.size();
+				}
+				
+			}
+		}
+
+		if (target_anchor_orient == 1)
+		{
+			std::reverse(tmp_src_anchor.begin(), tmp_src_anchor.end());
+			std::reverse(tmp_target_anchor.begin(), tmp_target_anchor.end());
+		}
+
+	}
+	
+	
+
+	
+
+
+
+
+
+
+	std::vector<std::pair<int, double>>tmp_correspond(tmp_src_curve.size());
+	for (int i = 0; i < tmp_target_anchor.size(); i++)
+	{
+
+		auto t_seg0 = tmp_target_anchor[i];
+		auto t_seg1 = tmp_target_anchor[(i + 1) % tmp_target_anchor.size()];
+		auto s_seg0 = tmp_src_anchor[i];
+		auto s_seg1 = tmp_src_anchor[(i + 1) % tmp_src_anchor.size()];
+		if (s_seg0.first == s_seg1.first)
+			continue;
+
+		//compute src length
+		int j = s_seg0.first;
+		OpenMesh::Vec3d src_pre_p = s_seg0.second;
+		double src_len = 0;
+		do {
+			j = (j + 1) % tmp_src_curve.size();
+			OpenMesh::Vec3d diff = tmp_src_curve[j] - src_pre_p;
+			src_len += std::sqrt(diff.sqrnorm());
+			src_pre_p = tmp_src_curve[j];
+		} while (j != s_seg1.first);
+
+		OpenMesh::Vec3d diff = s_seg1.second - src_pre_p;
+		src_len += std::sqrt(diff.sqrnorm());
+
+
+
+		//compute target length
+		int t = t_seg0.first;
+		OpenMesh::Vec3d target_pre_p = t_seg0.second;
+		double target_len = 0;
+		if (t_seg0.first == t_seg1.first)
+		{
+			OpenMesh::Vec3d diff = t_seg1.second - t_seg0.second;
+			target_len = std::sqrt(diff.sqrnorm());
+		}
+		else
+		{
+			do {
+
+				t = (t + 1) % tmp_target_curve.size();
+				OpenMesh::Vec3d diff = tmp_target_curve[t] - target_pre_p;
+				target_len += std::sqrt(diff.sqrnorm());
+				target_pre_p = tmp_target_curve[t];
+			} while (t != t_seg1.first);
+
+			OpenMesh::Vec3d diff = t_seg1.second - target_pre_p;
+			target_len += std::sqrt(diff.sqrnorm());
+		}
+		//std::cerr << "src len: " << src_len << " target len " << target_len << std::endl;
+
+		double src_current_length = 0, target_current_length = 0;
+		double target_current_ratio = target_current_length / target_len;
+		double target_pre_ratio = target_current_ratio;
+		src_pre_p = s_seg0.second;
+		j = s_seg0.first;
+		target_pre_p = t_seg0.second;
+		t = t_seg0.first;
+		do {
+			j = (j + 1) % tmp_src_curve.size();
+
+			OpenMesh::Vec3d diff = tmp_src_curve[j] - src_pre_p;
+			src_current_length += std::sqrt(diff.sqrnorm());
+			double src_current_ratio = src_current_length / src_len;
+			src_pre_p = tmp_src_curve[j];
+			if (src_current_ratio == 0)
+			{
+				std::cerr << "error src_current_ratio == 0!!!!!!!" << std::endl;
+				std::cerr << "src_pre_p " << src_pre_p << " tmp_src_curve[j] " << tmp_src_curve[j] << std::endl;
+				std::cerr << "s_seg0.first " << s_seg0.first << " j " << j << std::endl;
+				std::cerr << "s_seg0.second " << s_seg0.second << std::endl;
+			}
+
+			while (target_current_ratio < src_current_ratio)
+			{
+				target_pre_p = tmp_target_curve[t];
+				target_pre_ratio = target_current_ratio;
+				t = (t + 1) % tmp_target_curve.size();
+				OpenMesh::Vec3d diff = tmp_target_curve[t] - target_pre_p;
+				target_current_length += std::sqrt(diff.sqrnorm());
+				target_current_ratio = target_current_length / target_len;
+
+			}
+
+			int pret = (t + tmp_target_curve.size() - 1) % tmp_target_curve.size();
+
+			double ratio = (src_current_ratio - target_pre_ratio) / (target_current_ratio - target_pre_ratio);
+			if (target_current_ratio - target_pre_ratio == 0)
+			{ 
+				std::cerr << "target_current_ratio - target_pre_ratio==0" << std::endl;
+			}
+			OpenMesh::Vec3d tmp_p = OpenMesh::Vec3d(0, 0, 0) + ((1 - ratio)*(target_pre_p - OpenMesh::Vec3d(0, 0, 0)) + ratio*(target_curve[t] - OpenMesh::Vec3d(0, 0, 0)));
+			double s = ComputeScalarOnSegment(tmp_target_curve[pret], tmp_target_curve[t], tmp_p, 0, 1);
+			/*if (CGeoBaseAlg::ComputeDis(tmp_target_curve[pret], tmp_target_curve[t]) == 0)
+			{
+				std::cerr << "error CGeoBaseAlg::ComputeDis(tmp_target_curve[pret], tmp_target_curve[t]) == 0" << std::endl;
+				std::cerr << "pret " << pret << " t " << t << std::endl;
+			}*/
+			tmp_correspond[j] = std::make_pair(pret, s);
+			if (s == 1)
+			{
+				tmp_correspond[j].first = (tmp_correspond[j].first+1 + tmp_target_curve.size()) % tmp_target_curve.size();
+				tmp_correspond[j].second = 0;
+			}
+			//std::cerr << "tmp corres:" << j << " " << tmp_correspond[j].first << " " << ratio << " " << tmp_p << "t p " << target_pre_p << " t t" << target_curve[t] << " " << 1 - ratio << std::endl;
+
+		} while (j != s_seg1.first);
+
+	}
+
+	correspond.clear();
+	std::cerr << "tmp corres size: " << tmp_correspond.size() << std::endl;
+
+	if (is_flap)
+	{
+		for (int i = 0; i < tmp_correspond.size(); i++)
+		{
+			correspond.push_back(tmp_correspond[tmp_correspond.size() - i - 1]);
+			
+		}
+	}
+	else
+	{
+		for (int i = 0; i < tmp_correspond.size(); i++)
+		{
+			correspond.push_back(tmp_correspond[i]);
+		}
+	}
+	std::cerr << " corres size: " << correspond.size() << std::endl;
+	std::cerr << "end" << std::endl;
+
 }
 int CCurveBaseAlg::ComputLocalMaximamConcavityPoints(std::vector<OpenMesh::Vec2d>&curve, int neighbor_num, int neighbor_num_for_convexity, std::vector<int>&res_points)
 {

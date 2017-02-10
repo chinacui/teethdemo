@@ -24,17 +24,25 @@ bool CConverter::ConvertFromCGALToIGL(Polyhedron& mesh, Eigen::MatrixXd& v, Eige
 	return true;
 }
 
-bool CConverter::ConvertFromOpenMeshToIGL(COpenMeshT &mesh, Eigen::MatrixXd& v, Eigen::MatrixXi& f, std::vector<COpenMeshT::FaceHandle>*id_fh_map )
+bool CConverter::ConvertFromOpenMeshToIGL(COpenMeshT &mesh, Eigen::MatrixXd& v, Eigen::MatrixXi& f, std::vector<COpenMeshT::FaceHandle>*id_fh_map,std::vector<COpenMeshT::VertexHandle>*id_vh_map )
 {
 	COpenMeshT::FaceIter fiter = mesh.faces_begin();
 	f.resize(mesh.n_faces(), 3);
 	v.resize(mesh.n_vertices(), 3);
+	if (id_vh_map != NULL)
+	{
+		id_vh_map->resize(mesh.n_vertices());
+	}
 	for (int i = 0; i < mesh.n_vertices(); i++)
 	{
 		auto vpos=mesh.points()[i];
 		for (int j = 0; j < 3; j++)
 		{
 			v(i, j) = vpos[j];
+		}
+		if (id_vh_map != NULL)
+		{
+			(*id_vh_map)[i] = mesh.vertex_handle(i);
 		}
 	}
 	if (id_fh_map != NULL)

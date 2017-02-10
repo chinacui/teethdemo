@@ -3,6 +3,7 @@
 #include<iostream>
 #include"Polyhedron_type.h"
 #include"aabb_type.h"
+#include"obb_type.h"
 int CMeshObject::GetId()
 {
 	return mesh_id_;
@@ -39,6 +40,12 @@ OpenMesh::Vec3d CMeshObject::TransformPointByLocalMatrix(OpenMesh::Vec3d p)
 	Eigen::Vector4d res_p=mat_*p_eigen;
 	return OpenMesh::Vec3d(res_p(0), res_p(1), res_p(2));
 }
+OpenMesh::Vec3d CMeshObject::TransformPointToLocalMatrix(OpenMesh::Vec3d p)
+{
+	Eigen::Vector4d p_eigen(p[0], p[1], p[2], 1);
+	Eigen::Vector4d res_p = mat_.inverse()*p_eigen;
+	return OpenMesh::Vec3d(res_p(0), res_p(1), res_p(2));
+}
 void CMeshObject::ApplyTransform()
 {
 	for (auto viter = mesh_.vertices_begin(); viter != mesh_.vertices_end(); viter++)
@@ -62,6 +69,11 @@ void CMeshObject::SetChanged(bool is_changed)
 		{
 			delete aabb_tree_;
 			aabb_tree_ = NULL;
+		}
+		if (obb_wrapper_ != NULL)
+		{
+			delete obb_wrapper_;
+			obb_wrapper_ = NULL;
 		}
 		if (geodesic_model_ != NULL)
 		{
@@ -100,6 +112,7 @@ CMeshObject::CMeshObject(CMeshObject &b)
 	is_visiable_ = b.is_visiable_;
 	use_texture_ = false;
 	vtag_ = b.vtag_;
+	obb_wrapper_ = NULL;
 	is_shinning_ = b.is_shinning_;
 	SetChanged();
 }
@@ -111,6 +124,7 @@ CMeshObject::CMeshObject():CBaseObject()
 	use_texture_ = false;
 	is_changed_ = true;
 	tot_surface_area_ = -1;
+	obb_wrapper_ = NULL;
 	is_visiable_ = true;
 	vtag_.clear();
 	is_shinning_ = false;
@@ -118,6 +132,10 @@ CMeshObject::CMeshObject():CBaseObject()
 	{
 		vtag_[viter->idx()] = -1;
 	}
+}
+void CMeshObject::SetMesh(COpenMeshT& mesh)
+{
+	mesh_ = mesh;
 }
 void CMeshObject::SetMeshColor(OpenMesh::Vec3d color)
 {
@@ -176,6 +194,10 @@ CMeshObject::~CMeshObject()
 {
 	if (aabb_tree_ != NULL)
 		delete aabb_tree_;
+	if (obb_wrapper_ != NULL)
+	{
+		delete obb_wrapper_;
+	}
 	if (geodesic_model_ != NULL)
 		delete geodesic_model_;
 }
