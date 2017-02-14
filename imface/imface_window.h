@@ -5,13 +5,13 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_imface.h"
 #include"cmodelviewer.h"
-class CImfaceWindow : public QMainWindow
+class CMainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	CImfaceWindow(QWidget *parent = 0);
-	~CImfaceWindow();
+	CMainWindow(QWidget *parent = 0);
+	~CMainWindow();
 	CModelViewer* GetModelViewer() { return ui.model_viewer; }
 
 protected:
@@ -21,8 +21,8 @@ protected:
 	 void UpdateRequest();
 private slots:
 	//void OnClickButtonLoadData();
-void AdjustBaseCuttingPlane(int v);
-void AdjustSmallRegionThreshold(int);
+//void AdjustBaseCuttingPlane(int v);
+//void AdjustSmallRegionThreshold(int);
 };
 
 #endif // MY3DMM_H

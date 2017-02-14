@@ -820,6 +820,6 @@ void CHarmonicFieldSeg::ComputeConcavityAwareHarmonicField(COpenMeshT&mesh, std:
 	//auto Lt = L*L.transpose();
 	ldlt.compute(L);
 	res_u=ldlt.solve(b).eval();
-	igl::writeDMAT("res_u.dmat", res_u);
+	//igl::writeDMAT("res_u.dmat", res_u);
 
 }

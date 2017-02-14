@@ -27,7 +27,7 @@ public:
 	static void ComputeClosestPoint(OpenMesh::Vec3d p, std::pair<OpenMesh::Vec3d,OpenMesh::Vec3d>seg, OpenMesh::Vec3d &res_p, double &res_dis);
 	static bool ComputeClosestPointOfTwoSegments(std::pair<OpenMesh::Vec3d, OpenMesh::Vec3d>sega, std::pair<OpenMesh::Vec3d, OpenMesh::Vec3d>segb, OpenMesh::Vec3d&res_pa, OpenMesh::Vec3d &res_pb);//is they are paralle return false
 	static void GetSilhouetteEdges(COpenMeshT&mesh,OpenMesh::Vec3d view_dir, std::vector<std::pair<COpenMeshT::VertexHandle,COpenMeshT::VertexHandle>>&res_edges);
-	static void PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&res_mean, std::vector<OpenMesh::Vec3d> &res_eigen_vects, std::vector<double>& res_eigen_values);//row order
+	static void PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&res_mean, std::vector<OpenMesh::Vec3d> &res_eigen_vects, std::vector<double>& res_eigen_values);//row order,sorted from largest to smallest
 	static void CutByPlane(COpenMeshT &mesh, CPlane plane, COpenMeshT &res_mesh,std::map<COpenMeshT::VertexHandle,COpenMeshT::VertexHandle>&vid_orig);//approximate return positive side of plane
 	static void SeparateDisconnectedParts(COpenMeshT &mesh, std::vector<COpenMeshT*>&res_meshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_orig);
 	static void GetFeatureGroupsByConnectivity(COpenMeshT&mesh, std::vector<bool>&is_feature,std::vector<std::vector<COpenMeshT::VertexHandle>>&feature_groups);

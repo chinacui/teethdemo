@@ -72,6 +72,9 @@
     <ClInclude Include="obb_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="teeth_template_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="data_pool.cpp">
@@ -105,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="volume_data_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teeth_template_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

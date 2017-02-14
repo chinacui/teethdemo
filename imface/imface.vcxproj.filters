@@ -44,12 +44,6 @@
     <ClCompile Include="GeneratedFiles\qrc_imface.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_imface_window.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_imface_window.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="imface_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,6 +100,15 @@
     </ClCompile>
     <ClCompile Include="teeth_reconstruction_test_action.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teeth_reconstruction_action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_imface_window.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_imface_window.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +175,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="teeth_reconstruction_test_action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teeth_reconstruction_action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

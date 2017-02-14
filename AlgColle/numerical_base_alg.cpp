@@ -34,6 +34,7 @@ double CNumericalBaseAlg::Sigmoid(double x)
 {
 	return 1.0 / (1.0 + std::exp(-x));
 }
+
 void CNumericalBaseAlg::NormalizeScalarField(Eigen::VectorXd &data)
 {
 	double mmin = std::numeric_limits<double>::max();

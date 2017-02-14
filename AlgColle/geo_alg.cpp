@@ -723,7 +723,7 @@ void CGeoAlg::ConstrainedTriangulation(std::vector<Eigen::Vector2d>&points, std:
 	{
 		TriPoint tp=TriPoint(points[i][0], points[i][1]);
 		tri_points.push_back(tp);
-		orig_vidmap.push_back(i);
+		orig_vidmap.push_back(i); 
 		id_map[tp] = i;
 	}
 	CDT dt;

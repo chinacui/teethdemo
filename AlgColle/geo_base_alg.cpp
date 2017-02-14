@@ -168,6 +168,26 @@ OpenMesh::VertexHandle CGeoBaseAlg::GetClosestVhFromFacePoint(COpenMeshT&mesh, C
 	COpenMeshT::VertexHandle tvh = fvhs[maxi];
 	return tvh;
 }
+void CGeoBaseAlg::ComputeAABB(COpenMeshT& mesh, OpenMesh::Vec3d &res_min_p, OpenMesh::Vec3d &res_max_p)
+{
+	res_min_p = OpenMesh::Vec3d(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	res_max_p = OpenMesh::Vec3d(std::numeric_limits<double>::min(), std::numeric_limits<double>::min(), std::numeric_limits<double>::min());
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p = mesh.point(viter);
+		for (int i = 0; i < 3; i++)
+		{
+			if (p[i] > res_max_p[i])
+			{
+				res_max_p[i] = p[i];
+			}
+			if (p[i] < res_min_p[i])
+			{
+				res_min_p[i] = p[i];
+			}
+		}
+	}
+}
 void CGeoBaseAlg::GetLargestOrderedBoundary(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_bounds)
 {
 	std::vector<std::vector<COpenMeshT::VertexHandle>>bounds;
@@ -256,6 +276,146 @@ OpenMesh::Vec3d CGeoBaseAlg::Transform(Eigen::Matrix4d mat, OpenMesh::Vec3d p)
 	Eigen::Vector4d ep(p[0], p[1], p[2], 1);
 	ep = mat*ep;
 	return OpenMesh::Vec3d(ep.x(), ep.y(), ep.z());
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeRotMat(Eigen::Vector3d axis, double angle, Eigen::Vector3d center)
+{
+	Eigen::Matrix3d m;
+	m = Eigen::AngleAxisd(angle, axis);
+	Eigen::Quaternion<double>rot(m);
+	Eigen::Matrix3d rot_mat = rot.toRotationMatrix();
+	Eigen::Matrix4d rot_mat4;
+	rot_mat4.setIdentity();
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			rot_mat4(i, j) = rot_mat(i, j);
+		}
+	}
+	Eigen::Matrix4d mat_trans, mat_trans2;
+	mat_trans.setIdentity();
+	mat_trans2.setIdentity();
+	for (int i = 0; i < 3; i++)
+	{
+		mat_trans(i, 3) = -center(i);
+		mat_trans2(i, 3) = center(i);
+	}
+	return mat_trans2*rot_mat4*mat_trans;
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeRotMat(OpenMesh::Vec3d axis, double angle, OpenMesh::Vec3d center)
+{
+	Eigen::Matrix3d m;
+	m = Eigen::AngleAxisd(angle, Eigen::Vector3d(axis[0], axis[1], axis[2]));
+	Eigen::Quaternion<double>rot(m);
+	Eigen::Matrix3d rot_mat = rot.toRotationMatrix();
+	Eigen::Matrix4d rot_mat4;
+	rot_mat4.setIdentity();
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			rot_mat4(i, j) = rot_mat(i, j);
+		}
+	}
+	Eigen::Matrix4d mat_trans, mat_trans2;
+	mat_trans.setIdentity();
+	mat_trans2.setIdentity();
+	for (int i = 0; i < 3; i++)
+	{
+		mat_trans(i, 3) =- center[i];
+		mat_trans2(i, 3) = center[i];
+	}
+	return mat_trans2*rot_mat4*mat_trans;
+	
+
+
+}
+double CGeoBaseAlg::ComputeAngleDegreeOfVector(OpenMesh::Vec3d &dira, OpenMesh::Vec3d dirb)
+{
+	dira=dira.normalized();
+	dirb = dirb.normalized();
+	return std::acos(OpenMesh::dot(dira, dirb));
+}
+
+Eigen::Matrix4d CGeoBaseAlg::ComputeScaleMat(double scale, Eigen::Vector3d center)
+{
+	
+	Eigen::Matrix4d trans_mat0 = ComputeTransMat(-center), trans_mat1 = ComputeTransMat(center);
+	Eigen::Matrix4d mat;
+	mat.setIdentity();
+	for (int i = 0; i < 3; i++)
+	{
+		mat(i, i) = scale;
+	}
+	return trans_mat1*mat*trans_mat0;
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeScaleMat(double scale, OpenMesh::Vec3d center)
+{
+	return ComputeScaleMat(scale, Eigen::Vector3d(center[0], center[1], center[2]));
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeTransMat(OpenMesh::Vec3d trans)
+{
+	return ComputeTransMat(Eigen::Vector3d(trans[0], trans[1], trans[2]));
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeTransMat(Eigen::Vector3d trans)
+{
+	Eigen::Matrix4d mat;
+	mat.setIdentity();
+	for (int i = 0; i < 3; i++) 
+	{
+		mat(i, 3) = trans(i);
+	}
+	return mat;
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeFrameTransMatrix(OpenMesh::Vec3d src_center, std::vector<OpenMesh::Vec3d> src_frame, OpenMesh::Vec3d tgt_center, std::vector<OpenMesh::Vec3d> tgt_frame)
+{
+	Eigen::Vector3d src_center_eg(src_center[0], src_center[1], src_center[2]);
+	Eigen::Vector3d tgt_center_eg(tgt_center[0], tgt_center[1], tgt_center[2]);
+	std::vector<Eigen::Vector3d>src_frame_eg;
+	for (int i = 0; i < src_frame.size(); i++)
+	{
+		src_frame_eg.push_back(Eigen::Vector3d(src_frame[i][0], src_frame[i][1], src_frame[i][2]));
+	}
+	std::vector<Eigen::Vector3d>tgt_frame_eg;
+	for (int i = 0; i < tgt_frame.size(); i++)
+	{
+		tgt_frame_eg.push_back(Eigen::Vector3d(tgt_frame[i][0], tgt_frame[i][1], tgt_frame[i][2]));
+	}
+	return ComputeFrameTransMatrix(src_center_eg, src_frame_eg, tgt_center_eg, tgt_frame_eg);
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeFrameTransMatrix(Eigen::Vector3d src_center, std::vector<Eigen::Vector3d> src_frame, Eigen::Vector3d tgt_center, std::vector<Eigen::Vector3d> tgt_frame)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		src_frame[i].normalize();
+		tgt_frame[i].normalize();
+	}
+	Eigen::Matrix4d trans_mat;
+	Eigen::Vector3d trans = tgt_center - src_center;
+	trans_mat.setIdentity();
+	trans_mat(0, 3) = trans(0);
+	trans_mat(1, 3) = trans(1);
+	trans_mat(2, 3) = trans(2);
+
+	Eigen::Vector3d rot_axis0, rot_axis1;	
+	rot_axis0=src_frame[0].cross(tgt_frame[0]);
+	double rot_angle0 = std::acos(src_frame[0].dot(tgt_frame[0]));
+	Eigen::Matrix4d rot_mat0 = ComputeRotMat(rot_axis0, rot_angle0, Eigen::Vector3d(0, 0, 0));
+	Eigen::Vector4d tmp_axisy = Eigen::Vector4d(src_frame[1](0), src_frame[1](1), src_frame[1](0),1);
+	tmp_axisy = rot_mat0*tmp_axisy;
+	src_frame[1](0) = tmp_axisy(0);
+	src_frame[1](1) = tmp_axisy(1);
+	src_frame[1](2) = tmp_axisy(2);
+	
+	rot_axis1 = src_frame[1].cross(tgt_frame[1]);
+	double rot_angle1 = std::acos(src_frame[1].dot(tgt_frame[1]));
+
+	Eigen::Matrix4d rot_mat1 = ComputeRotMat(rot_axis1, rot_angle1, Eigen::Vector3d(0, 0, 0));
+	Eigen::Matrix4d mat = trans_mat*rot_mat1*rot_mat0;
+	return mat;
+
 }
 OpenMesh::Vec3d CGeoBaseAlg::ComputeMeshCenter(COpenMeshT &mesh)
 {

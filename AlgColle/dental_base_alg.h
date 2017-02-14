@@ -153,6 +153,7 @@ public:
 		}
 
 	};
+
 	static void ComputePCAFrameFromHighCurvaturePoints(COpenMeshT&mesh, double threshold, OpenMesh::Vec3d&mean,std::vector<OpenMesh::Vec3d>&res_frame);
 	static void ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs);
 	static void ComputeTeethFeaturePointsUsingSmoothedMesh(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs);

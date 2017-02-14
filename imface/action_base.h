@@ -8,7 +8,7 @@
 #include"qmetaobject.h"
 class CModelViewer;
 class CActionManager;
-enum CActionType { Common,EditFeatureEdge,HarmonicFieldSegmentation,VolumeDataSegmentation, CPanoramaMeshRegistration};
+enum CActionType { Common,EditFeatureEdge,HarmonicFieldSegmentation,VolumeDataSegmentation, CTeethReconstructionTest, CTeethReconstruction};
 class CActionBase :public QObject
 {
 	Q_OBJECT

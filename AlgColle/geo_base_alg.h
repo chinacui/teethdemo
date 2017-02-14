@@ -15,10 +15,18 @@ public:
 	static void ComputeMeanCurvatureVector(Eigen::MatrixXd& vertexs, Eigen::MatrixXi& faces, Eigen::MatrixXd &res_curvature);
 	static void ComputePerVertexNormal(COpenMeshT&mesh, Eigen::MatrixXd &res_normals);
 	static double ComputeAverageEdgeLength(COpenMeshT&mesh);
+	static Eigen::Matrix4d ComputeTransMat(Eigen::Vector3d trans);
+	static Eigen::Matrix4d ComputeTransMat(OpenMesh::Vec3d trans);
+	static Eigen::Matrix4d ComputeScaleMat(double scale, OpenMesh::Vec3d center);
+	static Eigen::Matrix4d ComputeScaleMat(double scale, Eigen::Vector3d center);
+	static Eigen::Matrix4d ComputeRotMat(Eigen::Vector3d axis, double angle, Eigen::Vector3d center);
+	static Eigen::Matrix4d ComputeRotMat(OpenMesh::Vec3d axis, double angle, OpenMesh::Vec3d center);
 	static void ComputePerVertexNormal(COpenMeshT&mesh, std::map<COpenMeshT::VertexHandle, OpenMesh::Vec3d>& vh_normals);
 	static void ComputePerVertexNormal(Eigen::MatrixXd& vertexs, Eigen::MatrixXi& faces, Eigen::MatrixXd &res_normals);
 	static double ComputeSquaredDistance2Plane(OpenMesh::Vec3d point, double a, double b, double c, double d);
 	static double ComputeSquaredDistance2Plane(OpenMesh::Vec3d point, CPlane plane);
+	static Eigen::Matrix4d ComputeFrameTransMatrix(Eigen::Vector3d src_center,std::vector<Eigen::Vector3d> src_frame,Eigen::Vector3d tgt_center, std::vector<Eigen::Vector3d> tgt_frame);
+	static Eigen::Matrix4d ComputeFrameTransMatrix(OpenMesh::Vec3d src_center, std::vector<OpenMesh::Vec3d> src_frame, OpenMesh::Vec3d tgt_center, std::vector<OpenMesh::Vec3d> tgt_frame);
 	static bool ConvertFromOpenMeshROIToOpenMesh(COpenMeshT &mesh, std::vector<COpenMeshT::FaceHandle>&roifaces, COpenMeshT&res_mesh, std::map<COpenMeshT::FaceHandle, COpenMeshT::FaceHandle>*new_mesh_2_old_vmap = NULL);
 	static void GetNeighborFaces(COpenMeshT  &mesh,std::vector<COpenMeshT::VertexHandle>&vhs,int nei_num, std::vector<COpenMeshT::FaceHandle>&res_fhs);
 	static void GetNeighborVhs(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&vhs, int nei_num,std::vector<COpenMeshT::VertexHandle>&res_vhs);
@@ -34,6 +42,8 @@ public:
 	static bool IsShareCommonVertex(COpenMeshT &mesh, COpenMeshT::FaceHandle fha, COpenMeshT::FaceHandle fhb,std::vector<COpenMeshT::VertexHandle>&res_comm_vhs= std::vector<COpenMeshT::VertexHandle>());
 	static bool IsShareCommonEdge(COpenMeshT &mesh, COpenMeshT::FaceHandle fha, COpenMeshT::FaceHandle fhb,COpenMeshT::EdgeHandle &res_common_edge= COpenMeshT::EdgeHandle());
 	static OpenMesh::Vec3d ComputeMeshCenter(COpenMeshT &mesh);
+	static double ComputeAngleDegreeOfVector(OpenMesh::Vec3d &dira, OpenMesh::Vec3d dirb);
+	static void ComputeAABB(COpenMeshT& mesh, OpenMesh::Vec3d &res_min_p, OpenMesh::Vec3d &res_max_p);
 	static bool GetCommonEdge(COpenMeshT &mesh,COpenMeshT::VertexHandle vha, COpenMeshT::VertexHandle vhb, COpenMeshT::EdgeHandle &res_h);
 	static bool IsConcavity(COpenMeshT &mesh, COpenMeshT::VertexHandle vh);
 	static OpenMesh::Vec3d ComputeVPosFromBaryCoord(COpenMeshT&mesh, COpenMeshT::FaceHandle fh, OpenMesh::Vec3d&bary_coord);

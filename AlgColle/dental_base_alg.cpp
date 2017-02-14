@@ -1011,9 +1011,20 @@ void CDentalBaseAlg::ComputeTwoSideBoundsOfToothMesh(COpenMeshT&mesh, std::vecto
 }
 void CDentalBaseAlg::ComputeGingivaVhs(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs)
 {
+	
 	OpenMesh::Vec3d mean;
 	std::vector<OpenMesh::Vec3d>frame;
-	ComputePCAFrameFromHighCurvaturePoints(mesh, 10, mean, frame);
+	OpenMesh::Vec3d min_p, max_p;
+	CGeoBaseAlg::ComputeAABB(mesh, min_p, max_p);
+	double max_with = -1;
+	for (int i = 0; i < 3; i++)
+	{
+		if (max_with < max_p[i] - min_p[i])
+		{
+			max_with = max_p[i] - min_p[i];
+		}
+	}
+	ComputePCAFrameFromHighCurvaturePoints(mesh, 10/max_with, mean, frame);
 	OpenMesh::Vec3d dir = frame[2];
 	OpenMesh::Vec3d bound_mean(0, 0, 0);
 	int bcount = 0;
@@ -1033,7 +1044,22 @@ void CDentalBaseAlg::ComputeGingivaVhs(COpenMeshT &mesh, std::vector<COpenMeshT:
 		dir = -dir;
 	}
 	dir = dir.normalize();
-	mean = mean - dir*0.02;
+	double height, min_h = std::numeric_limits<double>::max(),max_h=std::numeric_limits<double>::min();
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p=mesh.point(viter);
+		double tmp_h=OpenMesh::dot(p, dir);
+		if (min_h > tmp_h)
+		{
+			min_h = tmp_h;
+		}
+		if (max_h < tmp_h)
+		{
+			max_h = tmp_h;
+		}
+	}
+	height = max_h - min_h;
+	mean = mean - dir*0.1*height;
 	res_vhs.clear();
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
@@ -1210,7 +1236,7 @@ void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COp
 		}
 	}*/
 //	curvatures_value = curvatures_value / max_curv;
-	igl::writeDMAT("curvdmat0.dmat", curvatures_value);
+	//igl::writeDMAT("curvdmat0.dmat", curvatures_value);
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		if (mesh.is_boundary(viter))
@@ -1223,14 +1249,14 @@ void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COp
 		}
 
 	}
-	igl::writeDMAT("curvdmat1.dmat", curvatures_value);
+	//igl::writeDMAT("curvdmat1.dmat", curvatures_value);
 	//CNumericalBaseAlg::NormalizeScalarField(curvatures_value);
 	for (int i = 0; i < curvatures_value.size(); i++)
 	{
 		curvatures_value(i) = CNumericalBaseAlg::Sigmoid(curvatures_value(i));
 	}
 	//curvatures_value /= 300;
-	igl::writeDMAT("curvdmat.dmat", curvatures_value);
+	//igl::writeDMAT("curvdmat.dmat", curvatures_value);
 	OpenMesh::Vec3d pca_mean;
 	std::vector<OpenMesh::Vec3d>pca_frame;
 	ComputePCAFrameFromHighCurvaturePoints(mesh, 10, pca_mean, pca_frame);

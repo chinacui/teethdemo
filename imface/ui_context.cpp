@@ -3,7 +3,7 @@
 #include"scene.h"
 #include"imface_window.h"
 CScene* CUIContext::scene_=NULL;
-CImfaceWindow* CUIContext::main_window_ = NULL;
+CMainWindow* CUIContext::main_window_ = NULL;
 int CUIContext::selected_mesh_object_id_ = -1;
 CMorphSkelDentalMeshSeg* CUIContext::msdm_seg_ = NULL;
 std::string CUIContext::cm_current_adjust_param_= "Curvature";
@@ -20,12 +20,16 @@ void CUIContext::SetSelectedMeshObjectId(int id)
 }
 int CUIContext::GetSelectedMeshObjectId()
 {
+	if (DataPool::GetMeshObject(selected_mesh_object_id_)==NULL)
+	{
+		selected_mesh_object_id_=-1;
+	}
 	return selected_mesh_object_id_;
 }
 void CUIContext::Init()
 {
 	scene_ = new CScene();
-	main_window_ = new CImfaceWindow();
+	main_window_ = new CMainWindow();
 	main_window_->show();
 	QImage color_stripe("stripe2.bmp");
 	color_stripe_texture_id_=CUIContext::AddTexture(new QImage(color_stripe));

@@ -4,7 +4,7 @@
 #include"../DataColle/data_io.h"
 #include <QKeyEvent>
 #include"../AlgColle/geo_base_alg.h"
-CImfaceWindow::CImfaceWindow(QWidget *parent)
+CMainWindow::CMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -13,28 +13,28 @@ CImfaceWindow::CImfaceWindow(QWidget *parent)
 	ui.model_viewer->SetScene(CUIContext::GetScene());
 	//ui.base_cut_slilder->hide();
 	//ui.region_threshold_slilder->hide();
-	this->connect(ui.base_cut_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustBaseCuttingPlane(int)));
-	this->connect(ui.region_threshold_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustSmallRegionThreshold(int)));
+//	this->connect(ui.base_cut_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustBaseCuttingPlane(int)));
+	//this->connect(ui.region_threshold_slilder, SIGNAL(valueChanged(int)), this, SLOT(AdjustSmallRegionThreshold(int)));
 	
 }
-void CImfaceWindow::AdjustSmallRegionThreshold(int v)
-{
-	double percent = v / 100.0*0.4;
-	CUIContext::msdm_seg_->AdjustSmallRegionThreshold(percent);
-	CUIContext::msdm_seg_->RemoveSmallIsolateTeethRegion();
-}
-void CImfaceWindow::AdjustBaseCuttingPlane(int v)
-{
-	
-	static int prev = 0;
-	double l = (v - prev) / 100.0;
-	prev = v;
-	CUIContext::msdm_seg_->AdjustBaseCuttingPlane(l/5.0);
-	
-	this->UpdateRequest();
-
-}
-//void CImfaceWindow::OnClickButtonLoadData()
+//void CMainWindow::AdjustSmallRegionThreshold(int v)
+//{
+//	double percent = v / 100.0*0.4;
+//	CUIContext::msdm_seg_->AdjustSmallRegionThreshold(percent);
+//	CUIContext::msdm_seg_->RemoveSmallIsolateTeethRegion();
+//}
+//void CMainWindow::AdjustBaseCuttingPlane(int v)
+//{
+//	
+//	static int prev = 0;
+//	double l = (v - prev) / 100.0;
+//	prev = v;
+//	CUIContext::msdm_seg_->AdjustBaseCuttingPlane(l/5.0);
+//	
+//	this->UpdateRequest();
+//
+//}
+//void CMainWindow::OnClickButtonLoadData()
 //{
 //	std::cerr << "load data clicked" << std::endl;
 //	CMeshObject *meshobj = new CMeshObject();
@@ -46,12 +46,12 @@ void CImfaceWindow::AdjustBaseCuttingPlane(int v)
 //	DataPool::AddMeshObject(meshobj2);
 //}
 
-void CImfaceWindow::UpdateRequest()
+void CMainWindow::UpdateRequest()
 {
 	this->ui.model_viewer->update();
 	this->update();	
 }
-CImfaceWindow::~CImfaceWindow()
+CMainWindow::~CMainWindow()
 {
 	
 }

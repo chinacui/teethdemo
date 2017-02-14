@@ -3,19 +3,19 @@
 #define UI_CONTEXT_H
 #include"../AlgColle/morph_skel_dental_mesh_seg.h"
 class CScene;
-class CImfaceWindow;
+class CMainWindow;
 class TextureWraper;
 class QImage;
 class CUIContext
 {
 protected:
 	static CScene* scene_;
-	static CImfaceWindow* main_window_;
+	static CMainWindow* main_window_;
 	static int selected_mesh_object_id_;
 	static int color_stripe_texture_id_;
 	static int color_bar_texture_id_;
 public:
-	static CImfaceWindow*GetMainWindow() { return main_window_; }
+	static CMainWindow*GetMainWindow() { return main_window_; }
 	static CScene* GetScene();
 	static void Init();
 	static int GetSelectedMeshObjectId();

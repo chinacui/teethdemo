@@ -390,33 +390,38 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			igl::writeDMAT(ftagname, tags);
 			std::cerr << "save " << fname << "successfully" << std::endl;
 
+			bool write_sep_crowns = false;
 
-			std::map<int, COpenMeshT*>crowns;
-			CGeoAlg::SeparateMeshByVertexTag(p_mesh_obj_->GetMesh(), vtags_vec, crowns,std::map<int, std::map<OpenMesh::VertexHandle, OpenMesh::VertexHandle>>());
-			int cid = 0;
-			for (auto iter = crowns.begin(); iter != crowns.end(); iter++)
+			if (write_sep_crowns)
 			{
-				std::stringstream sstr;
-				if (fname.length() - 4 >= 0 && fname[fname.length() - 4] != '.')
+				std::map<int, COpenMeshT*>crowns;
+				CGeoAlg::SeparateMeshByVertexTag(p_mesh_obj_->GetMesh(), vtags_vec, crowns, std::map<int, std::map<OpenMesh::VertexHandle, OpenMesh::VertexHandle>>());
+				int cid = 0;
+				for (auto iter = crowns.begin(); iter != crowns.end(); iter++)
 				{
-					sstr << fname;
-				}
-				else
-				{
-					sstr<< fname.substr(0, fname.length() - 4) ;
-				}
-				sstr << "_" << cid++ << ".stl";
-				Eigen::MatrixXd v;
-				Eigen::MatrixXi f;
-				CConverter::ConvertFromOpenMeshToIGL(*(iter->second), v, f);
-				//igl::writeSTL(sstr.str(), v, f);
-				//igl::writeOBJ(fname, v, f);
-				if (!OpenMesh::IO::write_mesh(*(iter->second), sstr.str()))
-				{
-					std::cerr << "write error\n";
-					
+					std::stringstream sstr;
+					if (fname.length() - 4 >= 0 && fname[fname.length() - 4] != '.')
+					{
+						sstr << fname;
+					}
+					else
+					{
+						sstr << fname.substr(0, fname.length() - 4);
+					}
+					sstr << "_" << cid++ << ".stl";
+					Eigen::MatrixXd v;
+					Eigen::MatrixXi f;
+					CConverter::ConvertFromOpenMeshToIGL(*(iter->second), v, f);
+					//igl::writeSTL(sstr.str(), v, f);
+					//igl::writeOBJ(fname, v, f);
+					if (!OpenMesh::IO::write_mesh(*(iter->second), sstr.str()))
+					{
+						std::cerr << "write error\n";
+
+					}
 				}
 			}
+			
 			
 		}
 	
@@ -748,6 +753,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
+			std::cerr << "compute feature points" << std::endl;
 			COpenMeshT&mesh = meshobj->GetMesh();
 			std::vector<OpenMesh::VertexHandle>fvhs;
 			//CDentalBaseAlg::ComputeTeethFeaturePoints(mesh, fvhs);
@@ -832,7 +838,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		}
 		break;
 	}
-	case Qt::Key_L:
+	/*case Qt::Key_L:
 	{
 		QString path = QFileDialog::getOpenFileName(NULL, "load dental mesh", ".", "Files(*.stl *.off *.obj)");
 
@@ -927,7 +933,86 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 		int id=DataPool::AddMeshObject(meshobj);
 		CUIContext::SetSelectedMeshObjectId(id);
 		break;
-	}
+	}*/
+
+		case Qt::Key_L:
+		{
+			//	std::cerr << "l" << std::endl;
+			QString path = QFileDialog::getOpenFileName(NULL, "load dental mesh", ".", "Stl Files(*.stl)");
+
+			if (path.length() == 0)
+			{
+				std::cerr << "unable to load mesh\n" << std::endl;
+				return;
+			}
+			CMeshObject *meshobj = new CMeshObject();
+			if (!CDataIO::ReadMesh(path.toStdString(), *meshobj))
+			{
+				std::cerr << "unable to load mesh\n" << std::endl;
+			}
+			/*int mid = DataPool::AddMeshObject(meshobj);
+			CUIContext::SetSelectedMeshObjectId(mid);
+			break;*/
+			COpenMeshT &mesh = meshobj->GetMesh();
+			std::vector<COpenMeshT::FaceHandle>res_fhs;
+			std::vector<OpenMesh::Vec3d>res_bary_coords;
+
+
+
+			std::vector<COpenMeshT*>resmeshes;
+			std::cerr << "separate disconnected parts" << std::endl;
+			CGeoAlg::SeparateDisconnectedParts(mesh, resmeshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>());
+			std::cerr << "separate disconnected parts finish" << std::endl;
+			int max_vnum = -1;
+			int mi;
+			for (int i = 0; i < resmeshes.size(); i++)
+			{
+				int vnum = resmeshes[i]->n_vertices();
+				//std::cerr << "num " << resmeshes[i]->n_vertices() <<" max"<<max_vnum<<" flag"<<(max_vnum<resmeshes[i]->n_vertices())<< std::endl;
+				if (max_vnum <vnum)
+				{
+
+					max_vnum = vnum;
+					mi = i;
+				}
+			}
+
+			mesh = *resmeshes[mi];
+			std::cerr << mesh.n_vertices() << std::endl;
+			for (int i = 0; i < resmeshes.size(); i++)
+			{
+				delete resmeshes[i];
+			}
+
+
+			//CGeoAlg::FillHoles(mesh);
+			CGeoBaseAlg::RemoveNonManifold(mesh);
+			CGeoAlg::SelfIntersectionRemoval(mesh);
+			CGeoAlg::FillHoles(mesh, true);
+			CGeoAlg::SimplifyMesh(mesh, 160000);
+
+			//CGeoAlg::LaplacianSmooth(mesh, 20, 0.5);
+			std::cerr << "vnum " << mesh.n_vertices() << std::endl;
+			std::cerr << "fnum " << mesh.n_faces() << std::endl;
+			std::cerr << "enum " << mesh.n_edges() << std::endl;
+			for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+			{
+				mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
+			}
+			meshobj->RestoreCurrentVPos();
+			CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
+			CGeoBaseAlg::NormalizeMeshSize(mesh);
+			meshobj->SetChanged();
+			int id = DataPool::AddMeshObject(meshobj);
+			CUIContext::SetSelectedMeshObjectId(id);
+
+			dental_mesh_id_ = CUIContext::GetSelectedMeshObjectId();
+			
+			seg_tooth_mesh_id_ = -1;
+
+			break;
+		}
+
 	case Qt::Key_I:
 	{
 	

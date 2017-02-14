@@ -46,10 +46,12 @@ void CBaseObject::Rotate(OpenMesh::Vec3d axis, double angle, OpenMesh::Vec3d cen
 }
 void CBaseObject::Transform(OpenMesh::Vec3d trans)
 {
-	
+	Eigen::Matrix4d trans_mat;
+	trans_mat.setIdentity();
 	for (int i = 0; i < 3; i++)
 	{
-		mat_(i, 3) += trans[i];
+		trans_mat(i, 3)= trans[i];
 	}
+	mat_ = trans_mat*mat_;
 	
 }

@@ -39,9 +39,11 @@ void CModelViewer::InitCamera()
 {
 	camera_.setType(qglviewer::Camera::Type::ORTHOGRAPHIC);
 	//camera_.setAspectRatio(1);
-	camera_.setPosition(qglviewer::Vec(0, 0, 1));
+	camera_.setPosition(qglviewer::Vec(0, 0, 10));
 	camera_.lookAt(qglviewer::Vec(0, 0, 0));
 	camera_.setUpVector(qglviewer::Vec(0, 1, 0));
+	camera_.setZClippingCoefficient(1000);
+	std::cerr << "zclip " << camera_.zClippingCoefficient() << std::endl;
 }
 void CModelViewer::keyReleaseEvent(QKeyEvent*e)
 {
