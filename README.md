@@ -33,6 +33,6 @@ BOOST_INCLUDEDIR: D:\CodeLibrary\boost_1_62_0_vs2015
 
 BOOST_LIBRARYDIR: D:\CodeLibrary\boost_1_62_0_vs2015\lib64-msvc-14.0
 
-(Tutorial: https://putuyuwono.wordpress.com/2015/04/23/building-and-installing-opencv-3-0-on-windows-7-64-bit/)
+
 
 And further you may need to add your third-party dlls paths to your path in system variables. Alternatively, putting them together with the exe file is also a good choice.

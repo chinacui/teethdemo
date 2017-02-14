@@ -36,6 +36,18 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{b04f93c9-cf9b-4471-b7de-42850528926a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UIBasic">
+      <UniqueIdentifier>{f47711f9-9004-4171-8fe3-c190cfff3dfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actions">
+      <UniqueIdentifier>{aa432a99-1ba3-4e51-95d5-386179edc62a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actions">
+      <UniqueIdentifier>{eacdc493-c1a5-47be-96e9-8de58d0a7192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UIBasic">
+      <UniqueIdentifier>{4b0675df-462e-41ff-8886-35ddc41e1e8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,65 +62,65 @@
     <ClCompile Include="cmodelviewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scene_mesh_object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ui_context.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_action_base.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_action_base.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="action_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="hot_key_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="edit_feature_edge_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="texture_wrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="harmonic_field_segmentation_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_curve_object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_volume_object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="volume_data_segmentation_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="visual_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="manipulation_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="teeth_reconstruction_test_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="teeth_reconstruction_action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_imface_window.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_imface_window.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_curve_object.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_mesh_object.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="visual_utils.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_volume_object.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="texture_wrapper.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="ui_context.cpp">
+      <Filter>Source Files\UIBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="harmonic_field_segmentation_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="edit_feature_edge_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="teeth_reconstruction_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="teeth_reconstruction_test_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="volume_data_segmentation_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="manipulation_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="hot_key_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_manager.cpp">
+      <Filter>Source Files\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,60 +137,60 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="action_base.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_imface.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="scene_mesh_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="action_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hot_key_action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="edit_feature_edge_action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="texture_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="harmonic_field_segmentation_action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_curve_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_volume_object.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
     </ClInclude>
     <ClInclude Include="volume_data_segmentation_action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="visual_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="manipulation_action.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
     </ClInclude>
     <ClInclude Include="teeth_reconstruction_test_action.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
     </ClInclude>
     <ClInclude Include="teeth_reconstruction_action.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="harmonic_field_segmentation_action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="edit_feature_edge_action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="hot_key_action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="manipulation_action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="texture_wrapper.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_mesh_object.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_curve_object.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_volume_object.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_context.h">
+      <Filter>Header Files\UIBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="visual_utils.h">
+      <Filter>Header Files\UIBasic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,11 +7,11 @@
 #include <Eigen/Sparse>
 #include<Eigen/SparseLU>
 #include<igl/writeDMAT.h>
-#include"numerical_base_alg.h"
+#include"../AlgColle/numerical_base_alg.h"
 #include <igl/grad.h>
-#include"morphlogic_operation.h"
-#include"geo_base_alg.h"
-#include"geo_alg.h"
+#include"../AlgColle/morphlogic_operation.h"
+#include"../AlgColle/geo_base_alg.h"
+#include"../AlgColle/geo_alg.h"
 bool CHarmonicFieldSeg::IsConcave(COpenMeshT &mesh, COpenMeshT::VertexHandle vh)
 {
 	double theta = 0.01;

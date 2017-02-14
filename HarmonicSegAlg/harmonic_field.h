@@ -6,7 +6,7 @@
 #include<vector>
 #include"../DataColle/custom_openmesh_type.h"
 #include"prereq.h"
-class ALGCOLLE_CLASS CHarmonicFieldSeg
+class HARMONICSEGALG_CLASS CHarmonicFieldSeg
 {
 protected:
 	bool IsConcave(COpenMeshT &mesh, COpenMeshT::VertexHandle vh);

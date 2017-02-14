@@ -13,36 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\AlgBasic">
+      <UniqueIdentifier>{0dafdc45-0e02-4b82-b97e-cd0290912eed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AlgBasic">
+      <UniqueIdentifier>{8ff9c601-a155-47b1-9eac-220570c2b6a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prereq.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="geo_base_alg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="geo_alg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="numerical_base_alg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="morph_skel_dental_mesh_seg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="morphlogic_operation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="harmonic_field.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dental_base_alg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="curve_base_alg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="image_base_alg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="panoramic_alg.h">
@@ -52,9 +37,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="non_rigid_icp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="linear_algebra_alg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="correspondence_builder.h">
@@ -72,39 +54,36 @@
     <ClInclude Include="cgal_arap_deform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dental_template_fitting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rigid_icp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="geo_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="geo_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="dental_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="curve_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="linear_algebra_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="image_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="numerical_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="geo_alg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="geo_base_alg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="numerical_base_alg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="morph_skel_dental_mesh_seg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="morphlogic_operation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="harmonic_field.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dental_base_alg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="curve_base_alg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="image_base_alg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="panoramic_alg.cpp">
@@ -114,9 +93,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="non_rigid_icp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="linear_algebra_alg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="correspondence_builder.cpp">
@@ -131,11 +107,29 @@
     <ClCompile Include="cgal_arap_deform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dental_template_fitting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="rigid_icp.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dental_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="curve_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="geo_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="geo_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="image_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="linear_algebra_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="numerical_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

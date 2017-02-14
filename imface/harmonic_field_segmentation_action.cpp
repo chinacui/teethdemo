@@ -6,7 +6,7 @@
 #include"camera.h"
 #include"../AlgColle/geo_base_alg.h"
 #include<qimage.h>
-#include"../AlgColle/harmonic_field.h"
+#include"../HarmonicSegAlg/harmonic_field.h"
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include<igl/writeDMAT.h>
 #include"../DataColle/cgal_igl_converter.h"

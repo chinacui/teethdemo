@@ -156,10 +156,8 @@
     <ClInclude Include="correspondence_builder.h" />
     <ClInclude Include="curve_base_alg.h" />
     <ClInclude Include="dental_base_alg.h" />
-    <ClInclude Include="dental_template_fitting.h" />
     <ClInclude Include="geo_alg.h" />
     <ClInclude Include="geo_base_alg.h" />
-    <ClInclude Include="harmonic_field.h" />
     <ClInclude Include="hmm.h" />
     <ClInclude Include="linear_algebra_alg.h" />
     <ClInclude Include="morphlogic_operation.h" />
@@ -179,10 +177,8 @@
     <ClCompile Include="correspondence_builder.cpp" />
     <ClCompile Include="curve_base_alg.cpp" />
     <ClCompile Include="dental_base_alg.cpp" />
-    <ClCompile Include="dental_template_fitting.cpp" />
     <ClCompile Include="geo_alg.cpp" />
     <ClCompile Include="geo_base_alg.cpp" />
-    <ClCompile Include="harmonic_field.cpp" />
     <ClCompile Include="image_base_alg.cpp" />
     <ClCompile Include="linear_algebra_alg.cpp" />
     <ClCompile Include="morphlogic_operation.cpp" />
