@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\AlgBasic">
+      <UniqueIdentifier>{0dafdc45-0e02-4b82-b97e-cd0290912eed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AlgBasic">
+      <UniqueIdentifier>{8ff9c601-a155-47b1-9eac-220570c2b6a0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\AlgColle\curve_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\dental_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\geo_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\geo_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\image_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\linear_algebra_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\numerical_base_alg.h">
+      <Filter>Header Files\AlgBasic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\arap_deform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\cgal_arap_deform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\compute_voronoi_diagram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\correspondence_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\hmm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\morph_skel_dental_mesh_seg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\morphlogic_operation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\non_rigid_icp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\panoramic_alg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\prereq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\rigid_icp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AlgColle\shape_deformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\AlgColle\arap_deform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\cgal_arap_deform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\compute_voronoi_diagram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\correspondence_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\morph_skel_dental_mesh_seg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\morphlogic_operation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\non_rigid_icp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\panoramic_alg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\rigid_icp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\shape_deformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\curve_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\dental_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\geo_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\geo_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\image_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\linear_algebra_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AlgColle\numerical_base_alg.cpp">
+      <Filter>Source Files\AlgBasic</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

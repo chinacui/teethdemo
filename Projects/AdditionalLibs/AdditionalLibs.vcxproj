@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icp.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icpPointToPlane.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icpPointToPoint.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\kdtree.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\libicp_wrapper.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\libicp\matrix.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\Build.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\BV.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\BVTQ.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\cpqp_obb_wrapper.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\GetTime.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\MatVec.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\OBB_Disjoint.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\PQP.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\PQP_Compile.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\PQP_Internal.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\RectDist.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\Tri.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\obb\TriDist.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\prereq.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\Remesher\AdaptiveRemesherT.hh" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\Remesher\BaseRemesherT.hh" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\Remesher\MeshSelectionT.hh" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\Remesher\UniformRemesherT.hh" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\BaseModel.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\Chen_Han.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\DistanceApproach.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\EdgePoint.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\ExactDGPMethod.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\Extremity_Point_Utils.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\FacePoint.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\ICH_WindowFiltering.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\ModelWrapper.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\Parameters.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\Point3D.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\RichModel.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\Xin_Wang.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\xw_geodesic_wrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\demo.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\icp.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\icpPointToPlane.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\icpPointToPoint.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\kdtree.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\libicp_wrapper.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\libicp\matrix.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\obb\Build.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\obb\BV.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\obb\cpqp_obb_wrapper.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\obb\PQP.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\obb\TriDist.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\BaseModel.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\Chen_Han.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\ComputeGeodesics.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\DistanceApproach.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\ExactDGPMethod.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\Extremity_Point_Utils.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\ICH_WindowFiltering.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\ModelWrapper.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\Point3D.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\RichModel.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\Xin_Wang.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\xw_geodesic_wrapper.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{21D9ADBA-9E57-40F9-BFC3-DC1092BC47D1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AdditionalLibs</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_USRDLL;ADDITIONALLIBS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;$(TEIGEN_ROOT);$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;$(BOOST_LIBRARYDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenMeshToolsd.lib;OpenMeshCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_USRDLL;ADDITIONALLIBS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;$(TEIGEN_ROOT);$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(TOPEN_MESH_DIR)\lib;$(BOOST_LIBRARYDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenMeshTools.lib;OpenMeshCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
