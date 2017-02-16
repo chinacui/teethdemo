@@ -3,6 +3,14 @@
 *.lo
 *.o
 *.obj
+*.suo
+*.idb
+*.pdb
+*.db
+*.exp
+*.ipdb
+*.opendb
+*.iobj
 
 # Precompiled Headers
 *.gch
@@ -12,16 +20,21 @@
 *.so
 *.dylib
 *.dll
+*.log
+*.tlog
 
 # Fortran module files
 *.mod
 *.smod
+/Projects/x64/
+/Projects/TeethStudio/GeneratedFiles/
 
 # Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
+moc*.cpp
 
 # Executables
 *.exe
