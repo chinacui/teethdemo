@@ -46,6 +46,10 @@ CMainWindow::CMainWindow(QWidget *parent)
 //	DataPool::AddMeshObject(meshobj2);
 //}
 
+CModelViewer* CMainWindow::GetModelViewer() { 
+	return ui.model_viewer; 
+}
+
 void CMainWindow::UpdateRequest()
 {
 	this->ui.model_viewer->update();

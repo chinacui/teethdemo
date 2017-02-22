@@ -112,6 +112,4 @@ void CModelViewer::init()
 
 	action_manager_ = new CActionManager();
 	action_manager_->Init(this);
-
-
 }

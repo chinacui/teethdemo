@@ -12,17 +12,18 @@ class CMainWindow : public QMainWindow
 public:
 	CMainWindow(QWidget *parent = 0);
 	~CMainWindow();
-	CModelViewer* GetModelViewer() { return ui.model_viewer; }
+	CModelViewer* GetModelViewer();
 
 protected:
 	Ui::ImfaceWindow ui;
+
 protected:
-	
 	 void UpdateRequest();
+
 private slots:
 	//void OnClickButtonLoadData();
-//void AdjustBaseCuttingPlane(int v);
-//void AdjustSmallRegionThreshold(int);
+	//void AdjustBaseCuttingPlane(int v);
+	//void AdjustSmallRegionThreshold(int);
 };
 
 #endif // MY3DMM_H

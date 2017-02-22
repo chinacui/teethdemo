@@ -14,6 +14,7 @@
 #include"../AlgColle/dental_base_alg.h"
 #include"imface_window.h"
 #include<igl\writeOBJ.h>
+#include "panoramic_image_registration.h"
 
 void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 {
@@ -48,6 +49,12 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		manager_->SetCurrentActionType(CTeethReconstruction);
 		std::cerr << "switch to panoramia registration action" << std::endl;
 		break;
+	}
+	case Qt::Key_S:
+	{
+		PanoramicImageRegistration* panoramic_image_registration =
+			PanoramicImageRegistration::GetInstance();
+		panoramic_image_registration->show();
 	}
 	//case Qt::Key_M:
 	//{

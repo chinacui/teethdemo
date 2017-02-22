@@ -15,7 +15,7 @@ protected:
 	static int color_stripe_texture_id_;
 	static int color_bar_texture_id_;
 public:
-	static CMainWindow*GetMainWindow() { return main_window_; }
+	static CMainWindow* GetMainWindow() { return main_window_; }
 	static CScene* GetScene();
 	static void Init();
 	static int GetSelectedMeshObjectId();

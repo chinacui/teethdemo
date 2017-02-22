@@ -1,30 +1,30 @@
-#include"harmonic_field_segmentation_action.h"
-#include"../AlgColle/geo_alg.h"
-#include"ui_context.h"
-#include"../DataColle/data_pool.h"
-#include"cmodelviewer.h"
-#include"camera.h"
-#include"../AlgColle/geo_base_alg.h"
-#include<qimage.h>
-#include"../HarmonicSegAlg/harmonic_field.h"
+#include "harmonic_field_segmentation_action.h"
+#include "../AlgColle/geo_alg.h"
+#include "ui_context.h"
+#include "../DataColle/data_pool.h"
+#include "cmodelviewer.h"
+#include "camera.h"
+#include "../AlgColle/geo_base_alg.h"
+#include <qimage.h>
+#include "../HarmonicSegAlg/harmonic_field.h"
 #include <OpenMesh/Core/IO/MeshIO.hh>
-#include<igl/writeDMAT.h>
-#include"../DataColle/cgal_igl_converter.h"
-#include<igl/readDMAT.h>
-#include<igl/writeSTL.h>
-#include<igl/writeOBJ.h>
-#include<set>
-#include<time.h>
-#include"../AlgColle/dental_base_alg.h"
-#include"../DataColle/aux_geo_utils.h"
-#include"../AlgColle/curve_base_alg.h"
-#include"../AlgColle/image_base_alg.h"
-#include<opencv2/opencv.hpp>
-#include"../AlgColle/numerical_base_alg.h"
-#include"../AlgColle/morphlogic_operation.h"
+#include <igl/writeDMAT.h>
+#include "../DataColle/cgal_igl_converter.h"
+#include <igl/readDMAT.h>
+#include <igl/writeSTL.h>
+#include <igl/writeOBJ.h>
+#include <set>
+#include <time.h>
+#include "../AlgColle/dental_base_alg.h"
+#include "../DataColle/aux_geo_utils.h"
+#include "../AlgColle/curve_base_alg.h"
+#include "../AlgColle/image_base_alg.h"
+#include <opencv2/opencv.hpp>
+#include "../AlgColle/numerical_base_alg.h"
+#include "../AlgColle/morphlogic_operation.h"
 #include "qfiledialog.h"
-#include"../DataColle/data_io.h"
-#include<sstream>
+#include "../DataColle/data_io.h"
+#include <sstream>
 void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 {
 	if (is_drawing_)

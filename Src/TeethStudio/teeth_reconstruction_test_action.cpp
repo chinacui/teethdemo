@@ -673,8 +673,11 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				}
 				std::cerr << "panoramic size " << w << " " << h << std::endl;
 				COpenMeshT plain_mesh;
-				CAuxGeoUtils::GetPlainMeshFromPointAndAxis(OpenMesh::Vec3d(0, 0, -1), OpenMesh::Vec3d(w, 0, 0), OpenMesh::Vec3d(0, h, 0), OpenMesh::Vec3d(0, 0, 1), 2, plain_mesh);
-				for (auto viter = plain_mesh.vertices_begin(); viter != plain_mesh.vertices_end(); viter++)
+				CAuxGeoUtils::GetPlainMeshFromPointAndAxis(OpenMesh::Vec3d(0, 0, -1), 
+					OpenMesh::Vec3d(w, 0, 0), OpenMesh::Vec3d(0, h, 0), 
+					OpenMesh::Vec3d(0, 0, 1), 2, plain_mesh);
+				for (auto viter = plain_mesh.vertices_begin(); viter != plain_mesh.vertices_end(); 
+					viter++)
 				{
 					OpenMesh::Vec3d p = plain_mesh.point(viter);
 					COpenMeshT::TexCoord2D texcoord;
@@ -690,7 +693,8 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 							texcoord[i] = 0;
 						}
 					}
-					for (auto hiter = plain_mesh.vih_begin(viter); hiter != plain_mesh.vih_end(viter); hiter++)
+					for (auto hiter = plain_mesh.vih_begin(viter); hiter != plain_mesh.vih_end(viter); 
+						hiter++)
 					{
 						plain_mesh.data(*hiter).SetUV(texcoord);
 					}
