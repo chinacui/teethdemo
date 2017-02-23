@@ -66,18 +66,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="button_compute_crown_boundaries">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Compute Crown Boundaries</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QGroupBox" name="groupBox_3">
         <property name="minimumSize">
          <size>
@@ -490,18 +478,6 @@
         </property>
         <property name="text">
          <string>Registering with NDT Algorithm</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_info">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
       </item>

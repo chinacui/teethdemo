@@ -131,15 +131,6 @@
     <ClCompile Include="..\..\Src\TeethStudio\panoramic_image_registration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\TeethStudio\ndt_register_thread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ndt_register_thread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ndt_register_thread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Src\TeethStudio\imface.ui">
@@ -159,9 +150,6 @@
     </CustomBuild>
     <CustomBuild Include="..\..\Src\TeethStudio\panoramic_image_registration.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Src\TeethStudio\ndt_register_thread.h">
-      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

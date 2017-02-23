@@ -53,7 +53,7 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 	case Qt::Key_S:
 	{
 		PanoramicImageRegistration* panoramic_image_registration =
-			PanoramicImageRegistration::GetInstance();
+			new PanoramicImageRegistration();
 		panoramic_image_registration->show();
 	}
 	//case Qt::Key_M:

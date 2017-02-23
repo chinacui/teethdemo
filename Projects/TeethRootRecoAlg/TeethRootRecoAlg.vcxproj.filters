@@ -21,9 +21,15 @@
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\prereq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\TeethRootRecoAlg\ndt_registration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\dental_template_fitting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\TeethRootRecoAlg\ndt_registration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
