@@ -18,8 +18,10 @@
 #include"../AlgColle/compute_voronoi_diagram.h"
 #include"../AlgColle/arap_deform.h" 
 #include"../TeethRootRecoAlg/dental_template_fitting.h"
+#include"../TeethRootRecoAlg/panoramic_simulation.h"
 void CTeethReconstructionTestAction::Init()
 {
+	is_picking_fa_point_ = false;
 	sel_crown_id_ = -1;
 	sel_temp_id_ = -1;
 	is_picking_ = true;
@@ -35,6 +37,7 @@ bool CTeethReconstructionTestAction::IsTemplateTeeth(int id)
 
 void CTeethReconstructionTestAction::MousePressEvent(QMouseEvent *e)
 {
+
 	if (e->modifiers() == Qt::Modifier::CTRL || e->modifiers() == Qt::Modifier::ALT)
 	{
 		e->setAccepted(false);
@@ -76,7 +79,8 @@ void CTeethReconstructionTestAction::MousePressEvent(QMouseEvent *e)
 		}
 		
 	}
-	if (is_picking_)
+	
+	if (false)
 	{
 		auto camera = viewer_->GetCamera();
 		OpenMesh::Vec3d orig, dir;
@@ -126,7 +130,55 @@ void CTeethReconstructionTestAction::MousePressEvent(QMouseEvent *e)
 
 		}
 	}
+	 if (is_picking_fa_point_)
+	{
+		 std::cerr << "pick fa point" << std::endl;
+		auto camera = viewer_->GetCamera();
+		OpenMesh::Vec3d orig, dir;
 
+		camera.ConvertClickToLine(e->pos(), orig, dir);
+	
+		auto data_pool = DataPool::GetMeshObjectPool();
+		int meshid=CGeoAlg::PickMesh(orig, dir, data_pool, true);
+		if (meshid != -1)
+		{
+
+			CMeshObject *mesh_obj = DataPool::GetMeshObject(meshid);
+			OpenMesh::VertexHandle vh;
+			COpenMeshT&mesh = mesh_obj->GetMesh();
+			CGeoAlg::RayMeshIntersection(orig, dir, *(mesh_obj), vh);
+			mesh_obj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
+			mesh.set_color(vh, OpenMesh::Vec3d(1, 0, 0));
+
+			fa_point_map_[mesh_obj->GetId()] = vh;
+			OpenMesh::Vec3d fa_p = mesh_obj->TransformPointByLocalMatrix(mesh.point(vh));
+			OpenMesh::Vec3d center = mesh_obj->TransformPointByLocalMatrix(CGeoBaseAlg::ComputeMeshCenter(mesh_obj->GetMesh()));
+
+			Eigen::Matrix4d loc_mat = CDentalBaseAlg::ComputeTeethLocalCoordinateFromFaPointAndLongAxis(fa_p, center, long_axis_[mesh_obj->GetId()]);
+			std::cerr << loc_mat << std::endl;
+			
+			Eigen::Matrix4d loc_mat_inv = loc_mat;
+			loc_mat_inv = loc_mat_inv.inverse();
+
+			std::cerr << "inv loc " << std::endl;
+			std::cerr << loc_mat_inv << std::endl;
+			Eigen::Matrix4d tmp_mat = loc_mat_inv*mesh_obj->GetMatrix();
+			mesh_obj->SetMatrix(tmp_mat);
+			mesh_obj->ApplyTransform();
+			mesh_obj->SetMatrix(loc_mat);
+			mesh_obj->SetChanged();
+			OpenMesh::Vec3d crown_center = CGeoBaseAlg::Transform(loc_mat, OpenMesh::Vec3d(0, 0, 0));
+			crown_centers_[mesh_obj->GetId()] = crown_center;
+			DataPool::DeleteAllCurveObjects();
+			CCurveObject*co = new CCurveObject();
+			co->GetCurve().push_back(crown_center);
+			co->GetCurve().push_back(crown_center + long_axis_[mesh_obj->GetId()] * 20);
+			co->SetChanged();
+			DataPool::AddCurveObject(co);
+			crown_mats_[mesh_obj->GetId()] = mesh_obj->GetMatrix();
+		}
+		
+	}
 	
 }
 void CTeethReconstructionTestAction::MouseMoveEvent(QMouseEvent *e)
@@ -158,52 +210,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			break;
 		}
 		
-		case Qt::Key_O:
-		{//save selected crown and template
-
-			QString path = QFileDialog::getSaveFileName((QWidget*)CUIContext::GetMainWindow(), "save sel models");
-
-			if (path.length() == 0)
-			{
-				std::cerr << "unable to open path\n" << std::endl;
-				return;
-			}
-			CMeshObject *crown_obj=DataPool::GetMeshObject(sel_crown_id_);
-			CMeshObject *temp_obj = DataPool::GetMeshObject(sel_temp_id_);
-			std::string fname = path.toStdString();
-			std::string crownfname,tempfname;
-			if (fname.length() - 4 >= 0 && fname[fname.length() - 4] != '.')
-			{
-				crownfname = fname + "_crown.obj";
-				tempfname = fname+ "_temp.obj";
-			}
-			else
-			{
-				crownfname = fname.substr(0, fname.length() - 4) + "_crown.obj";
-				tempfname = fname.substr(0, fname.length() - 4) + "_temp.obj";
-			}
-			if (crown_obj != NULL)
-			{
-				CDataIO::WriteMesh(crownfname, *crown_obj);
-			}
-			if (temp_obj != NULL)
-			{
-				//CGeoBaseAlg::NormalizeMeshSize(temp_obj->GetMesh());
-				CDataIO::WriteMesh(tempfname, *temp_obj);
-			}
-			auto curve_pool=DataPool::GetCurveObjectPool();
-			
-			for (auto iter = curve_pool.begin(); iter != curve_pool.end(); iter++)
-			{
-				std::string fcurvename ;
-				std::stringstream sstream;
-				sstream << path.toStdString() + "_curve"<< iter->first << ".obj";
-				fcurvename = sstream.str();
-	
-				CDataIO::SaveCurveToObj(fcurvename, iter->second->GetCurve());
-			}
-			break;
-		}
+		
 		case Qt::Key_V:
 		{
 			QString path = QFileDialog::getOpenFileName(NULL, "load dental mesh", ".", "Files(*.obj *.stl *.off )");
@@ -351,6 +358,8 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				std::cerr << "unable to load mesh\n" << std::endl;
 			}
 			CGeoAlg::FillHoles(meshobj->GetMesh(), true);
+			OpenMesh::Vec3d center=CGeoBaseAlg::ComputeMeshCenter(meshobj->GetMesh());
+			viewer_->camera()->setSceneCenter(qglviewer::Vec(center[0], center[1], center[2]));
 			meshobj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
 			meshobj->SetChanged();
 			DataPool::AddMeshObject(meshobj);
@@ -453,7 +462,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 		}
 		case Qt::Key_H:
 		{
-			for (auto iter= crowns_.begin();iter!= crowns_.end();iter++)
+			/*for (auto iter= crowns_.begin();iter!= crowns_.end();iter++)
 			{
 				if (sel_crown_id_ != -1&&sel_crown_id_ != iter->second->GetId())
 				{
@@ -466,7 +475,28 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				{
 					iter->second->IsVisiable() = !iter->second->IsVisiable();
 				}
+			}*/
+			static bool ss = true;
+			std::map<int, std::shared_ptr<CMeshObject>>& pool = DataPool::GetMeshObjectPool();
+			for (auto iter = pool.begin(); iter != pool.end(); iter++)
+			{
+				if (ss==false)
+				{
+					int id = iter->second.get()->GetId();
+					Eigen::Matrix4d mat = crown_mats_[id];
+					iter->second.get()->SetMatrix(mat);
+					iter->second.get()->SetChanged();
+				}
+				else
+				{
+					Eigen::Matrix4d mat;
+					mat.setIdentity();
+					iter->second.get()->SetMatrix(mat);
+					iter->second.get()->SetChanged();
+				}
+				
 			}
+			ss = !ss;
 			break;
 		}
 		case Qt::Key_S://separate teeth
@@ -516,7 +546,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 
 				for (auto iter = res_meshes.begin(); iter!=res_meshes.end(); iter++)
 				{
-					if (iter->first != -1)
+					if (iter->first != -1 && iter->second->n_vertices()>30)
 					{
 						CMeshObject *tmp_mesh_obj = new CMeshObject();
 					
@@ -560,6 +590,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				crown_vec[count]->SetChanged();
 				count++;
 			}
+
 			break;
 			std::map<int,OpenMesh::Vec2d>center_points;
 			std::map<int,OpenMesh::Vec3d>center_points_3d;
@@ -596,7 +627,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			{
 				vec_center_points.push_back(iter->second);
 			}
-			CCurveBaseAlg::PolynomialFitting(vec_center_points,4, coeffs);
+			CCurveBaseAlg::PolynomialFitting(vec_center_points,2, coeffs);
 			std::vector<OpenMesh::Vec2d>curve;
 			std::vector<OpenMesh::Vec3d>curve3d;
 			for (double xi = min_x-0.02; xi <= max_x+0.02; xi =xi+0.01)
@@ -612,12 +643,12 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				curve.push_back(OpenMesh::Vec2d(xi, zi));
 				curve3d.push_back(OpenMesh::Vec3d(xi, 0.15, zi));
 			}
-		/*	CCurveObject *curveobj = new CCurveObject();
+			CCurveObject *curveobj = new CCurveObject();
 			curveobj->SetCurve(curve3d);
 			curveobj->SetColor(OpenMesh::Vec3d(0, 1, 0));
 			curveobj->SetChanged();
 			std::cerr << "curve size " << curveobj->GetCurve().size() << std::endl;
-			DataPool::AddCurveObject(curveobj);*/
+			DataPool::AddCurveObject(curveobj);
 			double curve_len=CCurveBaseAlg::ComputeLenOfCurve(curve);
 	
 			std::vector<double>curve_lens(curve.size(),0);
@@ -673,11 +704,8 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 				}
 				std::cerr << "panoramic size " << w << " " << h << std::endl;
 				COpenMeshT plain_mesh;
-				CAuxGeoUtils::GetPlainMeshFromPointAndAxis(OpenMesh::Vec3d(0, 0, -1), 
-					OpenMesh::Vec3d(w, 0, 0), OpenMesh::Vec3d(0, h, 0), 
-					OpenMesh::Vec3d(0, 0, 1), 2, plain_mesh);
-				for (auto viter = plain_mesh.vertices_begin(); viter != plain_mesh.vertices_end(); 
-					viter++)
+				CAuxGeoUtils::GetPlainMeshFromPointAndAxis(OpenMesh::Vec3d(0, 0, -50), OpenMesh::Vec3d(w, 0, 0), OpenMesh::Vec3d(0, h, 0), OpenMesh::Vec3d(0, 0, 1), 2, plain_mesh);
+				for (auto viter = plain_mesh.vertices_begin(); viter != plain_mesh.vertices_end(); viter++)
 				{
 					OpenMesh::Vec3d p = plain_mesh.point(viter);
 					COpenMeshT::TexCoord2D texcoord;
@@ -693,8 +721,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 							texcoord[i] = 0;
 						}
 					}
-					for (auto hiter = plain_mesh.vih_begin(viter); hiter != plain_mesh.vih_end(viter); 
-						hiter++)
+					for (auto hiter = plain_mesh.vih_begin(viter); hiter != plain_mesh.vih_end(viter); hiter++)
 					{
 						plain_mesh.data(*hiter).SetUV(texcoord);
 					}
@@ -822,6 +849,12 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 
 			break;
 		}
+		
+		case Qt::Key_I:
+		{
+			is_picking_fa_point_ = true;
+			break;
+		}
 		case Qt::Key_J:
 		{
 			CMeshObject *mesh_obj = DataPool::GetMeshObject(sel_temp_id_);
@@ -882,6 +915,54 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			}
 			break;
 		}
+#define SEL_FAPOINT
+#ifndef SEL_FAPOINT
+		case Qt::Key_O:
+		{//save selected crown and template
+
+			QString path = QFileDialog::getSaveFileName((QWidget*)CUIContext::GetMainWindow(), "save sel models");
+
+			if (path.length() == 0)
+			{
+				std::cerr << "unable to open path\n" << std::endl;
+				return;
+			}
+			CMeshObject *crown_obj = DataPool::GetMeshObject(sel_crown_id_);
+			CMeshObject *temp_obj = DataPool::GetMeshObject(sel_temp_id_);
+			std::string fname = path.toStdString();
+			std::string crownfname, tempfname;
+			if (fname.length() - 4 >= 0 && fname[fname.length() - 4] != '.')
+			{
+				crownfname = fname + "_crown.obj";
+				tempfname = fname + "_temp.obj";
+			}
+			else
+			{
+				crownfname = fname.substr(0, fname.length() - 4) + "_crown.obj";
+				tempfname = fname.substr(0, fname.length() - 4) + "_temp.obj";
+			}
+			if (crown_obj != NULL)
+			{
+				CDataIO::WriteMesh(crownfname, *crown_obj);
+			}
+			if (temp_obj != NULL)
+			{
+				//CGeoBaseAlg::NormalizeMeshSize(temp_obj->GetMesh());
+				CDataIO::WriteMesh(tempfname, *temp_obj);
+			}
+			auto curve_pool = DataPool::GetCurveObjectPool();
+
+			for (auto iter = curve_pool.begin(); iter != curve_pool.end(); iter++)
+			{
+				std::string fcurvename;
+				std::stringstream sstream;
+				sstream << path.toStdString() + "_curve" << iter->first << ".obj";
+				fcurvename = sstream.str();
+
+				CDataIO::SaveCurveToObj(fcurvename, iter->second->GetCurve());
+			}
+			break;
+		}
 		case Qt::Key_L:
 		{
 			QString path = QFileDialog::getOpenFileName(NULL, "load dental mesh", ".", "Files(*.obj *.stl *.off )");
@@ -893,6 +974,7 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			}
 			CMeshObject *meshobj = new CMeshObject();
 			COpenMeshT &mesh = meshobj->GetMesh();
+			
 			std::cerr << path.toStdString() << std::endl;
 			if (!CDataIO::ReadMesh(path.toStdString(), *meshobj))
 			{
@@ -900,8 +982,8 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			}
 			else
 			{
-
-
+				CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
+				CGeoBaseAlg::NormalizeMeshSize(meshobj->GetMesh());
 				path[path.length() - 3] = 'd';
 				path[path.length() - 2] = 'm';
 				path[path.length() - 1] = 'a';
@@ -952,6 +1034,111 @@ void CTeethReconstructionTestAction::KeyPressEvent(QKeyEvent *e)
 			
 			break;
 		}
+#else
+	case Qt::Key_O:
+	{//save 
+
+
+		QString path = QFileDialog::getExistingDirectory();
+
+		QString dir = path + QString("\\tmpfolder");
+		std::cerr << dir.toStdString() << std::endl;
+		QDir qdir;
+		qdir.mkpath(dir);
+		std::string std_dir = dir.toStdString();
+		CDataIO data_io;
+		int count = 0;
+		auto pool = DataPool::GetMeshObjectPool();
+		
+		for (auto iter = pool.begin(); iter != pool.end(); iter++)
+		{
+			std::stringstream sstream;
+			sstream << std_dir << "\\" << count << ".stl";
+			
+			data_io.WriteMesh(sstream.str(), *(iter->second));
+			std::stringstream infostream;
+			infostream << std_dir << "\\" << count << ".info";
+			std::string fname = infostream.str();
+			OpenMesh::Vec3d mean = iter->second->TransformPointByLocalMatrix(CGeoBaseAlg::ComputeMeshCenter(iter->second->GetMesh()));
+			std::ofstream fout(fname);
+			Eigen::Matrix4d mat = iter->second->GetMatrix();
+			OpenMesh::Vec3d p = iter->second->GetMesh().point(fa_point_map_[iter->second->GetId()]);
+			fout << "FA Point: " << p[0] << " " << p[1] << " " << p[2] << std::endl;
+			OpenMesh::Vec3d longaxis = long_axis_[iter->second->GetId()];
+			//fout << "Long Axis: " << longaxis[0] << " " << longaxis[1] << " " << longaxis[2] << std::endl;
+			//fout << "Mean: " << mean[0] << " " << mean[1] << " " << mean[2] << std::endl;
+			fout << "Matrix 4x4: " << std::endl;
+			for (int i = 0; i < mat.rows(); i++)
+			{
+				for (int j = 0; j < mat.cols(); j++)
+				{
+					fout << mat(i, j) << " ";
+				}
+				fout << std::endl;
+			}
+			fout.close();
+			count++;
+		}
+		break;
+	}
+	case Qt::Key_L:
+	{
+		QString path = QFileDialog::getExistingDirectory(NULL, "load dental meshes");
+
+		if (path.length() == 0)
+		{
+			std::cerr << "unable to load mesh\n" << std::endl;
+			break;
+		}
+
+		QDir *dir = new QDir(path);
+		QStringList filter;
+		filter<<"*.obj";
+		dir->setNameFilters(filter);
+		QList<QFileInfo> *fileInfo = new QList<QFileInfo>(dir->entryInfoList(filter));
+		for (int i = 0; i < fileInfo->count(); i++)
+		{
+			QString str= fileInfo->at(i).filePath();
+			std::string fname=str.toStdString();
+			CMeshObject *meshobj = new CMeshObject();
+			
+			//std::cerr << "try load " << fname << std::endl;
+			if (!CDataIO::ReadMesh(fname, *meshobj))
+			{
+				std::cerr << "unable to load mesh\n" << std::endl;
+			}
+			else
+			{
+				//std::cerr << "load " << path.toStdString() << std::endl;
+				
+				
+				Eigen::Matrix4d mat;
+				if (igl::readDMAT(path.toStdString() + "\\mat.dmat", mat))
+				{
+					Eigen::Matrix4d tmp_mat = meshobj->GetMatrix();
+					meshobj->GetMatrix() = mat*tmp_mat;
+				}
+				meshobj->ApplyTransform();
+				meshobj->SetChanged();
+				DataPool::AddMeshObject(meshobj);
+				std::cerr << meshobj->GetMesh().n_vertices() << std::endl;
+
+				OpenMesh::Vec3d mean;
+				std::vector<OpenMesh::Vec3d>res_frame;
+				CGeoAlg::ComputeMeshPCA(meshobj->GetMesh(), mean, res_frame);
+				long_axis_[meshobj->GetId()] = res_frame[0];
+				CCurveObject *co = new CCurveObject();
+				co->GetCurve().push_back(mean);
+				co->GetCurve().push_back(mean + long_axis_[meshobj->GetId()] * 80);
+				co->SetChanged();
+				DataPool::AddCurveObject(co);
+			}
+
+		}
+		std::cerr << "load mesh down" << std::endl;
+		break;
+	}
+#endif
 		case Qt::Key_Q:
 		{
 			std::cerr << "switch to common action" << std::endl;
@@ -967,6 +1154,11 @@ void CTeethReconstructionTestAction::KeyReleaseEvent(QKeyEvent *e)
 		case Qt::Key_A:
 		{
 			is_picking_ = false;
+			break;
+		}
+		case Qt::Key_I:
+		{
+			is_picking_fa_point_ = false;
 			break;
 		}
 	}

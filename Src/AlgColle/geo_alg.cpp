@@ -1,5 +1,9 @@
 #include"geo_alg.h"
 
+#include <CGAL/algorithm.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Alpha_shape_2.h>
+#include<CGAL/Triangulation_vertex_base_with_id_2.h>
 #include"../DataColle/cgal_igl_converter.h"
 #include <CGAL/Polygon_mesh_processing/triangulate_hole.h>
 #include <CGAL/linear_least_squares_fitting_3.h>
@@ -39,6 +43,8 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Projection_traits_xy_3.h>
 #include <CGAL/Delaunay_triangulation_2.h>
+#include<opencv2/opencv.hpp>
+#include"curve_base_alg.h"
 void CGeoAlg::PointSetPCA3D(std::vector<OpenMesh::Vec3d> &pts, OpenMesh::Vec3d&res_mean, std::vector<OpenMesh::Vec3d> &res_eigen_vects, std::vector<double>& res_eigen_values)
 {
 	int sz = static_cast<int>(pts.size());
@@ -1035,6 +1041,165 @@ void CGeoAlg::SplitFaceByPoints(COpenMeshT &mesh, COpenMeshT::FaceHandle fh, std
 	}
 	
 }
+void CGeoAlg::ComputeScaleAndTransMatformFrom2SetOfRegisteredPoints(std::vector<OpenMesh::Vec2d>&src_points, std::vector<OpenMesh::Vec2d>&tgt_points, Eigen::Matrix3d &res_mat)
+{
+	double res_scale;
+	OpenMesh::Vec2d res_trans;
+	ComputeScaleAndTransformFrom2SetOfRegisteredPoints(src_points, tgt_points,res_scale, res_trans);
+	res_mat.setZero();
+	res_mat(0, 0) = res_scale;
+	res_mat(1, 1) = res_scale;
+	res_mat(2, 2) = 1;
+	res_mat(0, 2) = res_trans[0];
+	res_mat(1, 2) = res_trans[1];
+
+}
+void CGeoAlg::ComputeScaleAndTransformFrom2SetOfRegisteredPoints(std::vector<OpenMesh::Vec2d>&src_points, std::vector<OpenMesh::Vec2d>&tgt_points, double &res_scale, OpenMesh::Vec2d &res_trans)
+{
+	Eigen::MatrixXd A;
+	Eigen::VectorXd B;
+	A.resize(2 * src_points.size(), 3);
+	B.resize(2 * src_points.size());
+	for (int i = 0; i < src_points.size(); i++)
+	{
+		A(i * 2, 0) = src_points[i][0];
+		A(i * 2, 1) = 1;
+		A(i * 2, 2) = 0;
+		A(i * 2+1, 0) = src_points[i][1];
+		A(i * 2+1, 1) = 0;
+		A(i * 2+1, 2) = 1;
+
+		B(i * 2) = tgt_points[i][0];
+		B(i * 2 + 1) = tgt_points[i][1];
+	}
+	Eigen::VectorXd res_x;
+
+	res_x=A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(B);
+	res_scale = res_x(0);
+	res_trans[0] = res_x(1);
+	res_trans[1] = res_x(2);
+
+}
+void CGeoAlg::AlphaShape2d(std::vector<OpenMesh::Vec2d>&pts, double alpha, std::vector<std::vector<int>>&bound_vids)
+{
+
+
+	typedef Kernel::FT FT;
+	
+
+	typedef CGAL::Alpha_shape_vertex_base_2<Kernel> Vb;
+	typedef CGAL::Alpha_shape_face_base_2<Kernel>  Fb;
+	typedef CGAL::Triangulation_data_structure_2<Vb, Fb> Tds;
+	typedef CGAL::Delaunay_triangulation_2<Kernel, Tds> Triangulation_2;
+	typedef CGAL::Alpha_shape_2<Triangulation_2>  Alpha_shape_2;
+	typedef Alpha_shape_2::Alpha_shape_edges_iterator Alpha_shape_edges_iterator;
+	
+	std::vector<Point_2>cgal_pts;
+	std::map<Point_2, int>pmap;
+	for (int i = 0; i < pts.size(); i++)
+	{
+		Point_2 p = Point_2(pts[i][0], pts[i][1]);
+		cgal_pts.push_back(p);
+		pmap[p] = i;
+	}
+	
+	std::vector<std::vector<int>>edges;
+	edges.resize(pts.size());
+	for (int i = 0; i < edges.size(); i++)
+	{
+		edges[i].clear();
+	}
+	Alpha_shape_2 A(cgal_pts.begin(), cgal_pts.end(),FT(alpha),Alpha_shape_2::GENERAL);	
+	bound_vids.clear();
+	std::vector<OpenMesh::Vec3d>curve;
+	for (Alpha_shape_edges_iterator it = A.alpha_shape_edges_begin();it != A.alpha_shape_edges_end();++it) 
+	{
+		if (A.classify(*it) == Alpha_shape_2::Classification_type::REGULAR)
+		{
+			Segment_2 seg = A.segment(*it);
+			Point_2 p0 = seg.point(0);
+			Point_2 p1 = seg.point(1);
+			int pid0 = pmap[p0];
+			int pid1 = pmap[p1];
+
+			edges[pid0].push_back(pid1);
+			edges[pid1].push_back(pid0);
+		}
+		
+	}
+	for (int i = 0; i < edges.size(); i++)
+	{
+		if (edges[i].size() != 0)
+		{
+			bound_vids.push_back(std::vector<int>());
+
+			
+			bound_vids.back().push_back(i);
+			int j = edges[i][0];
+			int prej = i;
+			while (j != i)
+			{
+				bound_vids.back().push_back(j);
+				if (edges[j].size() != 2)
+				{
+					std::cerr << "error in alpha shape edges size " <<edges[j].size()<< std::endl;
+				}
+				for (int t = 0; t < edges[j].size(); t++)
+				{
+					if (edges[j][t] != prej)
+					{
+						prej = j;
+						j = edges[j][t];
+						break;
+					}
+				}
+			}
+			for (int j = 0; j < bound_vids.back().size(); j++)
+			{
+				edges[bound_vids.back()[j]].clear();
+			}
+		
+
+			
+			break;
+		}
+	}
+	
+
+	
+
+	
+	//OpenMesh::Vec3d color;
+	//color[0] = rand() % 1000 / 1000.0;
+	//color[1] = rand() % 1000 / 1000.0;
+	//color[2] = rand() % 1000 / 1000.0;
+	//CCurveObject *co = new CCurveObject();
+	//co->SetCurve(curve);
+	//co->RendereType() = CCurveObject::Dots;
+	//co->SetColor(color);
+	//DataPool::AddCurveObject(co);
+
+}
+void CGeoAlg::SampleCircle(OpenMesh::Vec3d updir, OpenMesh::Vec3d center, double radius, double degree_step, std::vector<OpenMesh::Vec3d>&res_pts)
+{
+	OpenMesh::Vec3d start_dir(-updir[1], updir[0], 0);
+	if (updir[0] == 0 && updir[1] == 0)
+	{
+		start_dir = OpenMesh::Vec3d(1, 0, 0);
+	}
+	start_dir.normalize();
+	
+	OpenMesh::Vec3d start_p = center + start_dir*radius;
+	Eigen::Matrix4d rot_mat=CGeoBaseAlg::ComputeRotMat(updir, degree_step, center);
+	res_pts.clear();
+	for (double degree = 0; degree < 2 * M_PI; degree += degree_step)
+	{ 
+		Eigen::Matrix4d rot_mat = CGeoBaseAlg::ComputeRotMat(updir, degree, center);
+		OpenMesh::Vec3d p=CGeoBaseAlg::Transform(rot_mat, start_p);
+		
+		res_pts.push_back(p);
+	}
+}
 double CGeoAlg::ComputeAverageEdgeLength(COpenMeshT &mesh)
 {
 	int count = 0;
@@ -1067,6 +1232,19 @@ void CGeoAlg::Remeshing(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&
 	//Remeshing::UniformRemesherT<COpenMeshT> uni_remesher(mesh);
 	double ave_edge_len = ComputeAverageEdgeLength(mesh);
 	adapt_remesher.remesh(ave_edge_len, ave_edge_len * 0.1, ave_edge_len, 5);
+}
+
+
+void CGeoAlg::ComputeConvexHull(std::vector<OpenMesh::Vec2d>&pts, std::vector<int>&res_convex_ids)
+{
+	
+	std::vector<cv::Point2f>cv_pts;
+	for (int i = 0; i < pts.size(); i++)
+	{
+		cv_pts.push_back(cv::Point2f(pts[i][0], pts[i][1]));
+	}
+
+	cv::convexHull(cv_pts, res_convex_ids, false, false);
 }
 void CGeoAlg::Remeshing(COpenMeshT &mesh)
 {

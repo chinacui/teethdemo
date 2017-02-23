@@ -128,6 +128,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_panoramic_image_registration.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\TeethStudio\panoramic_simulation_test_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Src\TeethStudio\panoramic_image_registration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -209,6 +212,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_panoramic_image_registration.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\TeethStudio\panoramic_simulation_test_action.h">
+      <Filter>Header Files\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

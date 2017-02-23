@@ -9,6 +9,7 @@ class CTeethReconstructionTestAction:public CActionBase
 {
 protected:
 	bool is_picking_;
+	bool is_picking_fa_point_;
 	std::map<int,CMeshObject*>crowns_;
 	std::map<int,CMeshObject*>template_tooth_;
 	std::map<int,CMeshObject*>crown_of_template_tooth_;
@@ -20,6 +21,11 @@ protected:
 	CARAPDeformation* template_arap_=NULL;
 	CNonRigidICP* non_rigid_icp_=NULL;
 	std::vector<std::pair<COpenMeshT::FaceHandle, OpenMesh::Vec3d>>test_sel_ps;
+	std::map<int, COpenMeshT::VertexHandle>fa_point_map_;
+
+	std::map<int, OpenMesh::Vec3d>long_axis_;
+	std::map<int, OpenMesh::Vec3d>crown_centers_;
+	std::map<int, Eigen::Matrix4d>crown_mats_;
 	bool IsTemplateTeeth(int id);
 	void Init();
 	void MousePressEvent(QMouseEvent *e);

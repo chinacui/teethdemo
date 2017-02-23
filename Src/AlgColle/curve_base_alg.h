@@ -6,11 +6,13 @@
 class ALGCOLLE_CLASS CCurveBaseAlg
 {
 public:
+	//proj_dir contain 2 vectors spanned a planner space
 	static void ProjectCurve2Plannar(std::vector<OpenMesh::Vec3d>&curve, std::vector<OpenMesh::Vec3d> proj_dir,std::vector<OpenMesh::Vec2d>&curve_2d);//proj_dir : 2d frame
 	static void ComputeMeanOfCurve(std::vector<OpenMesh::Vec3d>&curve, OpenMesh::Vec3d &res_mean);
 	static void ComputeBoundingBoxOf2dCurve(std::vector<OpenMesh::Vec2d>&curve,OpenMesh::Vec2d &bbox_min,OpenMesh::Vec2d &bbox_max);
 	static double ResampleCurve(std::vector<OpenMesh::Vec3d>&curve, int num, bool is_closed = false);
 	//static bool CurveResampling(std::vector<OpenMesh::Vec3d> p_curveobject);
+	static OpenMesh::Vec2d ComputeCurveCenter(std::vector<OpenMesh::Vec2d> &curve);
 	static bool ComputeCurveNormals(std::vector<OpenMesh::Vec3d>& p_curvebobj, std::vector<OpenMesh::Vec3d> &res_normal_list);
 	static bool ComputeCurveNormals(std::vector<OpenMesh::Vec2d>& p_curvebobj, std::vector<OpenMesh::Vec2d> &res_normal_list);
 	static double ComputeLenOfCurve(std::vector<OpenMesh::Vec3d>&curve,bool is_closed=false);
@@ -26,7 +28,13 @@ public:
 	static double ComputeLenOfCurve(std::vector<OpenMesh::Vec2d>&curve);
 	static void ComputeClosestPoint(std::vector<OpenMesh::Vec2d>&curve, OpenMesh::Vec2d p, int &res_pid);
 	static void ComputeClosestPoint(std::vector<OpenMesh::Vec3d>&curve, OpenMesh::Vec3d p, int &res_pid);
+	static void ComputeNearestPoint(OpenMesh::Vec3d p, std::pair<OpenMesh::Vec3d,OpenMesh::Vec3d>&seg, OpenMesh::Vec3d &res_p, double &res_dis);
+	static void ComputeClosestPoint(std::vector<OpenMesh::Vec3d>&curve,bool is_closed, OpenMesh::Vec3d p, OpenMesh::Vec3d &res_p, int &res_pid);
+	//fit polynomial , for example y=ax^3+bx^2+cx+d
 	static void PolynomialFitting(std::vector<OpenMesh::Vec2d>&curve, int degree,std::vector<double>&coeffs);
+	static void SamplePointsOfPolynomial(std::vector<double>&coeff, double min_x, double max_x, double seg_len,std::vector<OpenMesh::Vec2d>&res_points);
+	static OpenMesh::Vec2d ComputePointOfPolynomial(std::vector<double>&coedff, double x);
 	static OpenMesh::Vec2d ComputeNormalOfPolynomial(std::vector<double>&coeffs,double x);
+	static OpenMesh::Vec2d ComputeNearestPoint2Polynomial(std::vector<double>&coeff, OpenMesh::Vec2d p);
 };
 #endif

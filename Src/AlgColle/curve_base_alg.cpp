@@ -6,9 +6,10 @@
 #include"../DataColle/Polyhedron_type.h"
 #include<CGAL/squared_distance_2_1.h>
 #include"geo_base_alg.h"
+#include"../DataColle/data_pool.h"
 void CCurveBaseAlg::ProjectCurve2Plannar(std::vector<OpenMesh::Vec3d>&curve,  std::vector<OpenMesh::Vec3d> proj_dir, std::vector<OpenMesh::Vec2d>&curve_2d)
 {
-	std::cerr << "project" << std::endl;
+	//std::cerr << "project" << std::endl;
 	curve_2d.resize(curve.size());
 	OpenMesh::Vec3d mean;
 	ComputeMeanOfCurve(curve, mean);
@@ -23,6 +24,12 @@ void CCurveBaseAlg::ProjectCurve2Plannar(std::vector<OpenMesh::Vec3d>&curve,  st
 		v2d[1] = OpenMesh::dot<double, 3>(vdir,proj_dir[1]);
 		curve_2d[i] = v2d;
 	}
+	/*CCurveObject *co = new CCurveObject();
+	for (int i = 0; i < curve_2d.size(); i++)
+	{
+		co->GetCurve().push_back(OpenMesh::Vec3d(curve_2d[i][0], curve_2d[i][1], 0));
+	}
+	DataPool::AddCurveObject(co);*/
 }
 OpenMesh::Vec2d CCurveBaseAlg::ComputeNormalOfPolynomial(std::vector<double>&coeffs, double x)
 {
@@ -81,6 +88,98 @@ void CCurveBaseAlg::PolynomialFitting(std::vector<OpenMesh::Vec2d>&points, int d
 	}
 	std::cerr << std::endl;
 }
+void CCurveBaseAlg::SamplePointsOfPolynomial(std::vector<double>&coeff, double min_x, double max_x, double seg_len, std::vector<OpenMesh::Vec2d>&res_points)
+{
+
+}
+OpenMesh::Vec2d CCurveBaseAlg::ComputePointOfPolynomial(std::vector<double>&coeffs, double x)
+{
+
+	double py = 0;
+	double dx = 1;
+	for (int i = 0; i < coeffs.size(); i++)
+	{
+		py += coeffs[i] * dx;
+		dx = dx*x;
+	}
+	return OpenMesh::Vec2d(x, py);
+	
+}
+OpenMesh::Vec2d CCurveBaseAlg::ComputeNearestPoint2Polynomial(std::vector<double>&coeff, OpenMesh::Vec2d p)
+{
+	return OpenMesh::Vec2d(0, 0);
+}
+void CCurveBaseAlg::ComputeClosestPoint(std::vector<OpenMesh::Vec3d>&curve,bool is_closed, OpenMesh::Vec3d query_p, OpenMesh::Vec3d &res_p, int &res_pid)
+{
+
+
+	double min_square_dis = std::numeric_limits<double>::max();
+	int mi=0;
+	Point cgal_query_p(query_p[0], query_p[1], query_p[2]);
+	int endi = curve.size() - 1;
+	if (is_closed == false)
+	{
+		endi--;
+	}
+	for (int i = 0; i < curve.size(); i++)
+	{
+		Point cgal_p = Point(curve[i][0], curve[i][1], curve[i][2]);
+		Point cgal_p_next = Point(curve[(i + 1) % curve.size()][0], curve[(i + 1) % curve.size()][1], curve[(i + 1) % curve.size()][2]);
+	
+		Segment_3 seg(cgal_p, cgal_p_next);
+		double tmp_square_dis = CGAL::squared_distance(seg, cgal_query_p);
+		if (min_square_dis > tmp_square_dis)
+		{
+			mi = i;
+			min_square_dis = tmp_square_dis;
+		}
+
+	}
+	OpenMesh::Vec3d pa = curve[mi];
+	OpenMesh::Vec3d pb = curve[(mi + 1) % curve.size()];
+
+	res_pid = mi;
+	double res_dis;
+	ComputeNearestPoint(query_p, std::make_pair(pa,pb), res_p, res_dis);
+
+
+}
+void CCurveBaseAlg::ComputeNearestPoint(OpenMesh::Vec3d p, std::pair<OpenMesh::Vec3d, OpenMesh::Vec3d>&seg, OpenMesh::Vec3d &res_p, double &res_dis)
+{
+
+	Point cgal_p(p[0], p[1], p[2]);
+	Point cgal_sega(seg.first[0], seg.first[1], seg.first[2]);
+	Point cgal_segb(seg.second[0], seg.second[1], seg.second[2]);
+	Segment_3 cgal_seg(cgal_sega, cgal_segb);
+	double dis = std::sqrt(CGAL::squared_distance(cgal_p, cgal_seg));
+
+	double dis0 = std::sqrt(CGAL::squared_distance(cgal_p, cgal_seg[0]));
+	double dis1 = std::sqrt(CGAL::squared_distance(cgal_p, cgal_seg[1]));
+	Point cgal_res_p;
+	res_dis = dis;
+	if ((dis >= dis0 - (1e-10) || (dis <= dis0 + (1e-10))))
+	{
+		cgal_res_p = cgal_seg[0];
+		
+	}
+	else if ((dis >= dis1 - (1e-10) || (dis <= dis1 + (1e-10))))
+	{
+		cgal_res_p = cgal_seg[1];
+		
+	}
+	else
+	{
+		Vector dir = cgal_seg[1] - cgal_seg[0];
+		dir = normalize(dir);
+		double len = std::sqrt(dis0*dis0 - dis*dis);
+		cgal_res_p = cgal_seg[0] + dir*len;
+		
+
+	}
+	res_p = OpenMesh::Vec3d(cgal_res_p[0], cgal_res_p[1], cgal_res_p[2]);
+
+}
+
 void CCurveBaseAlg::ComputeClosestPoint(std::vector<OpenMesh::Vec3d>&curve, OpenMesh::Vec3d p, int &res_pid)
 {
 	double min_dis = std::numeric_limits<double>::max();
@@ -383,7 +482,7 @@ bool CCurveBaseAlg::ComputeMatchingWithAnchorsFixed(std::vector<OpenMesh::Vec3d>
 	}
 	std::cerr << " corres size: " << correspond.size() << std::endl;
 	std::cerr << "end" << std::endl;
-
+	return true;
 }
 int CCurveBaseAlg::ComputLocalMaximamConcavityPoints(std::vector<OpenMesh::Vec2d>&curve, int neighbor_num, int neighbor_num_for_convexity, std::vector<int>&res_points)
 {
@@ -585,7 +684,16 @@ void CCurveBaseAlg::ComputeClosestPoint(std::vector<OpenMesh::Vec2d>&curve, Open
 		}
 	}
 }
-
+OpenMesh::Vec2d CCurveBaseAlg::ComputeCurveCenter(std::vector<OpenMesh::Vec2d> &curve)
+{
+	OpenMesh::Vec2d center(0, 0);
+	for (int i = 0; i < curve.size(); i++)
+	{
+		center += curve[i];
+	}
+	center /= curve.size();
+	return center;
+}
 double CCurveBaseAlg::ResampleCurve(std::vector<OpenMesh::Vec3d>&curve, int sample_num, bool is_closed)
 {
 	if (curve.size() == 0)

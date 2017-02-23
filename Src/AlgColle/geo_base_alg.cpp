@@ -168,6 +168,28 @@ OpenMesh::VertexHandle CGeoBaseAlg::GetClosestVhFromFacePoint(COpenMeshT&mesh, C
 	COpenMeshT::VertexHandle tvh = fvhs[maxi];
 	return tvh;
 }
+void CGeoBaseAlg::ComputeAABB(CMeshObject& mesh_obj, OpenMesh::Vec3d &res_min_p, OpenMesh::Vec3d &res_max_p)
+{
+	COpenMeshT &mesh = mesh_obj.GetMesh();
+	res_min_p = OpenMesh::Vec3d(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	res_max_p = OpenMesh::Vec3d(std::numeric_limits<double>::min(), std::numeric_limits<double>::min(), std::numeric_limits<double>::min());
+	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	{
+		OpenMesh::Vec3d p = mesh.point(viter);
+		p = mesh_obj.TransformPointByLocalMatrix(p);
+		for (int i = 0; i < 3; i++)
+		{
+			if (p[i] > res_max_p[i])
+			{
+				res_max_p[i] = p[i];
+			}
+			if (p[i] < res_min_p[i])
+			{
+				res_min_p[i] = p[i];
+			}
+		}
+	}
+}
 void CGeoBaseAlg::ComputeAABB(COpenMeshT& mesh, OpenMesh::Vec3d &res_min_p, OpenMesh::Vec3d &res_max_p)
 {
 	res_min_p = OpenMesh::Vec3d(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
@@ -276,6 +298,21 @@ OpenMesh::Vec3d CGeoBaseAlg::Transform(Eigen::Matrix4d mat, OpenMesh::Vec3d p)
 	Eigen::Vector4d ep(p[0], p[1], p[2], 1);
 	ep = mat*ep;
 	return OpenMesh::Vec3d(ep.x(), ep.y(), ep.z());
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeRotMat(OpenMesh::Vec3d src_dir, OpenMesh::Vec3d tgt_dir)
+{
+	Eigen::Vector3d eg_src_dir(src_dir[0], src_dir[1], src_dir[2]);
+	Eigen::Vector3d eg_tgt_dir(tgt_dir[0], tgt_dir[1], tgt_dir[2]);
+	return ComputeRotMat(eg_src_dir, eg_tgt_dir);
+}
+Eigen::Matrix4d CGeoBaseAlg::ComputeRotMat(Eigen::Vector3d src_dir, Eigen::Vector3d tgt_dir)
+{
+	src_dir.normalize();
+	tgt_dir.normalize();
+	Eigen::Vector3d axis=src_dir.cross(tgt_dir);
+	axis.normalize();
+	double rot_degree = std::acos(src_dir.dot(tgt_dir));
+	return ComputeRotMat(axis, rot_degree, Eigen::Vector3d(0, 0, 0));
 }
 Eigen::Matrix4d CGeoBaseAlg::ComputeRotMat(Eigen::Vector3d axis, double angle, Eigen::Vector3d center)
 {
@@ -402,6 +439,7 @@ Eigen::Matrix4d CGeoBaseAlg::ComputeFrameTransMatrix(Eigen::Vector3d src_center,
 	Eigen::Vector3d rot_axis0, rot_axis1;	
 	rot_axis0=src_frame[0].cross(tgt_frame[0]);
 	double rot_angle0 = std::acos(src_frame[0].dot(tgt_frame[0]));
+	rot_axis0.normalize();
 	Eigen::Matrix4d rot_mat0 = ComputeRotMat(rot_axis0, rot_angle0, Eigen::Vector3d(0, 0, 0));
 	Eigen::Vector4d tmp_axisy = Eigen::Vector4d(src_frame[1](0), src_frame[1](1), src_frame[1](0),1);
 	tmp_axisy = rot_mat0*tmp_axisy;
@@ -410,6 +448,7 @@ Eigen::Matrix4d CGeoBaseAlg::ComputeFrameTransMatrix(Eigen::Vector3d src_center,
 	src_frame[1](2) = tmp_axisy(2);
 	
 	rot_axis1 = src_frame[1].cross(tgt_frame[1]);
+	rot_axis1.normalize();
 	double rot_angle1 = std::acos(src_frame[1].dot(tgt_frame[1]));
 
 	Eigen::Matrix4d rot_mat1 = ComputeRotMat(rot_axis1, rot_angle1, Eigen::Vector3d(0, 0, 0));
@@ -692,6 +731,25 @@ double CGeoBaseAlg::Min_Dist_Point2_to_Line2(OpenMesh::Vec2d p, OpenMesh::Vec2d 
 	return min_dist;
 
 }
+double CGeoBaseAlg::ComputeAverageEdgeLength(CMeshObject *mesh_obj)
+{
+	COpenMeshT &mesh = mesh_obj->GetMesh();
+	double ave_edge_len = ComputeAverageEdgeLength(mesh_obj->GetMesh());
+	Eigen::Matrix4d  mat = mesh_obj->GetMatrix();
+	auto viter0 = mesh.vertices_begin();
+	OpenMesh::Vec3d p0=mesh.point(viter0);
+	viter0++;
+	OpenMesh::Vec3d p1 = mesh.point(viter0);
+	OpenMesh::Vec3d diff0 = p0 - p1;
+	double len0 = diff0.length();
+	p0=Transform(mat, p0);
+	p1= Transform(mat, p1);
+	OpenMesh::Vec3d diff1 = p1 - p0;
+	double len1 = diff1.length();
+	ave_edge_len = ave_edge_len*(len1 / len0);
+	return ave_edge_len;
+
+}
 double CGeoBaseAlg::ComputeAverageEdgeLength(COpenMeshT&mesh)
 {
 
@@ -708,6 +766,45 @@ double CGeoBaseAlg::ComputeAverageEdgeLength(COpenMeshT&mesh)
 	}
 	len /= count;
 	return len;
+}
+double CGeoBaseAlg::ComputeMaxEdgeLength(CMeshObject *mesh_obj)
+{
+	COpenMeshT &mesh = mesh_obj->GetMesh();
+	double max_edge_len = ComputeMaxEdgeLength(mesh_obj->GetMesh());
+	Eigen::Matrix4d  mat = mesh_obj->GetMatrix();
+	auto viter0 = mesh.vertices_begin();
+	OpenMesh::Vec3d p0 = mesh.point(viter0);
+	viter0++;
+	OpenMesh::Vec3d p1 = mesh.point(viter0);
+	OpenMesh::Vec3d diff0 = p0 - p1;
+	double len0 = diff0.length();
+	p0 = Transform(mat, p0);
+	p1 = Transform(mat, p1);
+	OpenMesh::Vec3d diff1 = p1 - p0;
+	double len1 = diff1.length();
+	max_edge_len = max_edge_len*(len1 / len0);
+	return max_edge_len;
+}
+double CGeoBaseAlg::ComputeMaxEdgeLength(COpenMeshT&mesh)
+{
+
+	int count = 0;
+	double max_len = -1;
+	for (auto eiter = mesh.edges_begin(); eiter != mesh.edges_end(); eiter++)
+	{
+		
+		COpenMeshT::VertexHandle vh0 = mesh.to_vertex_handle(mesh.halfedge_handle(eiter, 0));
+		COpenMeshT::VertexHandle vh1 = mesh.to_vertex_handle(mesh.halfedge_handle(eiter, 1));
+		OpenMesh::Vec3d p0 = mesh.point(vh0);
+		OpenMesh::Vec3d p1 = mesh.point(vh1);
+		double len = (p0 - p1).length();
+		if (max_len < len)
+		{
+			max_len = len;
+		}
+	}
+
+	return max_len;
 }
 void CGeoBaseAlg::ComputePerVertexNormal(COpenMeshT&mesh, std::map<COpenMeshT::VertexHandle, OpenMesh::Vec3d>& vh_normals)
 {

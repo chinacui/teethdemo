@@ -18,6 +18,9 @@ public:
 	static void ComputeStretchCrowns2LineMatrix(std::vector<CMeshObject*>&crowns, std::vector<Eigen::Matrix4d>&res_mats);
 	static void ComputeCrownFrontDirs(std::vector<CMeshObject*>&crowns, std::vector<OpenMesh::Vec3d>&res_front_dirs);
 	static void OrderCrowns(std::vector<CMeshObject*>&crowns,OpenMesh::Vec3d crown_updir, bool from_left2right);
+
 	static void ComputeCrownsType(std::vector<CMeshObject*>crowns,std::map<CMeshObject*,int>&fixed_id, std::map<CMeshObject *, std::string>&res_crown_type);
+
+
 };
 #endif

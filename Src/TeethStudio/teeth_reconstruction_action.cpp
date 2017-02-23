@@ -156,9 +156,23 @@ void CTeethReconstructionAction::KeyPressEvent(QKeyEvent *e)
 					tempss << stdpath << "\\temp_" << i << ".obj";
 					CMeshObject *crown_obj = DataPool::GetMeshObject(crown_ids_[i]);
 					CTeethTemplateObject  *temp_obj=crown_temp_map_[crown_ids_[i]];
-					CDataIO dataio;
-					dataio.WriteMesh(crownss.str(), *crown_obj);
-					dataio.WriteMesh(tempss.str(), *temp_obj);
+				
+						CDataIO dataio;
+						dataio.WriteMesh(crownss.str(), *crown_obj);
+						if (temp_obj != NULL)
+						{
+							COpenMeshT &mesh = temp_obj->GetMesh();
+							auto vhs_map=temp_obj->GetCrown2TempVhsMap();
+							for (auto iter = vhs_map.begin(); iter != vhs_map.end(); iter++)
+							{
+								mesh.set_color(iter->second, OpenMesh::Vec3d(0, 0, 0));
+							
+							}
+							temp_obj->SetAttrChanged();
+						dataio.WriteMesh(tempss.str(), *temp_obj);
+						temp_obj->SetMeshColor(OpenMesh::Vec3d(0.8, 0.8, 0.8));
+						}
+					
 				}
 			}
 			
@@ -262,6 +276,27 @@ void CTeethReconstructionAction::KeyPressEvent(QKeyEvent *e)
 			}
 			break;
 		}
+		case Qt::Key_I:
+		{
+			std::vector<CMeshObject*>crowns;
+			for (int i = 0; i < crown_ids_.size(); i++)
+			{
+				CMeshObject * mesh_obj = DataPool::GetMeshObject(crown_ids_[i]);
+				crowns.push_back(mesh_obj);
+			}
+			for (int i = 0; i < crowns.size(); i++)
+			{
+				CMeshObject *crown_obj = crowns[i];
+				
+				CTeethTemplateObject *crown_temp = crown_temp_map_[crown_obj->GetId()];
+
+				non_rigid_icp_[crown_obj->GetId()] = new CNonRigidICP(&crown_temp->GetCrownMesh(), &(crown_obj->GetMesh()));
+				crown_temp_arap_[crown_obj->GetId()] = new CARAPDeformation(crown_temp->GetMesh());
+				crown_temp->SetChanged();
+				is_temp_matching_finished_[crown_obj->GetId()] = false;
+			}
+			break;
+		}
 		case Qt::Key_P:
 		{
 			if (sel_teeth_ids_.size() == 2)
@@ -313,7 +348,7 @@ void CTeethReconstructionAction::KeyPressEvent(QKeyEvent *e)
 					CMeshObject *crown_obj = crowns[i];
 					crown_obj->ApplyTransform();
 					crown_obj->SetChanged();
-					//std::cerr << "crown id " << crown_ids_[i] << std::endl;
+					std::cerr << "crown id " << crown_ids_[i] << std::endl;
 					
 					std::string temp_type = crown2temptype_map_[crown_obj->GetId()];
 					CTeethTemplateObject *crown_temp = new CTeethTemplateObject(*template_meshes_[temp_type]);
@@ -363,6 +398,9 @@ void CTeethReconstructionAction::KeyPressEvent(QKeyEvent *e)
 				std::cerr << "unable to load mesh\n" << std::endl;
 			}
 			
+
+			meshobj->RestoreCurrentVPos();
+			CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
 			path[path.length() - 3] = 'd';
 			path[path.length() - 2] = 'm';
 			path[path.length() - 1] = 'a';

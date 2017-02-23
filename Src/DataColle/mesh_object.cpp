@@ -24,6 +24,7 @@ void CMeshObject::RestoreCurrentVPos()
 		//OpenMesh::Vec3d p = this->TransformPointByLocalMatrix(mesh_.point(viter));
 		
 	}
+	restore_mat_ = this->mat_;
 }
 void CMeshObject::RecoverCurrentVPos()
 {
@@ -31,6 +32,7 @@ void CMeshObject::RecoverCurrentVPos()
 	{
 		mesh_.set_point(iter->first, iter->second);
 	}
+	this->mat_ = restore_mat_;
 	SetChanged();
 	
 }

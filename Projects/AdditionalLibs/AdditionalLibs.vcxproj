@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\lbfgs.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\lbfgspre.h" />
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\Non_Linear_Optimization.h" />
     <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icp.h" />
     <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icpPointToPlane.h" />
     <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icpPointToPoint.h" />
@@ -59,6 +62,8 @@
     <ClInclude Include="..\..\Src\AdditionalLibs\XWGeodesic\xw_geodesic_wrapper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\AdditionalLibs\lbfgs\lbfgs.cpp" />
+    <ClCompile Include="..\..\Src\AdditionalLibs\lbfgs\Non_Linear_Optimization.cpp" />
     <ClCompile Include="..\..\Src\AdditionalLibs\libicp\demo.cpp" />
     <ClCompile Include="..\..\Src\AdditionalLibs\libicp\icp.cpp" />
     <ClCompile Include="..\..\Src\AdditionalLibs\libicp\icpPointToPlane.cpp" />
@@ -156,6 +161,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_USRDLL;ADDITIONALLIBS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(TOPEN_MESH_DIR)\include;$(TEIGEN_ROOT);$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

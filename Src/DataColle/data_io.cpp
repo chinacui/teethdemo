@@ -207,12 +207,31 @@ bool CDataIO::WriteMesh(std::string fname, CMeshObject & res_mesh_obj)
 	Eigen::MatrixXd V;
 	Eigen::MatrixXi F;
 	CConverter::ConvertFromOpenMeshToIGL(res_mesh_obj.GetMesh(), V, F);
-	igl::writeOBJ(fname, V, F);
-	/*if (!OpenMesh::IO::write_mesh(res_mesh_obj.GetMesh(), fname))
+	//igl::writeOBJ(fname, V, F);
+
+	//std::ofstream fout(fname);
+	//COpenMeshT &mesh = res_mesh_obj.GetMesh();
+	//for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+	//{
+	//	OpenMesh::Vec3d color = mesh.color(viter);
+	//	fout << "v " << mesh.point(viter)[0] << " " << mesh.point(viter)[1] << " " << mesh.point(viter)[2] << " " << color[0] << " " << color[1] << " " << color[2] << std::endl;
+
+	//}
+	//for (auto fiter = mesh.faces_begin(); fiter!= mesh.faces_end(); fiter++)
+	//{
+	//	fout << "f ";
+	//	for (auto fviter = mesh.fv_begin(fiter); fviter != mesh.fv_end(fiter); fviter++)
+	//	{
+	//		fout << fviter->idx()+1 << " ";
+	//	}
+	//	fout << std::endl;
+	//}
+	//fout.close();
+		if (!OpenMesh::IO::write_mesh(res_mesh_obj.GetMesh(), fname, OpenMesh::IO::Options::VertexColor))
 	{
 		std::cerr << "write error\n";
 		return false;
-	}*/
+	}
 	return true;
 }
 

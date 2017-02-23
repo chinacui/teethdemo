@@ -17,9 +17,15 @@ class ALGCOLLE_CLASS CGeoAlg
 protected:
 	
 public:
+	//reomve self intersection face
 	static bool SelfIntersectionRemoval(COpenMeshT& mesh);
+
+	//fill holes of the mesh
 	static void FillHoles(Eigen::MatrixXd& vertexs, Eigen::MatrixXi& faces);
+
+	//fill hole of the mesh, the largest hole can be remained by option
 	static void FillHoles(COpenMeshT &mesh, bool remain_largest=false);
+
 	static void SeparateMeshByVhsLoop(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&vhs, std::vector< COpenMeshT*>&res_meshes,std::vector<std::map<COpenMeshT::VertexHandle,COpenMeshT::VertexHandle>>&new2orig_vhsmap);
 	static void FindEdgePointsPath(CMeshObject &mesh_obj, std::pair<COpenMeshT::FaceHandle, OpenMesh::Vec3d>fpa, std::pair<COpenMeshT::FaceHandle, OpenMesh::Vec3d>fpb, std::vector<std::pair<COpenMeshT::EdgeHandle, OpenMesh::Vec3d>>&res_eps, std::vector<bool>&is_vertex,int recursive_num);
 	static void SmoothMesh(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&roi_vhs,int num);
@@ -57,6 +63,11 @@ public:
 	static void RefineMeshBoundary(COpenMeshT &mesh);
 	static double ComputeAverageEdgeLength(COpenMeshT &mesh);
 	static void Remeshing(COpenMeshT &mesh);
+	static void ComputeScaleAndTransformFrom2SetOfRegisteredPoints(std::vector<OpenMesh::Vec2d>&src_points, std::vector<OpenMesh::Vec2d>&tgt_points, double &res_scale, OpenMesh::Vec2d &res_trans);
+	static void ComputeScaleAndTransMatformFrom2SetOfRegisteredPoints(std::vector<OpenMesh::Vec2d>&src_points, std::vector<OpenMesh::Vec2d>&tgt_points, Eigen::Matrix3d &res_mat);
+	static void AlphaShape2d(std::vector<OpenMesh::Vec2d>&pts,double alpha,std::vector<std::vector<int>>&bound_vids);
+	static void SampleCircle(OpenMesh::Vec3d updir, OpenMesh::Vec3d center,double radius, double degree_step, std::vector<OpenMesh::Vec3d>&res_pts);
+	static void ComputeConvexHull(std::vector<OpenMesh::Vec2d>&pts, std::vector<int>&res_convex_ids);
 	static void Remeshing(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&roi);
 	static void SplitFaceByPoints(COpenMeshT &mesh, COpenMeshT::FaceHandle fh, std::vector<OpenMesh::Vec3d> &pts,std::vector<OpenMesh::VertexHandle>&new_vhs=std::vector<OpenMesh::VertexHandle>());
 	static void SplitFaceByVhs(COpenMeshT &mesh, COpenMeshT::FaceHandle fh, std::vector<COpenMeshT::VertexHandle>&vhs, std::vector<std::pair<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&cons,std::map<COpenMeshT::VertexHandle,COpenMeshT::EdgeHandle>&vh_eh_map);//if a vh is on an edge point , it should be added to vh_eh_map,trick: is cons <0  it indicates the orig vertex on triangle

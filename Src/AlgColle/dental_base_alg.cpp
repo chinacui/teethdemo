@@ -1190,6 +1190,24 @@ void CDentalBaseAlg::PCABasedOrientationCorrection(COpenMeshT& mesh)
 
 
 	Eigen::Matrix3d rot_mat = rot_mat1*rot_mat0;
+	Eigen::Matrix4d rot_mat4;
+	rot_mat4.setIdentity();
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			rot_mat4(i, j) = rot_mat(i, j);
+		}
+	}
+	
+	Eigen::Matrix4d tmp_mat;
+	tmp_mat.setIdentity();
+	tmp_mat(0, 3) = -mean[0];
+	tmp_mat(1, 3) = -mean[1];
+	tmp_mat(2, 3) = -mean[2];
+
+	tmp_mat = rot_mat4*tmp_mat;
+	igl::writeDMAT(std::string("mat.dmat"), tmp_mat.inverse());
 	for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
 	{
 		OpenMesh::Vec3d p = mesh.point(viter);
@@ -1216,6 +1234,33 @@ void CDentalBaseAlg::PCABasedOrientationCorrection(COpenMeshT& mesh)
 	}
 #endif
 }
+Eigen::Matrix4d CDentalBaseAlg::ComputeTeethLocalCoordinateFromFaPointAndLongAxis(OpenMesh::Vec3d fa_point, OpenMesh::Vec3d teeth_mean, OpenMesh::Vec3d longaxis)
+{
+	longaxis.normalize();
+	OpenMesh::Vec3d dir0 = fa_point - teeth_mean;
+	double len=OpenMesh::dot(dir0, longaxis);
+	OpenMesh::Vec3d crown_mean = teeth_mean + longaxis*len;
+
+	OpenMesh::Vec3d axisz = (fa_point - crown_mean);
+	axisz.normalize();
+	OpenMesh::Vec3d axisy = longaxis;
+	OpenMesh::Vec3d axisx = OpenMesh::cross(axisy,axisz);
+	axisx.normalize();
+	std::vector<OpenMesh::Vec3d>src_frame(3), tgt_frame(3);
+	src_frame[0] = OpenMesh::Vec3d(1, 0, 0);
+	src_frame[1] = OpenMesh::Vec3d(0, 1, 0);
+	src_frame[2] = OpenMesh::Vec3d(0, 0, 1);
+
+
+	tgt_frame[0] = axisx;
+	tgt_frame[1] = axisy;
+	tgt_frame[2] = axisz;
+
+	Eigen::Matrix4d mat= CGeoBaseAlg::ComputeFrameTransMatrix(OpenMesh::Vec3d(0, 0, 0), src_frame, crown_mean, tgt_frame);
+	
+	return mat;
+}
+
 void CDentalBaseAlg::ComputeTeethFeaturePoints(COpenMeshT &mesh, std::vector<COpenMeshT::VertexHandle>&res_vhs)
 {
 	std::cerr << "compute teeth feature points" << std::endl;

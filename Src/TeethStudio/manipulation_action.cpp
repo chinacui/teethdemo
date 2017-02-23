@@ -61,7 +61,7 @@ void CManipulationAction::MouseMoveEvent(QMouseEvent *e)
 			{
 				CMeshObject *mesh_obj = DataPool::GetMeshObject(sel_mesh_ids_[i]);
 				mesh_obj->Transform(trans);
-				
+				mesh_obj->SetChanged();
 
 			}
 			pre_move_pos_ = cpos;
@@ -127,6 +127,7 @@ void CManipulationAction::WheelEvent(QWheelEvent *e)
 					p=sel_mesh_center_+(p - sel_mesh_center_)*scale;
 					mesh.set_point(viter, p);
 				}
+				mesh_obj->ApplyTransform();
 				mesh_obj->SetChanged();
 			}
 		}

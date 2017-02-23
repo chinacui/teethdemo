@@ -24,9 +24,21 @@
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\ndt_registration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\TeethRootRecoAlg\panoramic_simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\TeethRootRecoAlg\panoramic_fitting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\dental_template_fitting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\TeethRootRecoAlg\panoramic_fitting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\TeethRootRecoAlg\panoramic_simulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\ndt_registration.cpp">

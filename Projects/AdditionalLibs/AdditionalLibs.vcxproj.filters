@@ -34,6 +34,12 @@
     <Filter Include="Header Files\remesher">
       <UniqueIdentifier>{9b77f6fe-5761-4091-8e21-374bf3ca7437}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\lbfgs">
+      <UniqueIdentifier>{55ddf92c-69bf-42f8-ba95-018eab540c2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lbfgs">
+      <UniqueIdentifier>{1dafc08c-50a6-4cb4-96d6-091674e3e4cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\AdditionalLibs\libicp\icp.h">
@@ -150,6 +156,15 @@
     <ClInclude Include="..\..\Src\AdditionalLibs\prereq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\Non_Linear_Optimization.h">
+      <Filter>Header Files\lbfgs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\lbfgs.h">
+      <Filter>Header Files\lbfgs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AdditionalLibs\lbfgs\lbfgspre.h">
+      <Filter>Header Files\lbfgs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\AdditionalLibs\libicp\demo.cpp">
@@ -223,6 +238,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Src\AdditionalLibs\XWGeodesic\xw_geodesic_wrapper.cpp">
       <Filter>Source Files\XWGeodesic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AdditionalLibs\lbfgs\lbfgs.cpp">
+      <Filter>Source Files\lbfgs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\AdditionalLibs\lbfgs\Non_Linear_Optimization.cpp">
+      <Filter>Source Files\lbfgs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

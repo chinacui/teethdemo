@@ -166,6 +166,9 @@ public:
 	static void MergeCuttingPointsByDis(COpenMeshT&mesh, std::vector<std::vector<COpenMeshT::VertexHandle>>&inside_vhs, std::vector<std::vector<COpenMeshT::VertexHandle>>&outside_vhs,double threshold);
 	static void ComputeCuttingPath(CMeshObject&meshobj, std::vector<std::vector<COpenMeshT::VertexHandle>>&inside_cutting_vhs, std::vector<std::vector<COpenMeshT::VertexHandle>>&outside_cutting_vhs,std::vector<CCuttingPath>&res_cuttingpath);
 	static int TagToothByCuttingPath(COpenMeshT&mesh, std::vector<CCuttingPath>&cutting_pathes,std::vector<int>&res_tags);
+	static Eigen::Matrix4d  ComputeTeethLocalCoordinateFromFaPointAndLongAxis(OpenMesh::Vec3d fa_point, OpenMesh::Vec3d mean, OpenMesh::Vec3d longaxis);
+
 	static void PCABasedOrientationCorrection(COpenMeshT& mesh);
+	
 };
 #endif

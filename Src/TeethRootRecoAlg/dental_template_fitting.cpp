@@ -13,6 +13,7 @@
 #include"../DataColle/data_io.h"
 #include"../DataColle/teeth_template_object.h"
 #include"../AlgColle/numerical_base_alg.h"
+#include"../AlgColle/dental_base_alg.h"
 void CDentalTemplateFitting::RefineFittingTemplate(COpenMeshT &mesh_template, COpenMeshT &mesh_target)
 {
 	Eigen::MatrixXd temp_v, tgt_v;
@@ -109,6 +110,7 @@ void CDentalTemplateFitting::ComputeCrownFrontDirs(std::vector<CMeshObject*>&cro
 }
 void CDentalTemplateFitting::ComputeStretchCrowns2LineMatrix(std::vector<CMeshObject*>&crowns, std::vector<Eigen::Matrix4d>&res_mats)
 {
+
 	std::vector<OpenMesh::Vec2d>center_points;
 	std::vector<OpenMesh::Vec3d>center_points_3d;
 	double mean_y = 0;
@@ -146,10 +148,10 @@ void CDentalTemplateFitting::ComputeStretchCrowns2LineMatrix(std::vector<CMeshOb
 	{
 		vec_center_points[i] = center_points[i];
 	}
-	CCurveBaseAlg::PolynomialFitting(vec_center_points, 4, coeffs);
+	CCurveBaseAlg::PolynomialFitting(vec_center_points, 2 , coeffs);
 	std::vector<OpenMesh::Vec2d>curve;
 	std::vector<OpenMesh::Vec3d>curve3d;
-	for (double xi = min_x - 0.02; xi <= max_x + 0.02; xi = xi + 0.01)
+	for (double xi = min_x - 0.02; xi <= max_x + 0.02; xi = xi + 0.001)
 	{
 		//std::cerr << xi << std::endl;
 		double zi = 0;
@@ -162,12 +164,14 @@ void CDentalTemplateFitting::ComputeStretchCrowns2LineMatrix(std::vector<CMeshOb
 		curve.push_back(OpenMesh::Vec2d(xi, zi));
 		curve3d.push_back(OpenMesh::Vec3d(xi, 0.15, zi));
 	}
-	/*	CCurveObject *curveobj = new CCurveObject();
+	double len=CCurveBaseAlg::ComputeLenOfCurve(curve3d, false);
+	CCurveBaseAlg::ResampleCurve(curve3d, len / 0.0001);
+		CCurveObject *curveobj = new CCurveObject();
 	curveobj->SetCurve(curve3d);
 	curveobj->SetColor(OpenMesh::Vec3d(0, 1, 0));
 	curveobj->SetChanged();
 	std::cerr << "curve size " << curveobj->GetCurve().size() << std::endl;
-	DataPool::AddCurveObject(curveobj);*/
+	DataPool::AddCurveObject(curveobj);
 	double curve_len = CCurveBaseAlg::ComputeLenOfCurve(curve);
 
 	std::vector<double>curve_lens(curve.size(), 0);
@@ -183,16 +187,22 @@ void CDentalTemplateFitting::ComputeStretchCrowns2LineMatrix(std::vector<CMeshOb
 	
 		
 		int closest_pid;
+	
 		CCurveBaseAlg::ComputeClosestPoint(curve, center_points[i], closest_pid);
-		OpenMesh::Vec2d new_centerpoint = OpenMesh::Vec2d(curve_lens[closest_pid] - curve_len / 2.0, mean_z);
-		OpenMesh::Vec3d trans(new_centerpoint[0] - center_points[i][0], 0, new_centerpoint[1] - center_points[i][1]);
-		
 		OpenMesh::Vec2d normal_dir = CCurveBaseAlg::ComputeNormalOfPolynomial(coeffs, curve[closest_pid][0]);
 		OpenMesh::Vec3d rot_axis = OpenMesh::cross(OpenMesh::Vec3d(normal_dir[0], 0, normal_dir[1]), OpenMesh::Vec3d(0, 0, 1));
 		double rot_angle = std::acos(OpenMesh::dot(normal_dir, OpenMesh::Vec2d(0, 1)));
-		Eigen::Vector3d rot_axis_eg;
+		Eigen::Matrix4d rot_mat = CGeoBaseAlg::ComputeRotMat(rot_axis, rot_angle, OpenMesh::Vec3d(center_points[i][0], mean_y, center_points[i][1]));
 
-		Eigen::Matrix4d rot_mat = CGeoBaseAlg::ComputeRotMat(rot_axis, rot_angle, OpenMesh::Vec3d(new_centerpoint[0], mean_y, new_centerpoint[1]));
+
+		OpenMesh::Vec2d new_centerpoint = OpenMesh::Vec2d(curve_lens[closest_pid] - curve_len / 2.0, mean_z);
+		OpenMesh::Vec3d trans0(curve[closest_pid][0] - center_points[i][0], 0, curve[closest_pid][1] - center_points[i][1]);
+		OpenMesh::Vec3d trans = trans0+OpenMesh::Vec3d(new_centerpoint[0] - center_points[i][0], 0, new_centerpoint[1] - center_points[i][1]);
+		
+
+		//OpenMesh::Vec3d trans_back(0, 0, trans0.length());
+		//OpenMesh::Vec3d normal_dir3d(normal_dir[0], 0, normal_dir[1]);
+		//if(OpenMesh::cross(normal_dir,trans0)>
 		Eigen::Matrix4d trans_mat;
 		trans_mat.setIdentity();
 		for (int j = 0; j < 3; j++)
@@ -201,7 +211,7 @@ void CDentalTemplateFitting::ComputeStretchCrowns2LineMatrix(std::vector<CMeshOb
 		}
 	
 
-		res_mats[i]= rot_mat*trans_mat;
+		res_mats[i] = trans_mat*rot_mat;
 	}
 }
 void CDentalTemplateFitting::OrderCrowns(std::vector<CMeshObject*>&crowns, OpenMesh::Vec3d crown_updir, bool from_left2right)

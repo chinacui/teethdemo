@@ -31,6 +31,12 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 		break;
 
 	}
+	case Qt::Key_T://test panoramic simulation
+	{
+		manager_->SetCurrentActionType(CPanoramicSimulationTest);
+		std::cerr << "switch to volume CPanoramicSimulationTest action" << std::endl;
+		break;
+	}
 	case Qt::Key_H:
 	{
 		manager_->SetCurrentActionType(HarmonicFieldSegmentation);

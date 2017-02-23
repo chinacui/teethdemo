@@ -22,7 +22,8 @@ protected:
 	std::map<int,int>vtag_;
 	bool is_shinning_=false;
 	bool is_pickable_ = true;
-	std::map<COpenMeshT::VertexHandle, OpenMesh::Vec3d>restore_pos_;
+	std::map<COpenMeshT::VertexHandle, OpenMesh::Vec3d>restore_pos_;//the previous pos can be stored
+	Eigen::Matrix4d restore_mat_;
 protected:
 	COpenMeshT mesh_;
 
