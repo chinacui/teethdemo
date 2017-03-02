@@ -134,6 +134,9 @@
     <ClCompile Include="..\..\Src\TeethStudio\panoramic_image_registration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\TeethStudio\cvmatandqimage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Src\TeethStudio\imface.ui">
@@ -215,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\TeethStudio\panoramic_simulation_test_action.h">
       <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\TeethStudio\cvmatandqimage.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

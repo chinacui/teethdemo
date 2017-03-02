@@ -145,6 +145,7 @@
     <ClCompile Include="..\..\Src\TeethStudio\action_manager.cpp" />
     <ClCompile Include="..\..\Src\TeethStudio\camera.cpp" />
     <ClCompile Include="..\..\Src\TeethStudio\cmodelviewer.cpp" />
+    <ClCompile Include="..\..\Src\TeethStudio\cvmatandqimage.cpp" />
     <ClCompile Include="..\..\Src\TeethStudio\edit_feature_edge_action.cpp" />
     <ClCompile Include="..\..\Src\TeethStudio\harmonic_field_segmentation_action.cpp" />
     <ClCompile Include="..\..\Src\TeethStudio\hot_key_action.cpp" />
@@ -199,6 +200,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Src\TeethStudio\cvmatandqimage.h" />
     <ClInclude Include="..\..\Src\TeethStudio\panoramic_simulation_test_action.h" />
     <ClInclude Include="GeneratedFiles\ui_panoramic_image_registration.h" />
     <CustomBuild Include="..\..\Src\TeethStudio\action_base.h">
@@ -292,6 +294,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <SubType>Designer</SubType>
     </CustomBuild>
     <CustomBuild Include="..\..\Src\TeethStudio\imface.qrc">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath);%(AdditionalInputs)</AdditionalInputs>
