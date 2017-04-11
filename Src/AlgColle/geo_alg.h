@@ -38,7 +38,7 @@ public:
 	static void SeparateDisconnectedParts(COpenMeshT &mesh, std::vector<COpenMeshT*>&res_meshes, std::vector<std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_orig);
 	static void GetFeatureGroupsByConnectivity(COpenMeshT&mesh, std::vector<bool>&is_feature,std::vector<std::vector<COpenMeshT::VertexHandle>>&feature_groups);
 	static void ComputeMeshPCA(COpenMeshT&mesh, OpenMesh::Vec3d&mean, std::vector<OpenMesh::Vec3d>&res_frame);
-	static void SeparateMeshByVertexTag(COpenMeshT &mesh_obj, std::vector<int>&v_tag,std::map<int,COpenMeshT*>&res_meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_orig);//v_tag should be continues, start from 0
+	static void SeparateMeshByVertexTag(COpenMeshT &mesh_obj, std::vector<int>&v_tag,std::map<int,COpenMeshT*>&res_meshes, std::map<int,std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_new_2_orig);//v_tag should be continues, start from 0
 	static void SeparateMeshByFaceTag(COpenMeshT &mesh, std::vector<int>&f_tag, std::map<int, COpenMeshT*>&res_meshes, std::map<int, std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>>&vid_orig);//f_tag should be continues, start from 0
 	static bool RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::FaceHandle & res_fh, OpenMesh::Vec3d &res_bary_coord);
 	static bool RayMeshIntersection(OpenMesh::Vec3d  source, OpenMesh::Vec3d dir, CMeshObject &mesh_obj, COpenMeshT::VertexHandle & res_vh);

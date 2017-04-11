@@ -1,5 +1,4 @@
 #include"geo_alg.h"
-
 #include <CGAL/algorithm.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Alpha_shape_2.h>
@@ -1139,6 +1138,7 @@ void CGeoAlg::AlphaShape2d(std::vector<OpenMesh::Vec2d>&pts, double alpha, std::
 			int prej = i;
 			while (j != i)
 			{
+				std::cerr << j << std::endl;
 				bound_vids.back().push_back(j);
 				if (edges[j].size() != 2)
 				{
@@ -1165,7 +1165,7 @@ void CGeoAlg::AlphaShape2d(std::vector<OpenMesh::Vec2d>&pts, double alpha, std::
 		}
 	}
 	
-
+	
 	
 
 	

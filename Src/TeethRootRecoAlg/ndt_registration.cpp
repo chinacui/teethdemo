@@ -1,5 +1,6 @@
 #include "ndt_registration.h"
 
+
 NDTRegistration* NDTRegistration::instance_ = nullptr;
 
 NDTRegistration::NDTRegistration()
@@ -48,6 +49,11 @@ bool NDTRegistration::SetBoundaryPoints(vector<Eigen::Vector2d>& points) {
 	this->boundary_points_ = points;
 	return true;
 }
+bool NDTRegistration::setBoundaryRootPoint(vector<Eigen::Vector2d>& boundary_points_root)
+{
+	this->boundary_points_root = boundary_points_root;
+	return true;
+}
 
 bool NDTRegistration::SetMaxIteratorTimes(const int max_iterator_times) {
 	this->max_iterator_times_ = max_iterator_times;
@@ -56,6 +62,10 @@ bool NDTRegistration::SetMaxIteratorTimes(const int max_iterator_times) {
 
 vector<Eigen::Vector2d>& NDTRegistration::GetBoundaryPoints() {
 	return this->boundary_points_;
+}
+
+void NDTRegistration::SetBoundaryCenterPoints(Eigen::Vector2d & boundaryCenterPoints) {
+	boundary_center_points_ = boundaryCenterPoints;
 }
 
 bool NDTRegistration::SetCellPartitionParameters(const int cell_init_num_w,
@@ -74,6 +84,7 @@ bool NDTRegistration::ComputeImageGradient() {
 	fill(this->image_gradient_.begin(), this->image_gradient_.end(), 0.0);
 	for (int w = 0; w < this->image_width_; ++w) {
 		for (int h = 0; h < this->image_height_; ++h) {
+			double gradientw, gradienth, gradient;
 			int upw = w;
 			int uph = (h - 1 >= 0) ? h - 1 : 0;
 			int downw = w;
@@ -82,14 +93,46 @@ bool NDTRegistration::ComputeImageGradient() {
 			int lefth = h;
 			int rightw = (w + 1 <= this->image_width_ - 1) ? w + 1 : this->image_width_ - 1;
 			int righth = h;
-			double gradientw = (this->primitive_image_[leftw * this->image_height_ + lefth] -
-				this->primitive_image_[rightw * this->image_height_ + righth]) / 2.0;
-			double gradienth = (this->primitive_image_[upw * this->image_height_ + uph] -
-				this->primitive_image_[downw * this->image_height_ + downh]) / 2.0;
-			double gradient = std::sqrt(gradientw * gradientw + gradienth * gradienth);
+			if(std::abs(boundary_center_points_[0] - rightw) < std::abs(boundary_center_points_[0] - leftw)) 
+				 gradientw = (this->primitive_image_[rightw * this->image_height_ + righth] -
+					this->primitive_image_[leftw * this->image_height_ + lefth]) / 2.0;
+			if (std::abs(boundary_center_points_[0] - rightw) >= std::abs(boundary_center_points_[0] - leftw))
+				 gradientw = (this->primitive_image_[leftw * this->image_height_ + lefth] -
+					this->primitive_image_[rightw * this->image_height_ + righth]) / 2.0;
+			if (std::abs(boundary_center_points_[1] - uph) < std::abs(boundary_center_points_[1] - downh))
+				 gradienth = (this->primitive_image_[upw * this->image_height_ + uph] -
+					this->primitive_image_[downw * this->image_height_ + downh]) / 2.0;
+			if (std::abs(boundary_center_points_[1] - uph) >= std::abs(boundary_center_points_[1] - downh))
+				 gradienth = (this->primitive_image_[downw * this->image_height_ + downh] -
+					this->primitive_image_[upw * this->image_height_ + uph]) / 2.0;
+			if (boundary_center_points_[0] == w)  
+			{
+				gradientw = 0;
+				gradienth = 1 * gradienth;
+			}
+			if (boundary_center_points_[0] != w)
+			{
+				double absw = (1 / (abs((boundary_center_points_[1] - h) / (boundary_center_points_[0] - w)) + 1));
+				gradientw = absw * gradientw;
+				gradienth = (1 - absw)*gradienth;
+				if (gradienth < 0) gradienth = -1 * gradienth / 100;
+				if (gradientw < 0) gradientw = -1 * gradientw / 100;
+			}
+			if (w == 56 && h == 188)
+			{
+				std::cerr << gradientw << " " << gradienth << std::endl;
+			}
+			//gradient = gradienth + gradientw;
+			//if (gradienth + gradientw > 0) gradient = std::sqrt(gradientw * gradientw + gradienth * gradienth);
+			//else gradient = 0.000001;
+			gradient = std::sqrt(gradientw * gradientw + gradienth * gradienth);
 			this->image_gradient_[w * this->image_height_ + h] = gradient;
 		}
 	}
+	/*for (auto i = 0; i < boundary_points_.size(); ++i)
+	{
+		this->image_gradient_[boundary_points_[i][0] * this->image_height_ + boundary_points_[i][1]] = 10 * this->image_gradient_[boundary_points_[i][0] * this->image_height_ + boundary_points_[i][1]];
+	}*/
 	return true;
 }
 
@@ -214,16 +257,17 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 	gauss_d1 = -log(gauss_c1 + gauss_c2) - gauss_d3;
 	gauss_d2 = -2 * log((-log(gauss_c1 * exp(-0.5) + gauss_c2) - gauss_d3) / gauss_d1);
 
-	Eigen::Matrix<double, 3, 1> p, delta_p, score_gradient;
+
+	Eigen::Matrix<double, 4, 1> p, delta_p, score_gradient;
 	p.setZero();
 	delta_p.setZero();
-	Eigen::Matrix<double, 3, 3> hessian;
+	Eigen::Matrix<double, 4, 4> hessian;
 
 	// Initialize Point Gradient and Hessian
-	Eigen::Matrix<double, 2, 3> point_gradient;
+	Eigen::Matrix<double, 2, 4> point_gradient;
 	point_gradient.setZero();
 	point_gradient.block<2, 2>(0, 0).setIdentity();
-	Eigen::Matrix<double, 6, 3> point_hessian;
+	Eigen::Matrix<double, 8, 4> point_hessian;
 	point_hessian.setZero();
 	int number_crown_boundary_points = boundary_points_.size();
 	double cell_size_w = (image_width_ + 1.0) / cell_num_w_;
@@ -247,7 +291,6 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 			h = (h >= cell_num_h_) ? cell_num_h_ - 1 : h;
 			w = (w < 0) ? 0 : w;
 			h = (h < 0) ? 0 : h;
-
 			int cell_id = w * cell_num_h_ + h;
 			x_trans(0) -= cell_mean_points_[cell_id](0);
 			x_trans(1) -= cell_mean_points_[cell_id](1);
@@ -258,6 +301,8 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 
 			point_gradient(0, 2) = -x(0) * sin(p(2)) - x(1) * cos(p(2));
 			point_gradient(1, 2) = x(0) * cos(p(2)) - x(1) * sin(p(2));
+			point_gradient(0, 3) = x(0) - boundary_center_points_(0);
+			point_gradient(1, 3) = x(1) - boundary_center_points_(1);
 			point_hessian(4, 2) = -x(0) * cos(p(2)) + x(1) * sin(p(2));
 			point_hessian(5, 2) = -x(0) * sin(p(2)) - x(1) * cos(p(2));
 
@@ -268,8 +313,8 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 			double score_inc = -gauss_d1 * e_x_cov_x;
 			score += score_inc;
 
-			e_x_cov_x = gauss_d2 * e_x_cov_x;
 
+			e_x_cov_x = gauss_d2 * e_x_cov_x;
 			// Error checking for invalid values.
 			if (e_x_cov_x > 1 || e_x_cov_x < 0 || e_x_cov_x != e_x_cov_x) {
 				continue;
@@ -277,8 +322,7 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 
 			// Reusable portion of Equation 6.12 and 6.13 [Magnusson 2009]
 			e_x_cov_x *= gauss_d1;
-
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 4; i++) {
 				// Sigma_k^-1 d(T(x,p))/dpi, Reusable portion of Equation 6.12 and 6.13 [Magnusson 2009]
 				cov_dxd_pi = c_inv * point_gradient.col(i);
 
@@ -294,20 +338,69 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 				}
 			}
 		}
+		
+		//score = score / number_crown_boundary_points;
 		// Solve for decent direction using newton method, line 23 in Algorithm 2 [Magnusson 2009]
-		Eigen::JacobiSVD<Eigen::Matrix<double, 3, 3> > sv(hessian, Eigen::ComputeFullU | Eigen::ComputeFullV);
+		Eigen::JacobiSVD<Eigen::Matrix<double, 4, 4> > sv(hessian, Eigen::ComputeFullU | Eigen::ComputeFullV);
 		// Negative for maximization as opposed to minimization
 		delta_p = sv.solve(-score_gradient);
 		delta_p.normalize();
 		p = p + 0.01 * delta_p;
+		if (it == 1 && cell_add_count_end_ == 0)
+		{
+			image_to_model_ro(0, 0) = cos(p(2)) + p(3);
+			image_to_model_ro(0, 1) = -1 * sin(p(2));
+			image_to_model_ro(1, 0) = sin(p(2));
+			image_to_model_ro(1, 1) = cos(p(2)) + p(3);
 
-		for (int id = 0; id < number_crown_boundary_points; ++id) {
-			double x = boundary_points_[id](0);
-			double y = boundary_points_[id](1);
-			boundary_points_[id](0) = x * cos(p(2)) - y * sin(p(2)) + p(0);
-			boundary_points_[id](1) = x * sin(p(2)) + y * cos(p(2)) + p(1);
+			image_to_model_tra(0, 0) = p(0) - p(3)*boundary_center_points_(0);
+			image_to_model_tra(1, 0) = p(1) - p(3)*boundary_center_points_(1);
+		}
+		else
+		{
+			Eigen::Matrix<double, 2, 2> temp_ro;
+			Eigen::Matrix<double, 2, 1> temp_tra;
+			temp_ro(0, 0) = cos(p(2)) + p(3);
+			temp_ro(0, 1) = -1 * sin(p(2));
+			temp_ro(1, 0) = sin(p(2));
+			temp_ro(1, 1) = cos(p(2)) + p(3);
+
+			temp_tra(0, 0) = p(0) - p(3)*boundary_center_points_(0);
+			temp_tra(1, 0) = p(1) - p(3)*boundary_center_points_(1);
+
+			image_to_model_ro = temp_ro*image_to_model_ro;
+			image_to_model_tra = temp_ro*image_to_model_tra + temp_tra;
+		}
+		for (int i = 0; i < number_crown_boundary_points; ++i) {
+			double x = boundary_points_[i](0);
+			double y = boundary_points_[i](1);
+			boundary_points_[i](0) = x * cos(p(2)) - y * sin(p(2)) + p(0) + p(3) * (x - boundary_center_points_(0));
+			boundary_points_[i](1) = x * sin(p(2)) + y * cos(p(2)) + p(1) + p(3) * (y - boundary_center_points_(1));
 		}
 	}
+
+	for (int i = 0; i < number_crown_boundary_points; ++i)
+	{
+		Eigen::Vector2d temp;
+		temp(0) = image_to_model_ro.inverse()(0, 0)*(boundary_points_[i](0) - image_to_model_tra(0, 0)) + image_to_model_ro.inverse()(0, 1)*(boundary_points_[i](1) - image_to_model_tra(1, 0));
+		temp(1) = image_to_model_ro.inverse()(1, 0)*(boundary_points_[i](0) - image_to_model_tra(0, 0)) + image_to_model_ro.inverse()(1, 1)*(boundary_points_[i](1) - image_to_model_tra(1, 0));
+		if (cell_add_count_end_ == cell_add_count_ - 1)
+		{
+			boundary_points_image_to_model.push_back(temp);
+
+		}
+	}
+		for (int i = 0; i < boundary_points_root.size(); i++)
+		{
+			Eigen::Vector2d temp;
+			temp(0) = image_to_model_ro.inverse()(0, 0)*(boundary_points_root[i](0) - image_to_model_tra(0, 0)) + image_to_model_ro.inverse()(0, 1)*(boundary_points_root[i](1) - image_to_model_tra(1, 0));
+			temp(1) = image_to_model_ro.inverse()(1, 0)*(boundary_points_root[i](0) - image_to_model_tra(0, 0)) + image_to_model_ro.inverse()(1, 1)*(boundary_points_root[i](1) - image_to_model_tra(1, 0));
+			if (cell_add_count_end_ == cell_add_count_ - 1)
+			{
+				boundary_points_image_to_model.push_back(temp);
+			}
+		}
+	
 	return true;
 }
 
@@ -317,6 +410,7 @@ bool NDTRegistration::ExecuteNDTRegister() {
 	this->cell_num_w_ = this->cell_init_num_w_;
 	this->cell_num_h_ = this->cell_init_num_h_;
 	for (int i = 0; i < this->cell_add_count_; ++i) {
+		this->cell_add_count_end_ = i;
 		this->ComputeCellMeanPoints();
 		this->ComputeCellCovarianceMatrix();
 		this->ComputeOneNDTRegister();

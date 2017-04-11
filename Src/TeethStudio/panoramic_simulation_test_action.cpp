@@ -438,13 +438,13 @@ void CPanoramicSimulationTestAction::KeyPressEvent(QKeyEvent *e)
 
 				if (w > h)
 				{
-					h = h / w*40;
-					w = 1.0 * 40;
+					h = h / w*4;
+					w = 1.0 * 4;
 				}
 				else
 				{
-					w = w / h * 40;
-					h = 1.0 * 40;
+					w = w / h * 4;
+					h = 1.0 * 4;
 				}
 				std::cerr << "panoramic size " << w << " " << h << std::endl;
 				COpenMeshT plain_mesh;

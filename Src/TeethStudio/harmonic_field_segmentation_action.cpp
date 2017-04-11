@@ -1,4 +1,4 @@
-#include "harmonic_field_segmentation_action.h"
+﻿#include "harmonic_field_segmentation_action.h"
 #include "../AlgColle/geo_alg.h"
 #include "ui_context.h"
 #include "../DataColle/data_pool.h"
@@ -25,6 +25,8 @@
 #include "qfiledialog.h"
 #include "../DataColle/data_io.h"
 #include <sstream>
+#include "vcl_iostream.h"
+
 void CHarmonicFieldSegmentation::MousePressEvent(QMouseEvent *e)
 {
 	if (is_drawing_)
@@ -443,9 +445,9 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case  Qt::Key_C:
 	{
-		Init();
+		/*Init();
 		DataPool::DeleteAllCurveObjects();
-		std::cerr << "clear" << std::endl;
+		std::cerr << "clear all" << std::endl;*/
 		break;
 	}
 	case Qt::Key_T:
@@ -737,24 +739,42 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 	}
 	case Qt::Key_Y://smooth
 	{
-		
 		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
+		COpenMeshT&mesh = meshobj->GetMesh();
+		FILE *fp;
+		if ((fp = fopen("C:/main1.txt", "w+")) != NULL)  //判断文件是否已经被打开  
+		{
+			OpenMesh::Vec3d p;
+			for (auto i = 0; i < picked_vhs_fore_.size(); i++)
+			{
+				p = mesh.point(picked_vhs_fore_[i]);
+				fprintf(fp, "%f", p[0]);
+				fprintf(fp, " ");
+				fprintf(fp, "%f", p[1]);
+				fprintf(fp, " "); 
+				fprintf(fp, "%f", p[2]);
+				fprintf(fp, "\n");
+			}
+			fclose(fp);  //关闭文件  
+		}
+	/*	CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			COpenMeshT&mesh = meshobj->GetMesh();
 			CGeoAlg::LaplacianSmooth(mesh, 5, 0.5);
 			meshobj->SetChanged();
-		}
+		}*/
 		break;
 	}
 	case Qt::Key_F:
 	{
-		
 		CMeshObject *meshobj = DataPool::GetMeshObject(dental_mesh_id_);
 		if (meshobj != NULL)
 		{
 			std::cerr << "compute feature points" << std::endl;
 			COpenMeshT&mesh = meshobj->GetMesh();
+
+
 			std::vector<OpenMesh::VertexHandle>fvhs;
 			//CDentalBaseAlg::ComputeTeethFeaturePoints(mesh, fvhs);
 			CDentalBaseAlg::ComputeTeethFeaturePointsUsingSmoothedMesh(mesh, fvhs);
@@ -765,7 +785,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			for (int i = 0; i < fvhs.size(); i++)
 			{
 				auto vh = fvhs[i];
-			
+			   
 				
 				if (picked_vhs_fore_mark_.find(vh) == picked_vhs_fore_mark_.end())
 				{
@@ -999,7 +1019,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			{
 				mesh.set_color(viter, OpenMesh::Vec3d(0.8, 0.8, 0.8));
 			}
-			meshobj->RestoreCurrentVPos();
+		    meshobj->RestoreCurrentVPos();
 			CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
 			CGeoBaseAlg::NormalizeMeshSize(mesh);
 			meshobj->SetChanged();
@@ -1192,8 +1212,7 @@ void CHarmonicFieldSegmentation::KeyPressEvent(QKeyEvent *e)
 			mesh.set_color(viter, color);
 		}
 		
-
-		p_mesh_obj_->UseTexture() = false;
+	    p_mesh_obj_->UseTexture() = false;
 		p_mesh_obj_->SetAttrChanged();
 		break;
 	}

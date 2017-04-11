@@ -91,7 +91,7 @@ void CImageBaseAlg::ShortestDis(cv::Mat &img, cv::Point src, std::vector<cv::Poi
 void CImageBaseAlg::MorphSkeleton(cv::Mat& img)
 {
 	cv::Mat dst;
-	int iterations = 150;
+	int iterations = 20;
 	const int height = img.rows - 1;
 	const int width = img.cols - 1;
 
@@ -172,11 +172,11 @@ void CImageBaseAlg::MorphSkeleton(cv::Mat& img)
 								isFinished = true;
 							}
 
-							//   if((p2*p4*p8==0)&&(p2*p6*p8==0))
-							//    {                           
-							//         dst.ptr<uchar>(i)[j]=0;
-							//         isFinished =TRUE;                            
-							//    }
+							   if((p2*p4*p8==0)&&(p2*p6*p8==0))
+							    {                           
+							         dst.ptr<uchar>(i)[j]=0;
+							         isFinished =true;                            
+							    }
 
 						}
 					}
@@ -241,11 +241,11 @@ void CImageBaseAlg::MorphSkeleton(cv::Mat& img)
 						{
 							if (ap == 1)
 							{
-								//   if((p2*p4*p6==0)&&(p4*p6*p8==0))
-								//   {                           
-								//         dst.ptr<uchar>(i)[j]=0;
-								//         isFinished =TRUE;                            
-								//    }
+								   if((p2*p4*p6==0)&&(p4*p6*p8==0))
+								   {                           
+								         dst.ptr<uchar>(i)[j]=0;
+								         isFinished =true;                            
+								    }
 
 								if ((p2*p4*p8 == 0) && (p2*p6*p8 == 0))
 								{

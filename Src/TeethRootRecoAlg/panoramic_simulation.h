@@ -38,6 +38,9 @@ public:
 	
 
 };
+
+
+/*CCircularSurfaceProjector -- get virtual x-ray image of crown using circular projection method*/
 class TEETHROOTRECOALG_CLASS CCircularSurfaceProjector :public CPanoramicProjectorBase
 {
 protected:
@@ -48,6 +51,11 @@ public:
 	CCircularSurfaceProjector() {
 
 	}
+	/*
+	*Summary: calculate the virtual x-ray projection center, up direction and radius parameters.
+	*Parameters:--
+	*returns:--
+	*/
 	OpenMesh::Vec3d GetCenter()
 	{
 		return center_;

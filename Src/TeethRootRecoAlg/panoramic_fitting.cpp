@@ -255,13 +255,11 @@ void CPanoramicFittingOptimization::GetPanoScaleAndTrans(double &res_scale, Open
 }
 void CPanoramicFittingOptimization::RunFitting()
 {
-	run();
+	  
 	std::vector<OpenMesh::Vec2d>pano_coords;
 	projector_.ComputeProjParams(points_, pano_coords);
 	
 	CGeoAlg::ComputeScaleAndTransformFrom2SetOfRegisteredPoints(tgt_proj_params_, pano_coords, pano_scale_, pano_trans_);
-
-
 }
 lbfgsfloatval_t CPanoramicFittingOptimization::evaluate(
 		const lbfgsfloatval_t *x,

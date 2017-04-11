@@ -99,4 +99,7 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		Qt5Version = qt5.7_x64
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		Qt5Version = qt5.7_x64
+	EndGlobalSection
 EndGlobal

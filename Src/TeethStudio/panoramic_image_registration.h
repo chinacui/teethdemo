@@ -11,6 +11,11 @@ class QProgressBar;
 class QLineEdit;
 class NDTRegistration;
 using std::vector;
+#include"action_base.h"
+#include "../DataColle/mesh_object.h"
+#include <Eigen\Dense>
+#include <iostream>
+#include<opencv2\opencv.hpp>
 
 class PanoramicImageRegistration : public QWidget
 {
@@ -22,6 +27,12 @@ public:
 	void SetComponents();
 	void SetConnections();
 	void ShowBoundaryPointsInImage();	
+	double scalse;
+	std::vector<Eigen::Vector2d> b1;
+	std::vector<Eigen::Vector2d> b2; // the boundary segmented from x-ray image
+	Eigen::Vector2d b_c; // the center of the boundary in x-ray image
+	Eigen::Vector2d b_c_P; // the center of the boundary in projection plane
+	vector<OpenMesh::Vec2d> line_skeleton; //the skelon of the tooth
 
 public slots:
 	void OnLoadPrimiticeImage(void);
@@ -29,6 +40,7 @@ public slots:
 	void OnLoadOBJPoints();
 	void OnTransformAndRotateBoundaries(void);
 	void OnRegisterWithNDTAlgorithm(void);
+	void RegionGrow(cv::Mat &src, Eigen::Vector2d pt);
 
 private:
 	Ui::PanoramicImageRegistration ui;

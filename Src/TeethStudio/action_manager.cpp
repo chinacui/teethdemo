@@ -9,6 +9,7 @@
 #include"teeth_reconstruction_test_action.h"
 #include"manipulation_action.h"
 #include"panoramic_simulation_test_action.h"
+#include"single_Teeth_Projection_Action.h"
 void CActionManager::Init(CModelViewer* viewer)
 {
 	viewer_ = viewer;
@@ -27,6 +28,7 @@ void CActionManager::Init(CModelViewer* viewer)
 	actions_.push_back(new CTeethReconstructionTestAction());
 	actions_.push_back(new CManipulationAction());
 	actions_.push_back(new CPanoramicSimulationTestAction());
+	actions_.push_back(new CSingleTeethProjectionAction());
 	for (int i = 0; i < actions_.size(); i++)
 	{
 		actions_[i]->SetViewer(viewer_);

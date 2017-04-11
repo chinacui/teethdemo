@@ -137,6 +137,9 @@
     <ClCompile Include="..\..\Src\TeethStudio\cvmatandqimage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="single_Teeth_Projection_Action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Src\TeethStudio\imface.ui">
@@ -221,6 +224,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Src\TeethStudio\cvmatandqimage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="single_Teeth_Projection_Action.h">
+      <Filter>Header Files\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

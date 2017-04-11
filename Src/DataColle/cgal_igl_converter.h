@@ -14,6 +14,7 @@ public:
 	static  bool ConvertFromOpenMeshToIGL(COpenMeshT &mesh, Eigen::MatrixXd& v, Eigen::MatrixXi& f,std::vector<COpenMeshT::FaceHandle>*id_fh_map=NULL, std::vector<COpenMeshT::VertexHandle>*id_vh_map=NULL);
 	static bool ConvertFromCGALToOpenMesh(Polyhedron& mesh, COpenMeshT& openmesh, std::map<Polyhedron::Vertex_handle, COpenMeshT::VertexHandle>& vh_map, std::map<Polyhedron::Facet_handle, COpenMeshT::FaceHandle>& fh_map);
 	static bool ConvertFromOpenMeshToCGAL(COpenMeshT& openmesh, Polyhedron &mesh, std::map<COpenMeshT::VertexHandle, Polyhedron::Vertex_handle>& vh_map, std::map<COpenMeshT::FaceHandle, Polyhedron::Facet_handle>& fh_map);
+	static bool ConvertFromIGLToOpenMesh(Eigen::MatrixXd& v, Eigen::MatrixXi& f, COpenMeshT& openmesh);
 	
 	
 };

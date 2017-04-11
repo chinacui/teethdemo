@@ -19,7 +19,9 @@ public:
 	int GetImageHeight();
 	vector<double>& GetPrimitiveImage();
 	bool SetBoundaryPoints(vector<Eigen::Vector2d>& points);
+	bool setBoundaryRootPoint(vector<Eigen::Vector2d>& boundary_points_root);
 	vector<Eigen::Vector2d>& GetBoundaryPoints();
+	void SetBoundaryCenterPoints(Eigen::Vector2d & boundaryCenterPoints);
 	bool SetCellPartitionParameters(const int cell_init_num_w,
 		const int cell_init_num_h, const int cell_add_num_w,
 		const int cell_add_num_h, const int cell_add_count);
@@ -30,6 +32,8 @@ public:
 	bool ExecuteNDTRegister();
 	bool SetMaxIteratorTimes(const int max_iterator_times);
 	bool TransformAndRotateBoundaryPoints(int type, double distance);
+	vector<Eigen::Vector2d> boundary_points_image_to_model;
+	vector<double> getImageGradient() { return image_gradient_; }
 
 private:
 	NDTRegistration();
@@ -38,6 +42,10 @@ private:
 	static NDTRegistration* instance_;
 	// the image which points will be registered with
 	vector<double> primitive_image_;
+	//the boundary points of the tooth root in x-ray image
+	vector<Eigen::Vector2d> boundary_points_root;
+	//The center point of the buodary in the x-ray image
+	Eigen::Vector2d boundary_center_points_;
 	// the points which will be registered with primitive image
 	vector<Eigen::Vector2d> boundary_points_;
 	// image gradient for primitive image
@@ -69,6 +77,11 @@ private:
 	int cell_add_count_;
 	// the maximum iterator times in one step
 	int max_iterator_times_;
+
+	Eigen::Matrix<double, 2, 2> image_to_model_ro;
+	Eigen::Matrix<double, 2, 1> image_to_model_tra;
+	int cell_add_count_end_;
+
 };
 
 #endif

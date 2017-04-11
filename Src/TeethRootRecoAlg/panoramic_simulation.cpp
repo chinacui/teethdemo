@@ -58,7 +58,7 @@ OpenMesh::Vec3d CCurveSurfaceProjector::Project(OpenMesh::Vec3d p)
 	
 	OpenMesh::Vec3d proj_p;
 
-	OpenMesh::Vec3d tmp_dir = p - curve_center_;
+	OpenMesh::Vec3d tmp_dir = p - curve_center_; /*Temporary projection direction*/
 	double zlen = OpenMesh::dot(tmp_dir, updir_);
 	proj_p = p - zlen*updir_;
 	OpenMesh::Vec3d closest_p;
@@ -151,9 +151,9 @@ void CCircularSurfaceProjector::GetParams(std::vector<double>&params)
 
 	params[2] = center_[0];
 	params[3] = center_[1];
-params[4] = center_[2];
+    params[4] = center_[2];
 
-params[5] = radius_;
+    params[5] = radius_;
 
 
 
@@ -330,7 +330,9 @@ void CPanoramicSimulation::GeneratePanoramicWholeBoundPointsByCircle(std::vector
 {
 	std::vector<std::vector<OpenMesh::Vec2d>>params;
 	std::vector<std::vector<COpenMeshT::VertexHandle>>vhs;
+	/*Get the projection points around the cycle in the parameters*/
 	GeneratePanoramicPointsByCircle(crown_objs, updir, center, radius, params, vhs);
+
 	res_bound_pano_params.resize(crown_objs.size());
 	res_corres_vhs.resize(crown_objs.size());
 	for (int i = 0; i < params.size(); i++)

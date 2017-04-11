@@ -62,6 +62,13 @@ void CHotKeyAction::KeyPressEvent(QKeyEvent *e)
 			new PanoramicImageRegistration();
 		panoramic_image_registration->show();
 	}
+
+	case Qt::Key_1:
+	{
+		manager_->SetCurrentActionType(CSingleTeethProjection);
+		std::cerr << "switch to single teeth projection!" << std::endl;
+
+	}
 	//case Qt::Key_M:
 	//{
 	//	manager_->SetCurrentActionType(EditFeatureEdge);

@@ -1,0 +1,11 @@
+Key_V:switch to volume segmentation action
+
+Key_T:switch to volume CPanoramicSimulationTest action
+
+Key_H:switch to harmonic action
+
+Key_P:switch to panoramia registration test action
+
+Key_K:switch to panoramia registration action
+
+Key_S;panoramic image registration

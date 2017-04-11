@@ -72,6 +72,30 @@ bool CConverter::ConvertFromOpenMeshToIGL(COpenMeshT &mesh, Eigen::MatrixXd& v, 
 	}
 	return true;
 }
+
+bool CConverter::ConvertFromIGLToOpenMesh(Eigen::MatrixXd& v, Eigen::MatrixXi& f, COpenMeshT& openmesh)
+{
+
+	openmesh.clear();
+	std::vector<COpenMeshT::VertexHandle>vh_map;
+	vh_map.resize(v.rows());
+	for (int i = 0; i < v.rows(); i++)
+	{
+		OpenMesh::Vec3d vertex(v(i, 0), v(i, 1), v(i, 2));
+		vh_map[i] = openmesh.add_vertex(vertex);
+	}
+	for (int i = 0; i < f.rows(); i++)
+	{
+		std::vector<OpenMesh::VertexHandle> vhandles;
+		for (int j = 0; j < f.cols(); j++)
+		{
+			vhandles.push_back(vh_map[f(i, j)]);
+		}
+		openmesh.add_face(vhandles);
+	}
+	return true;
+}
+
 bool CConverter::ConvertFromIGLToCGAL(Eigen::MatrixXd& v, Eigen::MatrixXi& f, Polyhedron &mesh, std::vector<Face_handle>&fid_fh_map, std::vector<Vertex_handle>&vid_vhs_map)
 {
 	typedef Polyhedron::HalfedgeDS             HalfedgeDS;
