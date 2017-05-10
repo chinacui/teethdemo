@@ -349,7 +349,7 @@ void CSingleTeethProjectionAction::segTeethToIndividual(COpenMeshT &mesh, std::v
 }
 void CSingleTeethProjectionAction::calProjectDir(int teeth_select_id, std::vector<OpenMesh::Vec3d> teethCenter, std::vector<OpenMesh::Vec3d> poly_teeth_cruve)
 {
-	for (auto i = 0; i < poly_teeth_cruve.size(); i++)
+	for (auto i = 0; i < poly_teeth_cruve.size();i++)
 	{
 		if (teethCenter[teeth_select_id][1] - poly_teeth_cruve[i][1] <= 0.1)
 		{
