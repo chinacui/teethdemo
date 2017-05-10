@@ -24,12 +24,18 @@
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\panoramic_fitting.h" />
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\panoramic_simulation.h" />
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\prereq.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="teethProjection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\dental_template_fitting.cpp" />
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\ndt_registration.cpp" />
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\panoramic_fitting.cpp" />
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\panoramic_simulation.cpp" />
+    <ClCompile Include="teethProjection.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TeethRootRecoAlg.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8EDF3C71-28BF-4A55-958D-7A3CC784EAF7}</ProjectGuid>

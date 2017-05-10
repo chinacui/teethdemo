@@ -61,7 +61,7 @@ void CCurveBaseAlg::PolynomialFitting(std::vector<OpenMesh::Vec2d>&points, int d
 	Eigen::VectorXd oy_matrix(points.size());
 	for (int i = 0; i < points.size(); i++)
 	{
-		oy_matrix(i) = points[i][1];
+		oy_matrix(i) = points[i][0];
 	}
 	for (size_t r = 0; r < points.size(); r++)
 	{
@@ -69,7 +69,7 @@ void CCurveBaseAlg::PolynomialFitting(std::vector<OpenMesh::Vec2d>&points, int d
 		for (int c = 0; c < coeff_num; c++)
 		{
 			ox_matrix(r, c) = nVal;
-			nVal *= points[r][0];
+			nVal *= points[r][1];
 		}
 	}
 	Eigen::MatrixXd ox_t_matrix = ox_matrix.transpose();

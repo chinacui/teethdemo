@@ -6,10 +6,11 @@
 
 #include"qobject.h"
 #include"qmetaobject.h"
+#include"qwidget.h"
 class CModelViewer;
 class CActionManager;
 enum CActionType { Common,EditFeatureEdge,HarmonicFieldSegmentation,VolumeDataSegmentation, CTeethReconstructionTest, CTeethReconstruction,CPanoramicSimulationTest,CSingleTeethProjection};
-class CActionBase :public QObject
+class CActionBase :public QWidget
 {
 	Q_OBJECT
 protected:
@@ -20,7 +21,6 @@ protected:
 	bool shielding_key_modifiers_ = true;
 	bool coexist_with_common_tool_ = false;
 public:
-
 	virtual void SetViewer(CModelViewer * v)
 	{
 		viewer_ = v;

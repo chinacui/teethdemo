@@ -88,6 +88,7 @@ protected:
 public:
 	//CNonRigidICP(Eigen::MatrixXd& src_vertexs, Eigen::MatrixXi& src_faces, Eigen::MatrixXd& tgt_vertexs, Eigen::MatrixXi& tgt_faces, CNonRigidICPParams params);
 	CNonRigidICP(COpenMeshT *src_mesh, COpenMeshT* tgt_mesh, CNonRigidICPParams params=CNonRigidICPParams());
+	bool CTemplateToDentalmesh(COpenMeshT *src_mesh, COpenMeshT* tgt_mesh);
 	void GetTgt2SrcMap(std::map<COpenMeshT::VertexHandle, COpenMeshT::FaceHandle>&vh_fh_map);
 	bool Run(int step=-1);//return true if finished
 	void GetTransformedSourceVertexs(Eigen::MatrixXd &res_transformed);

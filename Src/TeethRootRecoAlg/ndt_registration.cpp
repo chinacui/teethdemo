@@ -93,46 +93,14 @@ bool NDTRegistration::ComputeImageGradient() {
 			int lefth = h;
 			int rightw = (w + 1 <= this->image_width_ - 1) ? w + 1 : this->image_width_ - 1;
 			int righth = h;
-			if(std::abs(boundary_center_points_[0] - rightw) < std::abs(boundary_center_points_[0] - leftw)) 
-				 gradientw = (this->primitive_image_[rightw * this->image_height_ + righth] -
+		    gradientw = abs(this->primitive_image_[rightw * this->image_height_ + righth] -
 					this->primitive_image_[leftw * this->image_height_ + lefth]) / 2.0;
-			if (std::abs(boundary_center_points_[0] - rightw) >= std::abs(boundary_center_points_[0] - leftw))
-				 gradientw = (this->primitive_image_[leftw * this->image_height_ + lefth] -
-					this->primitive_image_[rightw * this->image_height_ + righth]) / 2.0;
-			if (std::abs(boundary_center_points_[1] - uph) < std::abs(boundary_center_points_[1] - downh))
-				 gradienth = (this->primitive_image_[upw * this->image_height_ + uph] -
+		    gradienth = abs(this->primitive_image_[upw * this->image_height_ + uph] -
 					this->primitive_image_[downw * this->image_height_ + downh]) / 2.0;
-			if (std::abs(boundary_center_points_[1] - uph) >= std::abs(boundary_center_points_[1] - downh))
-				 gradienth = (this->primitive_image_[downw * this->image_height_ + downh] -
-					this->primitive_image_[upw * this->image_height_ + uph]) / 2.0;
-			if (boundary_center_points_[0] == w)  
-			{
-				gradientw = 0;
-				gradienth = 1 * gradienth;
-			}
-			if (boundary_center_points_[0] != w)
-			{
-				double absw = (1 / (abs((boundary_center_points_[1] - h) / (boundary_center_points_[0] - w)) + 1));
-				gradientw = absw * gradientw;
-				gradienth = (1 - absw)*gradienth;
-				if (gradienth < 0) gradienth = -1 * gradienth / 100;
-				if (gradientw < 0) gradientw = -1 * gradientw / 100;
-			}
-			if (w == 56 && h == 188)
-			{
-				std::cerr << gradientw << " " << gradienth << std::endl;
-			}
-			//gradient = gradienth + gradientw;
-			//if (gradienth + gradientw > 0) gradient = std::sqrt(gradientw * gradientw + gradienth * gradienth);
-			//else gradient = 0.000001;
 			gradient = std::sqrt(gradientw * gradientw + gradienth * gradienth);
 			this->image_gradient_[w * this->image_height_ + h] = gradient;
 		}
 	}
-	/*for (auto i = 0; i < boundary_points_.size(); ++i)
-	{
-		this->image_gradient_[boundary_points_[i][0] * this->image_height_ + boundary_points_[i][1]] = 10 * this->image_gradient_[boundary_points_[i][0] * this->image_height_ + boundary_points_[i][1]];
-	}*/
 	return true;
 }
 
@@ -346,6 +314,7 @@ bool NDTRegistration::ComputeOneNDTRegister() {
 		delta_p = sv.solve(-score_gradient);
 		delta_p.normalize();
 		p = p + 0.01 * delta_p;
+		p(3) = 0;
 		if (it == 1 && cell_add_count_end_ == 0)
 		{
 			image_to_model_ro(0, 0) = cos(p(2)) + p(3);

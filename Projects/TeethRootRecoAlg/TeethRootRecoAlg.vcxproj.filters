@@ -30,6 +30,12 @@
     <ClInclude Include="..\..\Src\TeethRootRecoAlg\panoramic_fitting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teethProjection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\dental_template_fitting.cpp">
@@ -44,5 +50,13 @@
     <ClCompile Include="..\..\Src\TeethRootRecoAlg\ndt_registration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="teethProjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TeethRootRecoAlg.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

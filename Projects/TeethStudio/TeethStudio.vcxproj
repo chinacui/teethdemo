@@ -175,6 +175,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_single_Teeth_Projection_Action.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_imface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -197,13 +201,34 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_single_Teeth_Projection_Action.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="single_Teeth_Projection_Action.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\TeethStudio\cvmatandqimage.h" />
     <ClInclude Include="..\..\Src\TeethStudio\panoramic_simulation_test_action.h" />
     <ClInclude Include="GeneratedFiles\ui_panoramic_image_registration.h" />
-    <ClInclude Include="single_Teeth_Projection_Action.h" />
+    <CustomBuild Include="single_Teeth_Projection_Action.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing single_Teeth_Projection_Action.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-I.\..\..\Src\TeethStudio"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing single_Teeth_Projection_Action.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES -DCGAL_EIGEN3_ENABLED -DUSE_FORWARD_DECL -DINCLUDE_TEMPLATES -DCGAL_USE_MPFR -DCGAL_USE_GMP -DOM_STATIC_BUILD "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include" "-I$(TITK_DIR)\Modules\IO\GDCM\include" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\DataDictionary" "-I$(TITK_DIR)\Modules\Core\Common\include" "-I$(TITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl" "-I$(TITK_DIR)\Build\Modules\ThirdParty\VNL\src\vxl\vcl" "-I$(TITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core" "-I$(TITK_BUILD)\Modules\ThirdParty\VNL\src\vxl\core" "-I$(TITK_BUILD)\Examples\ITKIOFactoryRegistration" "-I$(TITK_DIR)\Modules\IO\ImageBase\include" "-I$(TITK_BUILD)\Modules\IO\ImageBase" "-I$(TITK_BUILD)\Modules\ThirdParty\GDCM\src\gdcm\Source\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\MediaStorageAndFileFormat" "-I$(TITK_BUILD)\Modules\Core\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\DataStructureAndEncodingDefinition" "-I$(TITK_BUILD)\Modules\ThirdParty\KWSys\src" "-I$(TANN_DIR)\include" "-I$(BOOST_INCLUDEDIR)\." "-I$(TCGAL_DIR)\include" "-I$(TCGAL_BUILD)\include" "-I$(TCGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\Src\TeethStudio"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing single_Teeth_Projection_Action.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-I.\..\..\Src\TeethStudio"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing single_Teeth_Projection_Action.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -D_USE_MATH_DEFINES -DCGAL_EIGEN3_ENABLED -DUSE_FORWARD_DECL -DINCLUDE_TEMPLATES -DCGAL_USE_MPFR -DCGAL_USE_GMP -DOM_STATIC_BUILD "-I.\GeneratedFiles" "-I." "-I$(TQTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(TQTDIR)\include\QtCore" "-I$(TQTDIR)\include\QtGui" "-I$(TQTDIR)\include\QtOpenGL" "-I$(TQTDIR)\include\QtWidgets" "-I$(TQGLVIEWER_DIR)\." "-I$(TQTDIR)\include\QtXml" "-I$(TEIGEN_ROOT)\." "-I$(TOPEN_MESH_DIR)\include" "-I$(TLIBIGL_INCLDUEDIR)\." "-I$(TLIBIGL_DIR)\." "-I$(TOPENCV_DIR)\include" "-I$(TITK_DIR)\Modules\IO\GDCM\include" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\DataDictionary" "-I$(TITK_DIR)\Modules\Core\Common\include" "-I$(TITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl" "-I$(TITK_DIR)\Build\Modules\ThirdParty\VNL\src\vxl\vcl" "-I$(TITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core" "-I$(TITK_BUILD)\Modules\ThirdParty\VNL\src\vxl\core" "-I$(TITK_BUILD)\Examples\ITKIOFactoryRegistration" "-I$(TITK_DIR)\Modules\IO\ImageBase\include" "-I$(TITK_BUILD)\Modules\IO\ImageBase" "-I$(TITK_BUILD)\Modules\ThirdParty\GDCM\src\gdcm\Source\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\MediaStorageAndFileFormat" "-I$(TITK_BUILD)\Modules\Core\Common" "-I$(TITK_DIR)\Modules\ThirdParty\GDCM\src\gdcm\Source\DataStructureAndEncodingDefinition" "-I$(TITK_BUILD)\Modules\ThirdParty\KWSys\src" "-I$(TANN_DIR)\include" "-I$(BOOST_INCLUDEDIR)\." "-I$(TCGAL_BUILD)\include" "-I$(TCGAL_DIR)\auxiliary\gmp\include" "-I$(TCGAL_DIR)\include" "-I.\..\..\Src\TeethStudio" "-I.\..\..\Src\TeethRootRecoAlg"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
     <CustomBuild Include="..\..\Src\TeethStudio\action_base.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing action_base.h...</Message>

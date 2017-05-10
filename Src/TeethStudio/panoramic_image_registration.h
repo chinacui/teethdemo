@@ -20,7 +20,7 @@ using std::vector;
 class PanoramicImageRegistration : public QWidget
 {
 	Q_OBJECT
-
+		
 public:
 	PanoramicImageRegistration(QWidget *parent = Q_NULLPTR);
 	~PanoramicImageRegistration();
@@ -33,7 +33,7 @@ public:
 	Eigen::Vector2d b_c; // the center of the boundary in x-ray image
 	Eigen::Vector2d b_c_P; // the center of the boundary in projection plane
 	vector<OpenMesh::Vec2d> line_skeleton; //the skelon of the tooth
-
+	
 public slots:
 	void OnLoadPrimiticeImage(void);
 	void OnLoadLabeledImage(void);

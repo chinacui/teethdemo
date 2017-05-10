@@ -38,11 +38,11 @@ void CUIContext::Init()
 	main_window_ = new CMainWindow();
 	main_window_->show();
 
-	QImage color_stripe("stripe2.bmp");
+	/*QImage color_stripe("stripe2.bmp");
 	color_stripe_texture_id_ = CUIContext::AddTexture(new QImage(color_stripe));
 
 	QImage color_bar("color.bmp");
-	color_bar_texture_id_ = CUIContext::AddTexture(new QImage(color_bar));
+	color_bar_texture_id_ = CUIContext::AddTexture(new QImage(color_bar));*/
 }
 
 int CUIContext::AddTexture(QImage *img)

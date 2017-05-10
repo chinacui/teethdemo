@@ -2,20 +2,18 @@
 #include <igl\readDMAT.h>
 #include <igl\writeDMAT.h>
 #include <algorithm> 
-#include "../DataColle/mesh_object.h"
 #include "qfiledialog.h"
-#include "visual_utils.h"
 #include "../DataColle/mesh_object.h"
 #include "../DataColle/data_io.h"
 #include "..\DataColle\data_pool.h"
 #include "../AlgColle/dental_base_alg.h"
 #include "../AlgColle/geo_alg.h"
+#include "..\..\Src\AlgColle\curve_base_alg.h"
 
 
 #include "ui_context.h"
 #include "qtextstream.h"
 #include "../AlgColle/geo_base_alg.h"
-#include "vcl_iostream.h"
 #include<boost\filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -32,20 +30,55 @@
 
 #include "c:\Users\admin\Desktop\workspace\Src\DataColle\cgal_igl_converter.h"
 
+#include <igl/grad.h>
+#include <igl/massmatrix.h>
+#include <igl/barycenter.h>
+#include <igl/per_vertex_normals.h>
 
+CSingleTeethProjectionAction* CSingleTeethProjectionAction::instance_ = nullptr;
+int CSingleTeethProjectionAction::id_1_num_ = 3;
+int CSingleTeethProjectionAction::id_2_num_ = 2;
+int CSingleTeethProjectionAction::id_3_num_ = 1;
+int CSingleTeethProjectionAction::id_4_num_ = 4;
+int CSingleTeethProjectionAction::id_5_num_ = 1;
+int CSingleTeethProjectionAction::id_6_num_ = 2;
+int CSingleTeethProjectionAction::id_7_num_ = 3;
 
 void CSingleTeethProjectionAction::Init()
 {
+}
 
+CSingleTeethProjectionAction* CSingleTeethProjectionAction::GetInstance() {
+	if (nullptr == instance_) {
+		instance_ = new CSingleTeethProjectionAction();
+	}
+	return instance_;
+}
+
+void CSingleTeethProjectionAction::DeleteInstance() {
+	if (nullptr != instance_) {
+		delete instance_;
+		instance_ = nullptr;
+	}
 }
 
 CSingleTeethProjectionAction::CSingleTeethProjectionAction()
 {
 	type_ = CSingleTeethProjection;
-
+}
+void CSingleTeethProjectionAction::templateIdNum(int id_1_, int id_2_, int id_3_, int id_4_, int id_5_, int id_6_, int id_7_)
+{
+	id_1_num_ = id_1_;
+	id_2_num_ = id_2_;
+	id_3_num_ = id_3_;
+	id_4_num_ = id_4_;
+	id_5_num_ = id_5_;
+	id_6_num_ = id_6_;
+	id_7_num_ = id_7_;
 }
 void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 {
+	//ui.setupUi(this);
 	switch (e->key())
 	{
 	case Qt::Key_2:
@@ -85,6 +118,7 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 				}
 			}
 			/*segment the teeth into individual and calculate the center of each tooth and the tooth tag*/
+			std::cerr << "1" << std::endl;
 			segTeethToIndividual(mesh, tag_mesh);
 			for (auto iter = sep_meshes.begin(); iter != sep_meshes.end(); iter++)
 			{
@@ -99,63 +133,47 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 				teethCenter.push_back(center_temp / count);
 				tagTeeth.push_back(iter->first);
 			}
-
-			/*for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
+			std::cerr << "11" << std::endl;
+			CCurveBaseAlg * a;
+			std::vector<OpenMesh::Vec2d> curve_teeth_center_;
+			OpenMesh::Vec2d teeth_center_2d;
+			for (auto i = 0; i < teethCenter.size(); i++)
 			{
-				bool flag = FALSE;
-				OpenMesh::Vec3d color = CVisualUtils::GetRandColorByTag(tags[viter->idx()]);
-				if (tags[viter->idx()] == -1 || tags[viter->idx()] != 15689)
-					mesh.set_color(viter, OpenMesh::Vec3d(0.2, 0.2, 0.2));
-				else
+				teeth_center_2d[0] = teethCenter[i][0];
+				teeth_center_2d[1] = teethCenter[i][1];
+				curve_teeth_center_.push_back(teeth_center_2d);
+			}
+			std::vector<double> ceoffs;
+			a->PolynomialFitting(curve_teeth_center_, 3, ceoffs);
+			ceoffs[0] = ceoffs[0] + 7;
+			teeth_projection_ = teethProjection::GetInstance();
+			teeth_projection_->setTeethMesh(sep_meshes);
+			teeth_projection_->setCurveCeoffs(ceoffs);
+			std::cerr << "111111" << std::endl;
+			this->teeth_projection_->test();
+              		
+			std::cerr << "2" << std::endl;
+			//test
+			std::vector<OpenMesh::Vec3d> t;
+			std::vector<OpenMesh::Vec2d> tt;
+			OpenMesh::Vec3d t1;
+			OpenMesh::Vec2d t0;
+			for (auto i = this->projection_teeth_image_.begin(); i != this->projection_teeth_image_.end(); i++)
+			{
+				tt = i->second;
+				for (auto j = 0; j != tt.size(); j++)
 				{
-					teethPoints.push_back(mesh.point(viter));
-					mesh.set_color(viter, color);
+					t1[0] = tt[j][0];
+					t1[1] = tt[j][1];
+					t1[2] = 0;
+					t.push_back(t1);
 				}
-				if (tagTeeth_num.size() == 0 && tags[viter->idx()] != -1) tagTeeth_num.push_back(tags[viter->idx()]);
-				for (auto i = 0; i < tagTeeth_num.size(); i++)
-				{
-					if (tags[viter->idx()] == tagTeeth_num[i])
-					{
-						flag = TRUE;
-					}
-				}
-				if (flag == FALSE && tags[viter->idx()] != -1) tagTeeth_num.push_back(tags[viter->idx()]);
 
 			}
-			/*calculate the center of each tooth and set it to .txt to simulate the polyfitting curve*/
-			//int countOneTooth;
-			/*FILE *fp;
-			if ((fp = fopen("C:/main2.txt", "w+")) != NULL)  //判断文件是否已经被打开*/
-			/*for (auto i = 0; i < tagTeeth_num.size(); i++)
-			{
-				OpenMesh::Vec3d center_temp;
-				countOneTooth = 0;
-				for (auto viter = mesh.vertices_begin(); viter != mesh.vertices_end(); viter++)
-				{
-					if (tagTeeth_num[i] == tags[viter->idx()])
-					{
-						center_temp = center_temp + mesh.point(viter);
-						countOneTooth++;
-					}
-				}
-				center_temp = center_temp / countOneTooth;
-				if (countOneTooth > 50)
-				{
-					teethCenter.push_back(center_temp);
-					tagTeeth.push_back(tagTeeth_num[i]);
-				}
-				/*fprintf(fp, "%f", teethCenter[i][0]);
-				fprintf(fp, " ");
-				fprintf(fp, "%f", teethCenter[i][1]);
-				fprintf(fp, " ");
-				fprintf(fp, "%f", teethCenter[i][2]);
-				fprintf(fp, "\n");*/
-				//	}
-					//fclose(fp);
 
 
 
-
+			std::cerr << "3" << std::endl;
 			std::map<int, COpenMeshT*>sep_meshes;
 			std::map<int, std::map<COpenMeshT::VertexHandle, COpenMeshT::VertexHandle>> vid_org_map_;
 			CGeoAlg::SeparateMeshByVertexTag(mesh, gingiva_seg_mark_, sep_meshes, vid_org_map_);
@@ -182,7 +200,7 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 
 			}
 
-
+			std::cerr << "4" << std::endl;
 			/*show the teeth curve on the screen*/
 			std::vector<OpenMesh::Vec3d> poly_teeth_cruve;
 			QFile fp("C:/polyfit.txt");
@@ -209,60 +227,31 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 
 			}
 
-			/*QFile fpp("C:/teethcenter.txt");
-			if (fpp.open(fpp.ReadOnly))
-			{
-				int count = 0;
-				int count1 = 0;
-				OpenMesh::Vec3d point;
-				while (!fpp.atEnd())
-				{
-					if (count % 3 == 0)
-					{
-						QString lineString = QString(fpp.readLine()).trimmed();
-						point[0] = lineString.toDouble();
-					}
-					if (count % 3 == 1)
-					{
-						QString lineString = QString(fpp.readLine()).trimmed();
-						point[1] = lineString.toDouble();
-					}
-					if (count % 3 == 2)
-					{
-						QString lineString = QString(fpp.readLine()).trimmed();
-						point[2] = lineString.toDouble();
-						teethCenter[count1] = point;
-						count1++;
-					}
-					count++;
-				}
-
-			}*/
 
 
 			std::vector<int>::iterator it;
-
+			std::cerr << "5" << std::endl;
 			/*project the teeth of the teethcurve*/
 			bubblesort(tagTeeth.size());
 			int teeth_select_id;
 			for (teeth_select_id = 0; teeth_select_id < tagTeeth.size(); teeth_select_id++)
 			{
 				calProjectDir(teeth_select_id, teethCenter, poly_teeth_cruve);
-				calProjectPlane(teeth_select_id, teethCenter, tagTeeth, mesh, tags);
-				CGeoAlg::AlphaShape2d(projection_Plane_front, 0.5, vids);
-				calToothEdge(judge_volume_edge_front, projection_Plane_front, teeth_select_id, vids);
+				//calProjectPlane(teeth_select_id, teethCenter, tagTeeth, mesh, tags);
+				//CGeoAlg::AlphaShape2d(projection_Plane_front, 0.5, vids);
+				//calToothEdge(judge_volume_edge_front, projection_Plane_front, teeth_select_id, vids);
 				//vids.clear();
 				//CGeoAlg::AlphaShape2d(projection_Plane_back, 0.5, vids);
 				//calToothEdge(judge_volume_edge_back, projection_Plane_back, teeth_select_id, vids);
 				//vids.clear();
-				judge_volume_edge_front.clear();
-				judge_volume_edge_back.clear();
-				projection_Plane_front.clear();
-				projection_Plane_back.clear();
-				edge_Point.clear();
+				//judge_volume_edge_front.clear();
+				//judge_volume_edge_back.clear();
+				//projection_Plane_front.clear();
+				//projection_Plane_back.clear();
+				//edge_Point.clear();
 			}
 
-
+			std::cerr << "6" << std::endl;
 			/*std::vector<OpenMesh::Vec3d> temp;
 			temp.push_back(teethCenter[0]);*/
 			CCurveObject *center = new CCurveObject();
@@ -270,7 +259,7 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 			color[0] = 200.0;
 			color[1] = 200.0;
 			color[2] = 0;
-			center->SetCurve(poly_teeth_cruve);
+			center->SetCurve(t);
 			center->RendereType() = CCurveObject::CurveType::Dots;
 			center->SetColor(color);
 			//co->SetChanged();
@@ -278,20 +267,12 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 
 
 
-			//segmented_jaws_.push_back(meshobj);
-			p_seg_tooth_mesh->SetChanged();
+			/*p_seg_tooth_mesh->SetChanged();
 			int id = DataPool::AddMeshObject(p_seg_tooth_mesh);
 			p_seg_tooth_mesh->RestoreCurrentVPos();
 			CUIContext::SetSelectedMeshObjectId(id);
-			//CDentalBaseAlg::PCABasedOrientationCorrection(meshobj->GetMesh());
-			//CGeoBaseAlg::NormalizeMeshSize(mesh);
 			p_seg_tooth_mesh->UseTexture() = false;
-			p_seg_tooth_mesh->SetAttrChanged();
-
-
-			//dental_mesh_id_ = CUIContext::GetSelectedMeshObjectId();
-
-			//seg_tooth_mesh_id_ = -1;
+			p_seg_tooth_mesh->SetAttrChanged();*/
 		}
 		break;
 	}
@@ -309,6 +290,20 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 
 	case Qt::Key_4: {
 		int num_teeth;
+		this->edge_crown_root_top_point = this->teeth_projection_->getTest();
+		//test
+		/*for (auto i = this->edge_crown_root_top_point.begin(); i != this->edge_crown_root_top_point.end(); i++)
+		{
+			OpenMesh::Vec3d t = teethCenter[i->first] - i->second;
+			OpenMesh::Vec3d t1;
+			double t2 = OpenMesh::dot(t, project_dir[i->first]);
+			t1 = i->second + t2*project_dir[i->first];
+			i->second = t1;
+		}*/
+		//test
+
+
+
 		QString path = QFileDialog::getOpenFileName(NULL, "load dental mesh", ".", "Files(*.dmat *.obj *.stl *.off )");
 		if (path.length() == 0)
 		{
@@ -316,21 +311,23 @@ void CSingleTeethProjectionAction::KeyPressEvent(QKeyEvent *e)
 			break;
 		}
 		std::cerr << "path " << path.toStdString() << std::endl;
-		LoadRawData(path.toStdString());
-
-		for (int i = 13; i < 16; i++)
+		for (auto i = 1; i < 5; i++)
 		{
-			if (i != 3 && i != 8 && i != 9)
+			if (i == 1) path[path.length() - 5] = '1';
+			if (i == 2) path[path.length() - 5] = '2';
+			if (i == 3) path[path.length() - 5] = '3';
+			if (i == 4) path[path.length() - 5] = '4';
+			std::cerr << path.toStdString() << std::endl;
+			LoadRawData(path.toStdString(), i);
+		}
+
+		for (int i = 0; i < 16; i++)
+		{
+			//if (i != 3 && i != 8 && i != 9)
 			{
 				crownRegistration(i);
 			}
 		}
-		//int id = 11;
-		//crownRegistration(id);
-		//LoadRawData(path.toStdString());
-		//CDataIO data_io;
-		//QString ss = "C:/4.stl";
-		//data_io.WriteMesh(ss.toStdString(), *(mesh_template));
 		break;
 	}
 	}
@@ -350,7 +347,6 @@ void CSingleTeethProjectionAction::segTeethToIndividual(COpenMeshT &mesh, std::v
 	}
 	vid_org_map_.clear();
 }
-
 void CSingleTeethProjectionAction::calProjectDir(int teeth_select_id, std::vector<OpenMesh::Vec3d> teethCenter, std::vector<OpenMesh::Vec3d> poly_teeth_cruve)
 {
 	for (auto i = 0; i < poly_teeth_cruve.size(); i++)
@@ -513,7 +509,7 @@ void CSingleTeethProjectionAction::getCrownRootPoint(int ii)
 		}
 	}
 
-	CCurveObject *co = new CCurveObject();
+/*	CCurveObject *co = new CCurveObject();
 	OpenMesh::Vec3d color;
 	color[0] = 255.0;
 	color[1] = 0.0;
@@ -522,7 +518,7 @@ void CSingleTeethProjectionAction::getCrownRootPoint(int ii)
 	co->RendereType() = CCurveObject::CurveType::Dots;
 	co->SetColor(color);
 	//co->SetChanged();
-	DataPool::AddCurveObject(co);
+	DataPool::AddCurveObject(co);*/
 }
 void CSingleTeethProjectionAction::bubblesort(int count)
 {
@@ -544,11 +540,10 @@ void CSingleTeethProjectionAction::bubblesort(int count)
 		}
 	}
 }
-bool CSingleTeethProjectionAction::LoadRawData(std::string dir_name)
+bool CSingleTeethProjectionAction::LoadRawData(std::string dir_name, int id_kind)
 {
 	std::pair<Eigen::MatrixXd, Eigen::MatrixXi>mean_shapes;
 
-	//
 	boost::filesystem::path path(dir_name);
 	if (!boost::filesystem::exists(path))
 	{
@@ -559,11 +554,66 @@ bool CSingleTeethProjectionAction::LoadRawData(std::string dir_name)
 	std::cerr << "load down" << std::endl;
 
 	int num_template = 16;
-	for (auto i = 0; i < num_template; i++)
+	if (id_kind == 1)
 	{
-		mesh_template = new CMeshObject();
-		template_map[i] = mesh_template;
-		CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		for (auto i = 0; i < id_1_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+		int temp_value = id_1_num_ + id_2_num_ + id_3_num_ + id_4_num_ + id_5_num_ + id_6_num_;
+		for (auto i = temp_value; i < temp_value + id_7_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+	}
+
+	if (id_kind == 2)
+	{
+		for (auto i = id_1_num_; i < id_1_num_ + id_2_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+		int temp_value = id_1_num_ + id_2_num_ + id_3_num_ + id_4_num_ + id_5_num_;
+		for (auto i = temp_value; i < temp_value + id_6_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+	}
+
+	if (id_kind == 3)
+	{
+		for (auto i = id_1_num_ + id_2_num_; i < id_1_num_ + id_2_num_ + id_3_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+		int temp_value = id_1_num_ + id_2_num_ + id_3_num_ + id_4_num_;
+		for (auto i = temp_value; i < temp_value + id_5_num_; i++)
+		{
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
+	}
+
+	if (id_kind == 4)
+	{
+		for (auto i = id_1_num_ + id_2_num_ + id_3_num_; i < id_1_num_ + id_2_num_ + id_3_num_ + id_4_num_; i++)
+		{
+			std::cerr << i << std::endl;
+			mesh_template = new CMeshObject();
+			template_map[i] = mesh_template;
+			CConverter::ConvertFromIGLToOpenMesh(mean_shapes.first, mean_shapes.second, template_map[i]->GetMesh());
+		}
 	}
 
 
@@ -572,6 +622,7 @@ bool CSingleTeethProjectionAction::LoadRawData(std::string dir_name)
 }
 void CSingleTeethProjectionAction::crownRegistration(int id)
 {
+	std::cerr << id << std::endl;
 	mesh_template = template_map[id];
 	/*separate template crown from tooth*/
 	std::map<int, COpenMeshT*>temp_crown_root_mesh;
@@ -602,15 +653,25 @@ void CSingleTeethProjectionAction::crownRegistration(int id)
 		}
 		crown_temp_arap_->SetDeformMap(deform_map);
 		crown_temp_arap_->Deform();
+		for (auto viter = mesh_template->GetMesh().vertices_begin(); viter != mesh_template->GetMesh().vertices_end(); viter++)
+		{
+			mesh_template->GetMesh().point(viter) = mesh_template->GetMesh().point(viter) + OpenMesh::Vec3d(0, 0, 1);
+		}
+		TempToMeshDisplacement(mesh_template->GetMesh(), mesh_crown->GetMesh(), id);
+
 
 		int teeth_id = id;
 		topPointHarmonic(temp_mesh_crown->GetMesh(), temp_crown_root_map, id);
-		//handlePointBoundary(mesh_template->GetMesh(), teeth_id);
+		meshSmooth(mesh_template->GetMesh());
+		handlePointBoundary(mesh_template->GetMesh(), teeth_id);
 		//boundPointHarmonic(mesh_template->GetMesh());
 	}
 
-
-	mesh_template->SetMeshColor(OpenMesh::Vec3d(0.8, 0.0, 0.0));
+	double i, j, k;
+	i = rand() / double(RAND_MAX);
+	j = rand() / double(RAND_MAX);
+	k = rand() / double(RAND_MAX);
+	mesh_template->SetMeshColor(OpenMesh::Vec3d(i, j, k));
 	DataPool::AddMeshObject(mesh_template);
 	mesh_template->SetAttrChanged();
 
@@ -727,7 +788,7 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 			topPoint = i;
 		}
 	}
-
+	/*
 	double scale;
 	Eigen::RowVector3d top_displacement;
 	scale = (project_dir[id][0] * (mesh_test.point(topPoint)[0] - edge_crown_root_top_point[id][0]) +
@@ -737,9 +798,9 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 	top_displacement[0] = scale*project_dir[id][0] + edge_crown_root_top_point[id][0] - mesh_test.point(topPoint)[0];
 	top_displacement[1] = scale*project_dir[id][1] + edge_crown_root_top_point[id][1] - mesh_test.point(topPoint)[1];
 	top_displacement[2] = scale*project_dir[id][2] + edge_crown_root_top_point[id][2] - mesh_test.point(topPoint)[2];
+	*/
 
-
-
+	Eigen::RowVector3d top_displacement;
 	CConverter::ConvertFromOpenMeshToIGL(mesh_test, mean_shapes.first, mean_shapes.second);
 	V = mean_shapes.first;
 	F = mean_shapes.second;
@@ -749,11 +810,10 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 	{
 		S(i) = -1;
 	}
-	for (auto i = template_mesh_crown.vertices_begin(); i != template_mesh_crown.vertices_end(); i++)
-	{
-		S(temp_crown_root_map[1][i].idx()) = 1;
+
+	for (auto iter = this->template_crown_displacement_.begin(); iter != this->template_crown_displacement_.end(); iter++){
+		S(iter->first) = 1;
 	}
-	S(topPoint->idx()) = 1;
 
 
 	igl::colon<int>(0, V.rows() - 1, b);
@@ -763,7 +823,7 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 	// Boundary conditions directly on deformed positions
 	U_bc.resize(b.size(), V.cols());
 	V_bc.resize(b.size(), V.cols());
-	for (int bi = 0; bi<b.size(); bi++)
+	for (int bi = 0; bi < b.size(); bi++)
 	{
 		V_bc.row(bi) = V.row(b(bi));
 		switch (S(b(bi)))
@@ -774,8 +834,11 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 			break;
 		case 1:
 			// move handle 1 down
-			if (topPoint->idx() == b(bi)) U_bc.row(bi) = V.row(b(bi)) + top_displacement;
-			else U_bc.row(bi) = V.row(b(bi));
+			top_displacement[0] = this->template_crown_displacement_[b(bi)][0];
+			top_displacement[1] = this->template_crown_displacement_[b(bi)][1];
+			top_displacement[2] = this->template_crown_displacement_[b(bi)][2];
+			U_bc.row(bi) = V.row(b(bi)) + top_displacement;
+
 			break;
 		case 2:
 		default:
@@ -787,7 +850,7 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 	Eigen::MatrixXd C(F.rows(), 3);
 	Eigen::RowVector3d purple(80.0 / 255.0, 64.0 / 255.0, 255.0 / 255.0);
 	Eigen::RowVector3d gold(255.0 / 255.0, 228.0 / 255.0, 58.0 / 255.0);
-	for (int f = 0; f<F.rows(); f++)
+	for (int f = 0; f < F.rows(); f++)
 	{
 		if (S(F(f, 0)) >= 0 && S(F(f, 1)) >= 0 && S(F(f, 2)) >= 0)
 		{
@@ -804,4 +867,211 @@ void CSingleTeethProjectionAction::topPointHarmonic(COpenMeshT &template_mesh_cr
 	igl::harmonic(V, F, b, D_bc, 2, D);
 	U = V + D;
 	CConverter::ConvertFromIGLToOpenMesh(U, F, mesh_test);
+}
+bool CSingleTeethProjectionAction::TempToMeshDisplacement(COpenMeshT &template_mesh, COpenMeshT& tooth_mesh, int id)
+{
+	if (this->template_crown_displacement_.size() != NULL)  this->template_crown_displacement_.clear();
+	OpenMesh::Vec3d template_crown_vector_;
+	OpenMesh::Vec3d template_minilen_;
+	OpenMesh::Vec3d temp_one, temp_two;
+	double template_crown_len_;
+	double template_crown_;
+	tooth_mesh.request_vertex_normals();
+	tooth_mesh.update_normals();
+	template_mesh.request_vertex_normals();
+	template_mesh.update_normals();
+	for (auto viter_crown = tooth_mesh.vertices_begin(); viter_crown != tooth_mesh.vertices_end(); viter_crown++){
+		int viter_crown_id;
+		template_crown_len_ = 1e10;
+		for (auto viter_template = template_mesh.vertices_begin(); viter_template != template_mesh.vertices_end(); viter_template++){
+			template_crown_vector_ = tooth_mesh.point(viter_crown) - template_mesh.point(viter_template);
+			temp_one[0] = template_mesh.normal(viter_template.handle()).data()[0];
+			temp_one[1] = template_mesh.normal(viter_template.handle()).data()[1];
+			temp_one[2] = template_mesh.normal(viter_template.handle()).data()[2];
+	        
+			temp_two[0] = tooth_mesh.normal(viter_crown.handle()).data()[0];
+			temp_two[1] = tooth_mesh.normal(viter_crown.handle()).data()[1];
+			temp_two[2] = tooth_mesh.normal(viter_crown.handle()).data()[2];
+			
+			template_crown_ = template_crown_vector_.length();
+			if (template_crown_len_ > template_crown_){
+				viter_crown_id = viter_template->idx();
+				template_minilen_ = template_crown_vector_;
+				template_crown_len_ = template_crown_;
+			}
+		}
+		template_crown_displacement_[viter_crown_id] = template_minilen_;
+	}
+
+	return true;
+}
+bool CSingleTeethProjectionAction::meshSmooth(COpenMeshT &template_mesh)
+{
+	std::pair<Eigen::MatrixXd, Eigen::MatrixXi>mean_shapes;
+	COpenMeshT &mesh_test = mesh_template->GetMesh();
+	Eigen::MatrixXd V, U;
+	Eigen::MatrixXi F;
+	Eigen::SparseMatrix<double> L;
+	CConverter::ConvertFromOpenMeshToIGL(mesh_test, mean_shapes.first, mean_shapes.second);
+	V = mean_shapes.first;
+	F = mean_shapes.second;
+	igl::cotmatrix(V, F, L);
+	// Alternative construction of same Laplacian
+	Eigen::SparseMatrix<double> G, K;
+	// Gradient/Divergence
+	igl::grad(V, F, G);
+	// Diagonal per-triangle "mass matrix"
+	Eigen::VectorXd dblA;
+	igl::doublearea(V, F, dblA);
+	// Place areas along diagonal #dim times
+	const auto & T = 1.*(dblA.replicate(3, 1)*0.5).asDiagonal();
+	// Laplacian K built as discrete divergence of gradient or equivalently
+	// discrete Dirichelet energy Hessian
+	K = -G.transpose() * T * G;
+	std::cerr << "|K-L|: " << (K - L).norm() << std::endl;
+	// Use original normals as pseudo-colors
+	Eigen::MatrixXd N;
+	igl::per_vertex_normals(V, F, N);
+	Eigen::MatrixXd C = N.rowwise().normalized().array()*0.5 + 0.5;
+	// Initialize smoothing with base mesh
+	U = V;
+
+	for (int i = 0; i < 60; i++)
+	{
+		// switch case for interation
+		// Recompute just mass matrix on each step
+		Eigen::SparseMatrix<double> M;
+		igl::massmatrix(U, F, igl::MASSMATRIX_TYPE_BARYCENTRIC, M);
+		// Solve (M-delta*L) U = M*U
+		const auto & S = (M - 0.001*L);
+		Eigen::SimplicialLLT<Eigen::SparseMatrix<double > > solver(S);
+		assert(solver.info() == Eigen::Success);
+		U = solver.solve(M*U).eval();
+		//CConverter::ConvertFromIGLToOpenMesh(U, F, mesh_test);
+		// Compute centroid and subtract (also important for numerics)
+		/*Eigen::VectorXd dblAA;
+		igl::doublearea(U, F, dblAA);
+		double area = 0.5*dblAA.sum();
+		Eigen::MatrixXd BC;
+		igl::barycenter(U, F, BC);
+		Eigen::RowVector3d centroid(0, 0, 0);
+		for (int i = 0; i<BC.rows(); i++)
+		{
+			centroid += 0.5*dblAA(i) / area*BC.row(i);
+		}
+		U.rowwise() -= centroid;
+		// Normalize to unit surface area (important for numerics)
+		U.array() /= sqrt(area);
+		//U.array() = U.array()*sqrt(area);
+		//U.rowwise() += centroid;*/
+	}
+	
+	CConverter::ConvertFromIGLToOpenMesh(U, F, mesh_test);
+
+	return true;
+}
+bool CSingleTeethProjectionAction::handlePointBoundary(COpenMeshT &template_mesh, int teeth_id)
+{
+	std::pair<Eigen::MatrixXd, Eigen::MatrixXi>mean_shapes;
+	Eigen::MatrixXd V, U, V_bc, U_bc;
+	Eigen::VectorXd Z;
+	Eigen::MatrixXi F;
+	Eigen::VectorXi b;
+	COpenMeshT &mesh_test = mesh_template->GetMesh();
+	double maxZ = -0.1;
+	auto topPoint = mesh_test.vertices_begin();
+	for (auto i = mesh_test.vertices_begin(); i != mesh_test.vertices_end(); i++)
+	{
+		if (maxZ < mesh_test.point(i)[2])
+		{
+			maxZ = mesh_test.point(i)[2];
+			topPoint = i;
+		}
+	}
+
+	for (auto i = this->edge_crown_root_top_point.begin(); i != this->edge_crown_root_top_point.end(); i++)
+	{
+		OpenMesh::Vec3d t = mesh_test.point(topPoint) - i->second;
+		OpenMesh::Vec3d t1;
+		double t2 = OpenMesh::dot(t, project_dir[i->first]);
+		t1 = i->second + t2*project_dir[i->first];
+		i->second = t1;
+	}
+
+
+	CConverter::ConvertFromOpenMeshToIGL(mesh_test, mean_shapes.first, mean_shapes.second);
+	V = mean_shapes.first;
+	F = mean_shapes.second;
+	U = V;
+	Eigen::VectorXi S(V.rows());
+	for (auto i = 0; i < V.rows(); i++)
+	{
+		S(i) = -1;
+	}
+	for (auto iter = this->template_crown_displacement_.begin(); iter != this->template_crown_displacement_.end(); iter++) {
+		S(iter->first) = 1;
+	}
+	S(topPoint->idx()) = 1;
+
+	Eigen::RowVector3d top_displacement;
+	top_displacement[0] = this->edge_crown_root_top_point[teeth_id][0] - mesh_test.point(topPoint)[0];
+	top_displacement[1] = this->edge_crown_root_top_point[teeth_id][1] - mesh_test.point(topPoint)[1];
+	top_displacement[2] = this->edge_crown_root_top_point[teeth_id][2] - mesh_test.point(topPoint)[2];
+
+	igl::colon<int>(0, V.rows() - 1, b);
+	b.conservativeResize(std::stable_partition(b.data(), b.data() + b.size(),
+		[&S](int i)->bool {return S(i) >= 0; }) - b.data());
+
+	// Boundary conditions directly on deformed positions
+	U_bc.resize(b.size(), V.cols());
+	V_bc.resize(b.size(), V.cols());
+	for (int bi = 0; bi < b.size(); bi++)
+	{
+		V_bc.row(bi) = V.row(b(bi));
+		switch (S(b(bi)))
+		{
+		case 0:
+			// Don't move handle 0
+			U_bc.row(bi) = V.row(b(bi));
+			break;
+		case 1:
+			// move handle 1 down
+			if (b(bi) == topPoint->idx())
+			{
+				U_bc.row(bi) = V.row(b(bi)) + top_displacement;
+			}
+			else
+			{
+				U_bc.row(bi) = V.row(b(bi));
+			}
+
+			break;
+		case 2:
+		default:
+			// move other handles forward
+			U_bc.row(bi) = V.row(b(bi)) + Eigen::RowVector3d(0, 0, -25);
+			break;
+		}
+	}
+	Eigen::MatrixXd C(F.rows(), 3);
+	Eigen::RowVector3d purple(80.0 / 255.0, 64.0 / 255.0, 255.0 / 255.0);
+	Eigen::RowVector3d gold(255.0 / 255.0, 228.0 / 255.0, 58.0 / 255.0);
+	for (int f = 0; f < F.rows(); f++)
+	{
+		if (S(F(f, 0)) >= 0 && S(F(f, 1)) >= 0 && S(F(f, 2)) >= 0)
+		{
+			C.row(f) = purple;
+		}
+		else
+		{
+			C.row(f) = gold;
+		}
+	}
+	const Eigen::MatrixXd U_bc_anim = V_bc + (U_bc - V_bc);
+	Eigen::MatrixXd D;
+	Eigen::MatrixXd D_bc = U_bc_anim - V_bc;
+	igl::harmonic(V, F, b, D_bc, 2, D);
+	U = V + D;
+	CConverter::ConvertFromIGLToOpenMesh(U, F, mesh_test);
+	return true;
 }

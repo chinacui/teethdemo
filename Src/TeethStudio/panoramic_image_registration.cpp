@@ -10,7 +10,7 @@
 #include "QRgb"
 #include <Eigen\Dense>
 #include "panoramic_image_registration.h"
-#include "ndt_registration.h"
+#include "..\..\Src\TeethRootRecoAlg\ndt_registration.h"
 #include "vcl_iostream.h"
 #include "qtextstream.h"
 #include<opencv2\opencv.hpp>
@@ -21,7 +21,6 @@ PanoramicImageRegistration::PanoramicImageRegistration(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-
 	this->SetComponents();
 	this->SetConnections();
 }
@@ -182,7 +181,7 @@ void PanoramicImageRegistration::OnLoadLabeledImage(void) {
 	boundary_points_center_temp[0] = boundary_points_center_temp[0] / boundary_points_temp.size();
 	boundary_points_center_temp[1] = boundary_points_center_temp[1] / boundary_points_temp.size();
 
-	cv::Mat binary_root_crown = cv::Mat(image_height, image_width, CV_8UC1);
+	/*cv::Mat binary_root_crown = cv::Mat(image_height, image_width, CV_8UC1);
 	unsigned char background_color = 0;
 	unsigned char foreground_color = 255;
 	binary_root_crown.setTo(background_color);
@@ -230,9 +229,9 @@ void PanoramicImageRegistration::OnLoadLabeledImage(void) {
 				std::cerr << count++ << std::endl;
 			}
 		}
-	}
+	}*/
 
-	QFile fpproject_edge("C:/project_edge/Projection_edge11.txt");
+	QFile fpproject_edge("C:/Projection_edgeTest.txt");//("C:/project_edge/Projection_edge11.txt");
 	if (fpproject_edge.open(fpproject_edge.ReadOnly))
 	{
 		int count = 0;
@@ -274,8 +273,8 @@ void PanoramicImageRegistration::OnLoadLabeledImage(void) {
 	}
 	for (auto i = 0; i < boundary_points.size(); i++)
 	{
-		boundary_points[i][0] = (boundary_points_center_temp[0] - boundary_points_center[0]) + (maxW - minW) / (maxW_P - minW_P) * (boundary_points[i][0] - boundary_points_center[0]) + boundary_points_center[0];
-		boundary_points[i][1] = (boundary_points_center_temp[1] - boundary_points_center[1]) + (maxW - minW) / (maxW_P - minW_P) * (boundary_points[i][1] - boundary_points_center[1]) + boundary_points_center[1];
+		//boundary_points[i][0] = (boundary_points_center_temp[0] - boundary_points_center[0]) + (maxW - minW) / (maxW_P - minW_P) * (boundary_points[i][0] - boundary_points_center[0]) + boundary_points_center[0];
+		//boundary_points[i][1] = (boundary_points_center_temp[1] - boundary_points_center[1]) + (maxW - minW) / (maxW_P - minW_P) * (boundary_points[i][1] - boundary_points_center[1]) + boundary_points_center[1];
 	}
 	this->ndt_registration_->SetBoundaryCenterPoints(boundary_points_center_temp);
 	this->ndt_registration_->SetBoundaryPoints(boundary_points);
@@ -391,21 +390,13 @@ void PanoramicImageRegistration::ShowBoundaryPointsInImage() {
 				image.setPixel(w, h, QColor(int(gradient[w * image_height + h]), int(gradient[w * image_height + h]), int(gradient[w * image_height + h])).rgb());
 			}
 		}*/
-	for (int i = 0; i < line_skeleton.size(); i++)
-	{
-		int idx = (int)line_skeleton[i][1];
-		int idy = (int)line_skeleton[i][0];
-		if (idx >= 0 && idx < image_width && idy >= 0 && idy < image_height) {
-			image.setPixel(idx, idy, QColor(255, 0, 0).rgb());
-		}
-	}
-		/*for (int p = 0; p < boundary_points_count; ++p) {
+		for (int p = 0; p < boundary_points_count; ++p) {
 			int idx = (int)boundary_points[p](0);
 			int idy = (int)boundary_points[p](1);
 			if (idx >= 0 && idx < image_width && idy >= 0 && idy < image_height) {
 				image.setPixel(idx, idy, QColor(255, 0, 0).rgb());
 			}
-		}*/
+		}
 		this->label_image_panel1_->setPixmap(QPixmap::fromImage(image));
 	//}
 }
